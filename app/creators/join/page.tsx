@@ -22,9 +22,13 @@ export default function CreatorJoin() {
   }, []);
 
   const handleXLogin = async () => {
+    // Wir nutzen wieder 'twitter', aber erzwingen OAuth 2.0 Scopes
     await supabase.auth.signInWithOAuth({
-      provider: 'twitter_oauth2', options: { redirectTo: window.location.origin + '/creators/join', skipBrowserRedirect: false },
-      options: { redirectTo: window.location.origin + '/creators/join' }
+      provider: 'twitter',
+      options: { 
+        redirectTo: window.location.origin + '/creators/join',
+        scopes: 'users.read tweet.read' 
+      }
     });
   };
 
@@ -49,10 +53,9 @@ export default function CreatorJoin() {
       <main className="flex flex-col items-center justify-center pt-40 pb-20 px-6">
         <div className="bg-white rounded-[4rem] p-12 max-w-lg w-full shadow-sm border border-black/[0.01]">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-[900] uppercase tracking-tighter mb-2">Identity Link</h1>
+            <h1 className="text-4xl font-[900] uppercase tracking-tighter mb-2 text-black">Identity Link</h1>
             <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">X-Verified Creator Access</p>
           </div>
-
           <div className="space-y-4">
             <div className={`p-8 rounded-[2.5rem] border transition-all ${connected ? 'bg-green-50/50 border-green-100' : 'bg-zinc-50 border-zinc-100'}`}>
               <div className="flex justify-between items-start mb-2">
@@ -64,10 +67,9 @@ export default function CreatorJoin() {
                    <WalletMultiButton className="!bg-black !rounded-2xl !text-[10px] !font-black !uppercase !w-full !justify-center !h-14" />
                 </div>
               ) : (
-                <h3 className="text-sm font-black uppercase tracking-tight truncate">{publicKey?.toString()}</h3>
+                <h3 className="text-sm font-black uppercase tracking-tight truncate text-black">{publicKey?.toString()}</h3>
               )}
             </div>
-
             <div className={`p-8 rounded-[2.5rem] border transition-all ${user ? 'bg-green-50/50 border-green-100' : 'bg-zinc-50 border-zinc-100'}`}>
               <p className="text-[10px] font-[900] uppercase tracking-widest mb-2 text-zinc-400">Step 2: X Identity</p>
               {!user ? (
@@ -75,16 +77,14 @@ export default function CreatorJoin() {
               ) : (
                 <div className="flex items-center gap-4 mt-2">
                   <img src={user.user_metadata.avatar_url} className="w-10 h-10 rounded-full" />
-                  <h3 className="text-sm font-black uppercase tracking-tight">@{user.user_metadata.user_name}</h3>
+                  <h3 className="text-sm font-black uppercase tracking-tight text-black">@{user.user_metadata.user_name}</h3>
                 </div>
               )}
             </div>
-
             <div className="p-8 rounded-[2.5rem] bg-zinc-50 border border-zinc-100">
               <p className="text-[10px] font-[900] uppercase tracking-widest mb-2 text-zinc-400">Display Name</p>
-              <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="YOUR NAME" className="w-full bg-transparent border-none p-0 text-xl font-black uppercase placeholder:text-zinc-200 focus:ring-0" />
+              <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="YOUR NAME" className="w-full bg-transparent border-none p-0 text-xl font-black uppercase placeholder:text-zinc-200 focus:ring-0 text-black" />
             </div>
-
             <button disabled={!connected || !user} onClick={handleComplete} className={`w-full py-7 rounded-[2.5rem] text-[11px] font-black uppercase tracking-[0.3em] transition-all mt-8 ${connected && user ? 'bg-black text-white shadow-xl shadow-black/10' : 'bg-zinc-100 text-zinc-300 cursor-not-allowed'}`}>
               {connected && user ? "Complete Mission" : "Connect Wallet & X"}
             </button>
