@@ -1,14 +1,13 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   typescript: {
-    // IGNORIERT TypeScript-Fehler beim Build
     ignoreBuildErrors: true,
   },
   eslint: {
-    // IGNORIERT ESLint-Fehler beim Build
     ignoreDuringBuilds: true,
   },
+  // Verhindert Fehler bei fehlenden Umgebungsvariablen während des Builds
+  output: 'standalone', 
 };
 
 export default nextConfig;
