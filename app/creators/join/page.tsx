@@ -23,7 +23,7 @@ export default function CreatorJoin() {
 
   const handleXLogin = async () => {
     await supabase.auth.signInWithOAuth({
-      provider: 'twitter',
+      provider: 'twitter_oauth2', options: { redirectTo: window.location.origin + '/creators/join', skipBrowserRedirect: false },
       options: { redirectTo: window.location.origin + '/creators/join' }
     });
   };
