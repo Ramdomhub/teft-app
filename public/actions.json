@@ -1,0 +1,8 @@
+{
+  "rules": [
+    {
+      "pathPattern": "/creators/**",
+      "apiPath": "/api/actions/tip/**"
+    }
+  ]
+}
