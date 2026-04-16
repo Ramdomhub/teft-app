@@ -1,13 +1,10 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  // Verhindert Fehler bei fehlenden Umgebungsvariablen während des Builds
-  output: 'standalone', 
+  // eslint wurde hier entfernt, da Next 15 es anders handhabt
 };
 
 export default nextConfig;
