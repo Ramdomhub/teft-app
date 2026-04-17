@@ -52,11 +52,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Footer Links - Mit korrigiertem Telegram Link */}
+        {/* Footer Links - Mit korrigiertem X Link */}
         <div className="mt-10 mb-4 text-center">
           <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-tight mb-4">Mobile ready · Phantom supported</p>
           <div className="flex justify-center items-center gap-4 text-[11px] font-bold">
-            <a href="https://x.com/teft" target="_blank" className="text-zinc-500 hover:text-black transition-none">X</a>
+            <a href="https://x.com/TEFTofficial" target="_blank" className="text-zinc-500 hover:text-black transition-none">X</a>
             <a href="https://www.teftlegion.io" className="text-zinc-500 hover:text-black">www.teftlegion.io</a>
             <a href="https://t.me/teftlegionofficial" target="_blank" className="text-zinc-500 hover:text-black transition-none">Telegram</a>
           </div>
