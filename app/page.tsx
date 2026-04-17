@@ -3,51 +3,55 @@ import React from "react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] font-sans antialiased flex flex-col items-center justify-center p-6 selection:bg-black selection:text-white">
+    <div className="min-h-screen bg-[#f2f2f2] text-black font-sans antialiased flex flex-col items-center justify-center p-4">
       
-      <div className="max-w-[440px] w-full space-y-12">
+      <div className="bg-white rounded-[2.5rem] max-w-[380px] w-full p-4 shadow-xl shadow-black/5 overflow-hidden">
         
-        {/* Main Visual Card */}
-        <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-black/[0.02]">
+        {/* Main Visual - Abgerundet wie im Foto */}
+        <div className="rounded-[2rem] overflow-hidden mb-6">
           <img 
             src="https://fuxshiauvjshvshvuvnd.supabase.co/storage/v1/object/public/images/TEFT-LEGION.png" 
             alt="TEFT LEGION"
-            className="w-full aspect-[4/5] object-cover"
+            className="w-full aspect-square object-cover"
           />
-          <div className="p-10 text-center">
-            <h1 className="text-2xl font-[1000] tracking-tighter uppercase">TEFT</h1>
-            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mt-1">Access the TEFT ecosystem</p>
+        </div>
+
+        {/* Header Text */}
+        <div className="px-4 mb-8">
+          <h1 className="text-2xl font-black tracking-tight uppercase">TEFT</h1>
+          <p className="text-sm font-medium text-zinc-400 mt-1">Access the TEFT ecosystem</p>
+        </div>
+
+        {/* Button Grid - Exakt wie im Foto */}
+        <div className="grid grid-cols-2 gap-3 px-2">
+          <a href="https://jup.ag/swap/SOL-TEFT" target="_blank" className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all">
+            Swap via Phantom
+          </a>
+          <a href="https://magiceden.io" target="_blank" className="bg-[#e9e9e9] text-black py-4 rounded-2xl text-center text-xs font-bold hover:bg-[#dfdfdf] transition-all">
+            Get NFTs
+          </a>
+          
+          {/* Staking gesperrt */}
+          <div className="bg-[#e9e9e9] text-black py-4 rounded-2xl text-center text-xs font-bold opacity-60 cursor-not-allowed">
+            NFT Staking
+          </div>
+          
+          {/* Creator Hub gesperrt */}
+          <div className="bg-[#e9e9e9] text-zinc-400 py-4 rounded-2xl text-center text-xs font-bold opacity-60 cursor-not-allowed">
+            Creator Hub
           </div>
         </div>
 
-        {/* Action Grid */}
-        <div className="grid grid-cols-2 gap-3">
-          <a href="https://jup.ag/swap/SOL-TEFT" target="_blank" className="bg-white p-6 rounded-[2rem] text-center border border-black/[0.03] shadow-sm hover:bg-zinc-50 transition-all active:scale-95">
-            <span className="text-[10px] font-black uppercase tracking-widest">Swap</span>
-          </a>
-          <a href="https://magiceden.io" target="_blank" className="bg-white p-6 rounded-[2rem] text-center border border-black/[0.03] shadow-sm hover:bg-zinc-50 transition-all active:scale-95">
-            <span className="text-[10px] font-black uppercase tracking-widest">NFTs</span>
-          </a>
-          
-          {/* STAKING GESPERRT */}
-          <div className="bg-white/50 p-6 rounded-[2rem] text-center border border-black/[0.02] opacity-40 cursor-not-allowed">
-            <span className="text-[10px] font-black uppercase tracking-widest">Staking</span>
-          </div>
-          
-          {/* CREATOR HUB GESPERRT */}
-          <div className="bg-zinc-100/50 p-6 rounded-[2rem] text-center border border-dashed border-zinc-300 opacity-60 cursor-not-allowed">
-            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Creator Hub</span>
+        {/* Footer Links */}
+        <div className="mt-10 mb-4 text-center">
+          <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-tight mb-4">Mobile ready · Phantom supported</p>
+          <div className="flex justify-center items-center gap-4 text-[11px] font-bold">
+            <a href="https://x.com/teft" target="_blank" className="text-zinc-500 hover:text-black">X</a>
+            <a href="https://www.teftlegion.io" className="text-zinc-500 hover:text-black italic">www.teftlegion.io</a>
+            <a href="https://t.me/teft" target="_blank" className="text-zinc-500 hover:text-black">Telegram</a>
           </div>
         </div>
 
-        {/* Footer Info */}
-        <div className="text-center space-y-6 pt-4">
-          <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.1em]">Mobile ready. Phantom supported.</p>
-          <div className="flex justify-center gap-8">
-            <a href="https://x.com/teft" target="_blank" className="text-[10px] font-black uppercase tracking-widest hover:opacity-50 transition-all">X</a>
-            <a href="https://t.me/teft" target="_blank" className="text-[10px] font-black uppercase tracking-widest hover:opacity-50 transition-all">Telegram</a>
-          </div>
-        </div>
       </div>
     </div>
   );
