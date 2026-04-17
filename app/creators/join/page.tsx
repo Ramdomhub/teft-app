@@ -24,7 +24,7 @@ export default function CreatorJoin() {
   const handleXLogin = async () => {
     // Wir nutzen wieder 'twitter', aber erzwingen OAuth 2.0 Scopes
     await supabase.auth.signInWithOAuth({
-      provider: 'twitter',
+      provider: 'x',
       options: { 
         redirectTo: window.location.origin + '/creators/join',
         scopes: 'users.read tweet.read' 
