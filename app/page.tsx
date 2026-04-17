@@ -1,51 +1,63 @@
 "use client";
-import Link from "next/link";
+import React from "react";
+import Navigation from "./components/Navigation";
 
-export default function Gateway() {
+export default function Home() {
   return (
-    <main className="min-h-screen bg-[#f5f5f5] flex items-center justify-center p-4 antialiased font-sans">
-      <div className="w-full max-w-[400px] bg-white rounded-[32px] p-[12px] shadow-[0_20px_50px_rgba(0,0,0,0.05)]">
-        
-        {/* Top Image */}
-        <div className="rounded-[24px] overflow-hidden aspect-square w-full bg-zinc-100">
-          <img src="/teft.png" alt="TEFT" className="w-full h-full object-cover" />
-        </div>
+    <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] font-sans antialiased selection:bg-black selection:text-white">
+      <Navigation />
+      
+      <main className="flex flex-col items-center justify-center pt-32 pb-20 px-6">
+        <div className="max-w-[440px] w-full space-y-12">
+          
+          {/* Main Visual / Card */}
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-black/5 to-black/10 rounded-[3.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+            <div className="relative bg-white rounded-[3rem] overflow-hidden shadow-sm border border-black/[0.02]">
+              <img 
+                src="https://fuxshiauvjshvshvuvnd.supabase.co/storage/v1/object/public/images//TEFT-LEGION.png" 
+                alt="TEFT LEGION"
+                className="w-full aspect-[4/5] object-cover"
+              />
+              <div className="p-10 text-center space-y-4">
+                <div className="space-y-1">
+                  <h1 className="text-2xl font-[1000] tracking-tighter uppercase italic">TEFT</h1>
+                  <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Access the TEFT ecosystem</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        {/* Content */}
-        <div className="px-5 pt-5 pb-6 flex flex-col text-center">
-          <h1 className="text-[22px] font-bold tracking-tight text-black m-0 p-0">TEFT</h1>
-          <p className="text-[14px] text-zinc-500 mt-1 mb-5">Access the TEFT ecosystem</p>
-
-          <div className="grid grid-cols-2 gap-2.5 mb-5">
-            <a href="https://phantom.com/tokens/solana/8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump" target="_blank" className="bg-black text-white py-3.5 rounded-[16px] text-[13px] font-bold flex items-center justify-center hover:scale-[1.02] transition-transform">
-              Swap
+          {/* Action Grid */}
+          <div className="grid grid-cols-2 gap-3">
+            <a href="https://jup.ag/swap/SOL-TEFT" target="_blank" className="bg-white p-6 rounded-[2rem] text-center border border-black/[0.03] hover:bg-zinc-50 transition-all group">
+              <span className="text-[10px] font-black uppercase tracking-widest group-hover:tracking-[0.2em] transition-all">Swap</span>
             </a>
-            
-            {/* GEÄNDERT: Link jetzt auf /nft */}
-            <Link href="/nft" className="bg-[#efefef] text-black py-3.5 rounded-[16px] text-[13px] font-bold flex items-center justify-center hover:bg-[#e5e5e5] transition-colors">
-              NFTs
-            </Link>
-
-            <a href="https://www.solsuite.io/teftsupreme" target="_blank" className="bg-[#efefef] text-black py-3.5 rounded-[16px] text-[13px] font-bold flex items-center justify-center hover:bg-[#e5e5e5] transition-colors">
-              Staking
+            <a href="https://magiceden.io" target="_blank" className="bg-white p-6 rounded-[2rem] text-center border border-black/[0.03] hover:bg-zinc-50 transition-all group">
+              <span className="text-[10px] font-black uppercase tracking-widest group-hover:tracking-[0.2em] transition-all">NFTs</span>
             </a>
-
-            {/* GEÄNDERT: Name jetzt Creator Hub und Link auf /hub */}
-            <Link href="/hub" className="bg-[#efefef] text-black py-3.5 rounded-[16px] text-[13px] font-bold flex items-center justify-center hover:bg-black hover:text-white transition-all">
-              Creator Hub
-            </Link>
+            <a href="#" className="bg-white p-6 rounded-[2rem] text-center border border-black/[0.03] opacity-50 cursor-not-allowed group">
+              <span className="text-[10px] font-black uppercase tracking-widest">Staking</span>
+            </a>
+            {/* DEAKTIVIERTER CREATOR HUB */}
+            <div className="bg-zinc-100/50 p-6 rounded-[2rem] text-center border border-dashed border-zinc-200 cursor-help group relative">
+              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Creator Hub</span>
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-[2rem]">
+                <span className="text-[8px] font-black uppercase tracking-tighter text-black">Under Construction</span>
+              </div>
+            </div>
           </div>
 
           {/* Footer Info */}
-          <div className="flex flex-col items-center gap-1.5">
-            <div className="text-[10px] text-zinc-400 font-medium">Mobile ready · Phantom supported</div>
-            <div className="flex justify-center gap-4 text-[11px] text-zinc-500 font-semibold mt-1">
-              <a href="https://x.com/TEFTofficial" target="_blank" className="hover:text-black transition-colors">X</a>
-              <a href="https://t.me/teftlegionofficial" target="_blank" className="hover:text-black transition-colors">Telegram</a>
+          <div className="text-center space-y-6">
+            <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.1em]">Mobile ready. Phantom supported.</p>
+            <div className="flex justify-center gap-8">
+              <a href="https://x.com/teft" target="_blank" className="text-[10px] font-black uppercase tracking-widest hover:text-blue-400 transition-colors">X</a>
+              <a href="https://t.me/teft" target="_blank" className="text-[10px] font-black uppercase tracking-widest hover:text-blue-500 transition-colors">Telegram</a>
             </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
