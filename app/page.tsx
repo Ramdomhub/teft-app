@@ -7,7 +7,7 @@ export default function Home() {
       
       <div className="bg-white rounded-[2.5rem] max-w-[380px] w-full p-4 shadow-xl shadow-black/5 overflow-hidden">
         
-        {/* Main Visual - Abgerundet wie im Foto */}
+        {/* Main Visual */}
         <div className="rounded-[2rem] overflow-hidden mb-6">
           <img 
             src="https://fuxshiauvjshvshvuvnd.supabase.co/storage/v1/object/public/images/TEFT-LEGION.png" 
@@ -22,7 +22,7 @@ export default function Home() {
           <p className="text-sm font-medium text-zinc-400 mt-1">Access the TEFT ecosystem</p>
         </div>
 
-        {/* Button Grid - Exakt wie im Foto */}
+        {/* Button Grid */}
         <div className="grid grid-cols-2 gap-3 px-2">
           <a href="https://jup.ag/swap/SOL-TEFT" target="_blank" className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all">
             Swap via Phantom
@@ -31,12 +31,12 @@ export default function Home() {
             Get NFTs
           </a>
           
-          {/* Staking gesperrt */}
-          <div className="bg-[#e9e9e9] text-black py-4 rounded-2xl text-center text-xs font-bold opacity-60 cursor-not-allowed">
+          {/* STAKING WIEDER AKTIV */}
+          <a href="/staking" className="bg-[#e9e9e9] text-black py-4 rounded-2xl text-center text-xs font-bold hover:bg-[#dfdfdf] transition-all">
             NFT Staking
-          </div>
+          </a>
           
-          {/* Creator Hub gesperrt */}
+          {/* NUR CREATOR HUB GESPERRT */}
           <div className="bg-[#e9e9e9] text-zinc-400 py-4 rounded-2xl text-center text-xs font-bold opacity-60 cursor-not-allowed">
             Creator Hub
           </div>
