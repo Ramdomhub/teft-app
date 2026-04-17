@@ -24,15 +24,18 @@ export default function Home() {
 
         {/* Button Grid */}
         <div className="grid grid-cols-2 gap-3 px-2">
-          <a href="https://jup.ag/swap/SOL-TEFT" target="_blank" className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all">
+          {/* Swap via Phantom Deep Link */}
+          <a href="https://phantom.app/ul/browse/https://jup.ag/swap/SOL-TEFT" target="_blank" className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all">
             Swap via Phantom
           </a>
-          <a href="https://magiceden.io" target="_blank" className="bg-[#e9e9e9] text-black py-4 rounded-2xl text-center text-xs font-bold hover:bg-[#dfdfdf] transition-all">
+          
+          {/* Eure NFT Marketplace Unterseite (mit ME API & Slideshow) */}
+          <a href="/nft-marketplace" className="bg-[#e9e9e9] text-black py-4 rounded-2xl text-center text-xs font-bold hover:bg-[#dfdfdf] transition-all">
             Get NFTs
           </a>
           
-          {/* STAKING WIEDER AKTIV */}
-          <a href="/staking" className="bg-[#e9e9e9] text-black py-4 rounded-2xl text-center text-xs font-bold hover:bg-[#dfdfdf] transition-all">
+          {/* Staking via solsuite.io */}
+          <a href="https://solsuite.io" target="_blank" className="bg-[#e9e9e9] text-black py-4 rounded-2xl text-center text-xs font-bold hover:bg-[#dfdfdf] transition-all">
             NFT Staking
           </a>
           
