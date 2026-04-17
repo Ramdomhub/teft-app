@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { WalletButton } from "../Providers";
+import { WalletButton } from "../AppWalletProvider";
 
 export default function Navigation() {
   const { publicKey } = useWallet();

@@ -2,9 +2,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Navigation from "@/app/components/Navigation";
-import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { getAssociatedTokenAddress, createTransferInstruction } from "@solana/spl-token";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+
+const TEFT_MINT_ADDRESS = new PublicKey("8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump");
+const TEFT_DECIMALS = 6;
 
 export default function Leaderboard() {
+  const { connection } = useConnection();
+  const { publicKey, sendTransaction } = useWallet();
   const [creators, setCreators] = useState<any[]>([]);
   const [tips, setTips] = useState<any[]>([]);
   const [selectedCreator, setSelectedCreator] = useState<any>(null);
@@ -30,39 +37,44 @@ export default function Leaderboard() {
 
   const executeTransaction = async (amount: number) => {
     if (!selectedCreator) return;
-    const provider = (window as any).solana;
-    if (!provider) return alert("Phantom Wallet nicht gefunden!");
+    if (!publicKey) return alert("Please connect your wallet first.");
 
     try {
-      await provider.connect();
-      // Nutze einen alternativen Public RPC für bessere Erreichbarkeit
-      const connection = new Connection("https://solana-mainnet.rpc.extrnode.com", "confirmed");
+      const transaction = new Transaction();
+      const recipient = new PublicKey(selectedCreator.wallet_address);
 
-      let transaction = new Transaction();
       if (currency === "SOL") {
         transaction.add(
           SystemProgram.transfer({
-            fromPubkey: provider.publicKey,
-            toPubkey: new PublicKey(selectedCreator.wallet_address),
+            fromPubkey: publicKey,
+            toPubkey: recipient,
             lamports: Math.round(amount * LAMPORTS_PER_SOL),
           })
         );
       } else {
-        alert("TEFT Transfer via SPL Library wird im nächsten Schritt aktiviert.");
-        return;
+        const senderATA = await getAssociatedTokenAddress(TEFT_MINT_ADDRESS, publicKey);
+        const creatorATA = await getAssociatedTokenAddress(TEFT_MINT_ADDRESS, recipient);
+        transaction.add(
+          createTransferInstruction(
+            senderATA,
+            creatorATA,
+            publicKey,
+            Math.round(amount * Math.pow(10, TEFT_DECIMALS))
+          )
+        );
       }
 
-      transaction.feePayer = provider.publicKey;
+      transaction.feePayer = publicKey;
       const { blockhash } = await connection.getLatestBlockhash();
       transaction.recentBlockhash = blockhash;
 
-      const { signature } = await provider.signAndSendTransaction(transaction);
-      
+      const signature = await sendTransaction(transaction, connection);
+
       await supabase.from("tips").insert({
         amount,
         currency,
         recipient_name: selectedCreator.display_name,
-        sender_wallet: provider.publicKey.toString(),
+        sender_wallet: publicKey.toString(),
         sender_name: user?.user_metadata?.full_name || user?.user_metadata?.user_name || null,
         tx_hash: signature
       });
@@ -71,7 +83,7 @@ export default function Leaderboard() {
       setSelectedCreator(null);
       fetchData();
     } catch (err: any) {
-      alert("RPC Error: " + err.message);
+      alert("Transaction failed: " + (err?.message || "Unknown error"));
     }
   };
 

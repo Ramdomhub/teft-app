@@ -31,7 +31,7 @@ export default function CreatorHub() {
         <p className="text-zinc-400 text-lg font-bold max-w-xl mx-auto mb-12 uppercase tracking-tight">
           The elite ecosystem for Solana creators.
         </p>
-        <Link href="/leaderboard" className="bg-black text-white px-12 py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] inline-block shadow-2xl hover:scale-105 transition-all">
+        <Link href="/creators" className="bg-black text-white px-12 py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] inline-block shadow-2xl hover:scale-105 transition-all">
           View Creators
         </Link>
       </section>

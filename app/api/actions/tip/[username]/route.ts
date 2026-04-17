@@ -16,8 +16,8 @@ export async function OPTIONS() {
   return NextResponse.json(null, { headers });
 }
 
-export async function GET(req: NextRequest, { params }: { params: { username: string } }) {
-  const { username } = params;
+export async function GET(req: NextRequest, { params }: { params: Promise<{ username: string }> }) {
+  const { username } = await params;
   const { data: creator } = await supabase.from("creators").select("*").eq("username", username).single();
 
   if (!creator) {
@@ -41,9 +41,9 @@ export async function GET(req: NextRequest, { params }: { params: { username: st
   return NextResponse.json(payload, { headers });
 }
 
-export async function POST(req: NextRequest, { params }: { params: { username: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ username: string }> }) {
   try {
-    const { username } = params;
+    const { username } = await params;
     const { searchParams } = new URL(req.url);
     const amount = parseFloat(searchParams.get("amount") || "0.1");
     const tokenType = searchParams.get("token") || "SOL";
@@ -54,19 +54,20 @@ export async function POST(req: NextRequest, { params }: { params: { username: s
     const { data: creator } = await supabase.from("creators").select("wallet_address").eq("username", username).single();
     if (!creator) throw new Error("Creator not found");
 
-    const connection = new Connection("https://api.devnet.solana.com");
+    const connection = new Connection(
+      process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com"
+    );
     const latestBlockhash = await connection.getLatestBlockhash();
-    
+
     const transaction = new Transaction({
       feePayer: senderWallet,
       recentBlockhash: latestBlockhash.blockhash,
     });
 
     if (tokenType === "TEFT") {
-      // TEFT Token Transfer (SPL)
       const senderATA = await getAssociatedTokenAddress(TEFT_MINT_ADDRESS, senderWallet);
       const creatorATA = await getAssociatedTokenAddress(TEFT_MINT_ADDRESS, new PublicKey(creator.wallet_address));
-      
+
       transaction.add(
         createTransferInstruction(
           senderATA,
@@ -76,7 +77,6 @@ export async function POST(req: NextRequest, { params }: { params: { username: s
         )
       );
     } else {
-      // Standard SOL Transfer
       transaction.add(
         SystemProgram.transfer({
           fromPubkey: senderWallet,
