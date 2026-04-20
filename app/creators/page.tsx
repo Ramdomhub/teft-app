@@ -27,7 +27,7 @@ export default function Leaderboard() {
     if (creatorData) {
       setCreators(creatorData.map(c => ({
         ...c,
-        display_sol: Number(c.total_sol || (c.display_name === "TEFT" ? 1.7 : 0))
+        display_sol: Number(c.total_sol_received || 0)
       })).sort((a, b) => b.display_sol - a.display_sol));
     }
     if (tipData) setTips(tipData);
@@ -72,11 +72,11 @@ export default function Leaderboard() {
 
       await supabase.from("tips").insert({
         amount,
-        currency,
-        recipient_name: selectedCreator.display_name,
+        token: currency,
+        creator_username: selectedCreator.username,
         sender_wallet: publicKey.toString(),
         sender_name: user?.user_metadata?.full_name || user?.user_metadata?.user_name || null,
-        tx_hash: signature
+        tx_signature: signature
       });
 
       alert("LEGION MISSION SUCCESS");
@@ -124,9 +124,9 @@ export default function Leaderboard() {
                     <span className="text-[10px] font-black text-black uppercase tracking-tight">
                       {t.sender_name ? `@${t.sender_name}` : `${t.sender_wallet?.slice(0,4)}...`}
                     </span>
-                    <span className="text-green-600 font-black text-[11px]">+{t.amount} {t.currency || "SOL"}</span>
+                    <span className="text-green-600 font-black text-[11px]">+{t.amount} {t.token || "SOL"}</span>
                   </div>
-                  <div className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">pushed {t.recipient_name}</div>
+                  <div className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">pushed {t.creator_username}</div>
                 </div>
               ))}
             </div>

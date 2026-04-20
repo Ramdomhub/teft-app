@@ -13,7 +13,7 @@ export default function CreatorHub() {
     if (tips) setRecentTips(tips);
     
     const { data: creatorData } = await supabase.from("creators").select("total_sol");
-    const total = creatorData?.reduce((sum, c) => sum + (Number(c.total_sol) || 0), 0) || 1.7;
+    const total = creatorData?.reduce((sum, c) => sum + (Number(c.total_sol_received) || 0), 0) || 1.7;
     setStats({ totalVolume: total < 1.7 ? 1.7 : total, activeCreators: creatorData?.length || 1 });
   };
 
