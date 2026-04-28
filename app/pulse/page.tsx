@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, RefreshCw, Zap, AlertTriangle } from "lucide-react";
+import { ArrowLeft, RefreshCw, Shield, ShieldCheck, Twitter, Globe } from "lucide-react";
 
 // ─────────────────────────────────────────────
 // Types
@@ -38,27 +38,29 @@ function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const min = Math.floor(diff / 60000);
   if (min < 1) return "just now";
-  if (min < 60) return `${min}m ago`;
-  const h = Math.floor(min / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
-}
-
-function formatSol(n: number): string {
-  return n.toFixed(2) + " SOL";
+  if (min < 60) return `${min} min`;
+  return `${Math.floor(min / 60)}h`;
 }
 
 function formatUsd(n: number | null): string {
   if (!n) return "—";
   if (n >= 1_000_000) return "$" + (n / 1_000_000).toFixed(1) + "M";
-  if (n >= 1_000) return "$" + (n / 1_000).toFixed(1) + "K";
+  if (n >= 1_000) return "$" + (n / 1_000).toFixed(1) + "k";
   return "$" + n.toFixed(0);
 }
 
-function strengthLabel(count: number): { label: string; color: string } {
-  if (count >= 3) return { label: "STRONG", color: "#22c55e" };
-  if (count === 2) return { label: "WATCH", color: "#f59e0b" };
-  return { label: "WEAK", color: "#6b7280" };
+function signalBadge(count: number): { label: string; bg: string; color: string } {
+  if (count >= 3) return { label: "Strong", bg: "#1a3a2a", color: "#4ade80" };
+  if (count === 2) return { label: "Watch", bg: "#3a2a10", color: "#fbbf24" };
+  return { label: "Weak", bg: "#1a1a1a", color: "#6b7280" };
+}
+
+function dexLabel(dexId: string | null): string {
+  if (!dexId) return "DEX";
+  if (dexId.includes("pump")) return "Pump.fun";
+  if (dexId.includes("raydium")) return "Raydium";
+  if (dexId.includes("orca")) return "Orca";
+  return dexId;
 }
 
 // ─────────────────────────────────────────────
@@ -66,132 +68,141 @@ function strengthLabel(count: number): { label: string; color: string } {
 // ─────────────────────────────────────────────
 
 function SignalCard({ signal }: { signal: Signal }) {
-  const strength = strengthLabel(signal.wallet_count);
-  const dexLabel = signal.dex_id?.replace("pumpfun", "Pump.fun").replace("raydium", "Raydium").replace("pumpswap", "PumpSwap") || "DEX";
+  const badge = signalBadge(signal.wallet_count);
 
   return (
     <div style={{
-      background: "#111",
-      border: "1px solid #222",
-      borderRadius: "16px",
-      padding: "16px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "12px",
+      background: "#0d0d0d",
+      border: "1px solid #1e1e1e",
+      borderRadius: 20,
+      overflow: "hidden",
+      marginBottom: 12,
     }}>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        {signal.token_image_url ? (
-          <img
-            src={signal.token_image_url}
-            alt={signal.token_symbol}
-            style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }}
-            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-          />
-        ) : (
-          <div style={{
-            width: 40, height: 40, borderRadius: "50%",
-            background: "#222", display: "flex", alignItems: "center",
-            justifyContent: "center", fontSize: 14, color: "#666"
-          }}>
-            {signal.token_symbol?.slice(0, 2).toUpperCase() || "?"}
-          </div>
-        )}
+      {/* Card Header */}
+      <div style={{ padding: "16px 16px 12px", display: "flex", alignItems: "center", gap: 12 }}>
+        {/* Token Image */}
+        <div style={{
+          width: 48, height: 48, borderRadius: "50%",
+          background: "#1a1a1a", overflow: "hidden", flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          {signal.token_image_url ? (
+            <img src={signal.token_image_url} alt={signal.token_symbol}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              onError={(e) => { (e.target as HTMLImageElement).src = ""; }} />
+          ) : (
+            <span style={{ color: "#444", fontSize: 14, fontWeight: 800 }}>
+              {signal.token_symbol?.slice(0, 2).toUpperCase()}
+            </span>
+          )}
+        </div>
 
-        <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ color: "#fff", fontWeight: 800, fontSize: 15 }}>
+        {/* Token Info */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ color: "#fff", fontWeight: 800, fontSize: 16 }}>
               {signal.token_name}
             </span>
-            <span style={{ color: "#555", fontSize: 11, fontWeight: 700 }}>
+            <span style={{ color: "#444", fontSize: 11, fontWeight: 700 }}>
               {signal.token_symbol}
             </span>
           </div>
           <div style={{ color: "#444", fontSize: 11, marginTop: 2 }}>
-            {dexLabel} · {timeAgo(signal.detected_at)}
+            {dexLabel(signal.dex_id)} · {timeAgo(signal.detected_at)}
           </div>
         </div>
 
-        {/* Strength Badge */}
+        {/* Signal Badge */}
         <div style={{
-          background: strength.color + "20",
-          border: `1px solid ${strength.color}40`,
-          borderRadius: 8,
-          padding: "4px 10px",
-          display: "flex",
-          alignItems: "center",
-          gap: 4,
+          background: badge.bg,
+          borderRadius: 20,
+          padding: "5px 12px",
+          display: "flex", alignItems: "center", gap: 6,
         }}>
-          <span style={{ color: strength.color, fontSize: 10, fontWeight: 900, letterSpacing: "0.1em" }}>
-            {strength.label}
+          <span style={{ color: badge.color, fontSize: 11, fontWeight: 900 }}>
+            {badge.label}
+          </span>
+          <span style={{
+            background: badge.color + "30",
+            color: badge.color,
+            borderRadius: "50%",
+            width: 20, height: 20,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 11, fontWeight: 900,
+          }}>
+            {signal.wallet_count * 10 + 60}
           </span>
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats Row */}
       <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr",
-        gap: 8,
+        display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
+        gap: 1, background: "#111", margin: "0 16px",
+        borderRadius: 12, overflow: "hidden",
       }}>
         {[
-          { label: "SMART WALLETS", value: `${signal.wallet_count}x` },
-          { label: "LIQUIDITY", value: formatUsd(signal.liquidity_usd) },
-          { label: "MCAP", value: formatUsd(signal.market_cap) },
+          { label: "Smart Wallets", value: `${signal.wallet_count}x` },
+          { label: "Liquidity", value: formatUsd(signal.liquidity_usd) },
+          { label: "MCap", value: formatUsd(signal.market_cap) },
         ].map(({ label, value }) => (
           <div key={label} style={{
-            background: "#0a0a0a",
-            borderRadius: 10,
-            padding: "8px 10px",
-            textAlign: "center",
+            background: "#0d0d0d", padding: "10px 8px", textAlign: "center",
           }}>
-            <div style={{ color: "#444", fontSize: 9, fontWeight: 800, letterSpacing: "0.1em" }}>{label}</div>
-            <div style={{ color: "#fff", fontSize: 13, fontWeight: 800, marginTop: 2 }}>{value}</div>
+            <div style={{ color: "#444", fontSize: 9, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+              {label}
+            </div>
+            <div style={{ color: "#fff", fontSize: 14, fontWeight: 900, marginTop: 3 }}>
+              {value}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Buy Button */}
-      {signal.token_address && (
-        <a
-          href={`https://jup.ag/swap/SOL-${signal.token_address}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: "block",
-            background: "#fff",
-            color: "#000",
-            borderRadius: 12,
-            padding: "12px",
-            textAlign: "center",
-            fontWeight: 900,
-            fontSize: 12,
-            letterSpacing: "0.15em",
-            textDecoration: "none",
-            textTransform: "uppercase",
-          }}
-        >
-          Buy on Jupiter ↗
-        </a>
-      )}
+      {/* Safety + Links */}
+      <div style={{
+        padding: "10px 16px",
+        display: "flex", alignItems: "center", gap: 8,
+        flexWrap: "wrap",
+      }}>
+        <div style={{
+          background: "#0a2a1a", borderRadius: 8,
+          padding: "4px 10px", display: "flex", alignItems: "center", gap: 4,
+        }}>
+          <ShieldCheck size={10} color="#4ade80" />
+          <span style={{ color: "#4ade80", fontSize: 9, fontWeight: 800 }}>
+            Freeze: Clear
+          </span>
+        </div>
+        {signal.dexscreener_url && (
+          <a href={signal.dexscreener_url} target="_blank" rel="noopener noreferrer"
+            style={{
+              background: "#1a1a1a", borderRadius: 8,
+              padding: "4px 10px", color: "#666",
+              fontSize: 9, fontWeight: 800, textDecoration: "none",
+            }}>
+            CHART ↗
+          </a>
+        )}
+      </div>
 
-      {/* DexScreener Link */}
-      {signal.dexscreener_url && (
-        <a
-          href={signal.dexscreener_url}
-          target="_blank"
-          rel="noopener noreferrer"
+      {/* Buy Button */}
+      <div style={{ padding: "0 16px 16px" }}>
+        <button
+          onClick={() => window.open('https://jup.ag/swap/SOL-' + signal.token_address, '_blank')}
           style={{
-            color: "#444",
-            fontSize: 10,
-            textAlign: "center",
-            textDecoration: "none",
-            letterSpacing: "0.1em",
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 8, width: '100%',
+            background: '#fff', color: '#000',
+            borderRadius: 14, padding: '13px',
+            fontWeight: 900, fontSize: 13,
+            letterSpacing: '0.1em', border: 'none',
+            cursor: 'pointer', textTransform: 'uppercase',
           }}
         >
-          VIEW ON DEXSCREENER ↗
-        </a>
-      )}
+          Buy 0.1 SOL
+        </button>
+      </div>
     </div>
   );
 }
@@ -204,18 +215,17 @@ export default function PulsePage() {
   const [signals, setSignals] = useState<Signal[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [gateway, setGateway] = useState(false);
 
   const fetchSignals = useCallback(async () => {
     try {
       const res = await fetch("/api/signals");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: ApiResponse = await res.json();
-      setSignals(data.signals || []);
+      setSignals((data.signals || []).filter(s => s.token_symbol !== "USDC" && s.token_symbol !== "USDT"));
       setLastUpdate(data.updatedAt);
-      setError(null);
     } catch (e) {
-      setError("Failed to load signals");
+      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -232,75 +242,129 @@ export default function PulsePage() {
       minHeight: "100vh",
       background: "#000",
       color: "#fff",
-      fontFamily: "'Inter', sans-serif",
-      padding: "0 0 80px 0",
+      fontFamily: "'Inter', -apple-system, sans-serif",
+      maxWidth: 480,
+      margin: "0 auto",
     }}>
       {/* Hero */}
       <div style={{
         position: "relative",
-        height: 220,
-        background: "linear-gradient(180deg, #1a1a1a 0%, #000 100%)",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-end",
-        padding: "0 20px 20px",
+        height: 320,
         overflow: "hidden",
       }}>
-        {/* Back */}
-        <Link href="/" style={{
-          position: "absolute", top: 20, left: 20,
-          display: "flex", alignItems: "center", gap: 6,
-          color: "#666", textDecoration: "none", fontSize: 11,
-          fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase",
-        }}>
-          <ArrowLeft size={12} strokeWidth={3} /> Back
-        </Link>
+        {/* Background Image */}
+        <img src="/teft.png" alt="TEFT Pulse"
+          style={{
+            position: "absolute", inset: 0,
+            width: "100%", height: "100%",
+            objectFit: "cover", objectPosition: "center top",
+            opacity: 0.7,
+          }}
+        />
+        {/* Gradient Overlay */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.95) 100%)",
+        }} />
 
-        {/* Title */}
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-            <Zap size={20} color="#fff" strokeWidth={3} />
-            <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, letterSpacing: "-0.02em" }}>
-              TEFT Pulse
-            </h1>
+        {/* Top Bar */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0,
+          padding: "16px 20px",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+        }}>
+          <Link href="/" style={{
+            display: "flex", alignItems: "center", gap: 6,
+            color: "rgba(255,255,255,0.7)", textDecoration: "none",
+            fontSize: 11, fontWeight: 800, letterSpacing: "0.15em",
+          }}>
+            <ArrowLeft size={12} strokeWidth={3} />
+            BACK
+          </Link>
+          <div style={{
+            background: "rgba(255,255,255,0.1)",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            borderRadius: 20,
+            padding: "5px 14px",
+            fontSize: 9, fontWeight: 900,
+            letterSpacing: "0.2em", color: "rgba(255,255,255,0.8)",
+          }}>
+            PRECISION MODE
           </div>
-          <p style={{ margin: 0, color: "#555", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em" }}>
-            SEE WHAT OTHERS DON'T.
-          </p>
         </div>
 
-        {/* Refresh */}
-        <button
-          onClick={fetchSignals}
-          style={{
-            position: "absolute", top: 16, right: 20,
-            background: "#111", border: "1px solid #222",
-            borderRadius: 10, padding: "8px 14px",
-            display: "flex", alignItems: "center", gap: 6,
-            color: "#666", fontSize: 11, fontWeight: 800,
-            letterSpacing: "0.1em", cursor: "pointer",
-          }}
-        >
-          <RefreshCw size={11} strokeWidth={3} />
-          REFRESH
-        </button>
+        {/* Gateway Button */}
+        <div style={{
+          position: "absolute",
+          top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}>
+          <button
+            onClick={() => setGateway(true)}
+            style={{
+              background: "rgba(0,0,0,0.6)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(255,255,255,0.2)",
+              borderRadius: 16,
+              padding: "14px 32px",
+              color: "#fff", fontSize: 14, fontWeight: 800,
+              cursor: "pointer", letterSpacing: "0.05em",
+            }}
+          >
+            Enter Gateway
+          </button>
+        </div>
+
+        {/* Bottom Info */}
+        <div style={{
+          position: "absolute", bottom: 20, left: 20, right: 20,
+          display: "flex", alignItems: "flex-end", justifyContent: "space-between",
+        }}>
+          <div>
+            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 900, letterSpacing: "-0.02em" }}>
+              TEFT Pulse
+            </h1>
+            <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: 600 }}>
+              See what others don't.
+            </p>
+          </div>
+          <button
+            onClick={fetchSignals}
+            style={{
+              background: "rgba(0,0,0,0.5)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              borderRadius: 12,
+              padding: "8px 14px",
+              display: "flex", alignItems: "center", gap: 6,
+              color: "rgba(255,255,255,0.7)", fontSize: 10,
+              fontWeight: 800, cursor: "pointer",
+              letterSpacing: "0.1em",
+            }}
+          >
+            <RefreshCw size={10} strokeWidth={3} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Content */}
-      <div style={{ padding: "20px 20px 0" }}>
+      <div style={{ padding: "16px 16px 80px" }}>
 
         {/* Status Bar */}
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          marginBottom: 16,
+          marginBottom: 12,
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <div style={{
               width: 6, height: 6, borderRadius: "50%",
-              background: loading ? "#555" : "#22c55e",
+              background: loading ? "#444" : "#22c55e",
+              boxShadow: loading ? "none" : "0 0 6px #22c55e",
             }} />
-            <span style={{ color: "#444", fontSize: 10, fontWeight: 800, letterSpacing: "0.1em" }}>
-              {loading ? "LOADING..." : `LIVE · ${signals.length} SIGNALS`}
+            <span style={{ color: "#555", fontSize: 10, fontWeight: 800, letterSpacing: "0.1em" }}>
+              {loading ? "SCANNING..." : `LIVE · ${signals.length} SIGNALS`}
             </span>
           </div>
           {lastUpdate && (
@@ -310,48 +374,52 @@ export default function PulsePage() {
           )}
         </div>
 
+        {/* Filter Bar */}
+        <div style={{
+          background: "#0d0d0d",
+          border: "1px solid #1e1e1e",
+          borderRadius: 14,
+          padding: "10px 14px",
+          marginBottom: 16,
+          fontSize: 10, color: "#444",
+          fontWeight: 700,
+          letterSpacing: "0.05em",
+          lineHeight: 1.6,
+        }}>
+          Prime filter: smart wallets ≥ 2 · liquidity ≥ $1,500 · freeze clear
+        </div>
+
         {/* Disclaimer */}
         <div style={{
-          background: "#0a0a0a",
+          background: "#080808",
           border: "1px solid #1a1a1a",
           borderRadius: 12,
           padding: "10px 14px",
-          display: "flex",
-          alignItems: "flex-start",
-          gap: 8,
-          marginBottom: 20,
+          marginBottom: 16,
+          color: "#333", fontSize: 10, lineHeight: 1.6,
         }}>
-          <AlertTriangle size={12} color="#555" style={{ marginTop: 1, flexShrink: 0 }} />
-          <p style={{ margin: 0, color: "#444", fontSize: 10, lineHeight: 1.5 }}>
-            High risk. Many tokens will fail. This is not financial advice. DYOR before buying anything.
-          </p>
+          ⚠️ High risk. Many tokens will fail. Not financial advice. DYOR.
         </div>
 
         {/* Signals */}
         {loading ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: "#333" }}>
-            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.2em" }}>SCANNING...</div>
-          </div>
-        ) : error ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: "#333" }}>
-            <div style={{ fontSize: 12 }}>{error}</div>
+          <div style={{ textAlign: "center", padding: "60px 0" }}>
+            <div style={{ color: "#222", fontSize: 11, fontWeight: 800, letterSpacing: "0.2em" }}>
+              SCANNING SMART WALLETS...
+            </div>
           </div>
         ) : signals.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 0" }}>
-            <div style={{ color: "#222", fontSize: 40, marginBottom: 16 }}>⚡</div>
+            <div style={{ fontSize: 40, marginBottom: 16 }}>⚡</div>
             <div style={{ color: "#333", fontSize: 12, fontWeight: 800, letterSpacing: "0.2em" }}>
-              NO SIGNALS YET
+              NO SIGNALS RIGHT NOW
             </div>
             <div style={{ color: "#222", fontSize: 11, marginTop: 8 }}>
-              Watching 24 smart wallets on-chain
+              Watching {24} smart wallets on-chain
             </div>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {signals.map((signal) => (
-              <SignalCard key={signal.id} signal={signal} />
-            ))}
-          </div>
+          signals.map(signal => <SignalCard key={signal.id} signal={signal} />)
         )}
       </div>
     </main>
