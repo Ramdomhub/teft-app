@@ -154,7 +154,7 @@ function SignalCard({ signal }: { signal: Signal }) {
       {/* Buy Button */}
       {signal.token_address && (
         
-          href={`https://jup.ag/swap/SOL-${signal.token_address}?referralAccount=YOUR_REFERRAL_ACCOUNT&referralName=TEFTPulse`}
+          href={`https://jup.ag/swap/SOL-${signal.token_address}`}
           target="_blank"
           rel="noopener noreferrer"
           style={{
