@@ -177,7 +177,7 @@ function SignalCard({ signal }: { signal: Signal }) {
 
       {/* DexScreener Link */}
       {signal.dexscreener_url && (
-        
+        <a
           href={signal.dexscreener_url}
           target="_blank"
           rel="noopener noreferrer"
