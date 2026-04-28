@@ -153,7 +153,7 @@ function SignalCard({ signal }: { signal: Signal }) {
 
       {/* Buy Button */}
       {signal.token_address && (
-        
+        <a
           href={`https://jup.ag/swap/SOL-${signal.token_address}`}
           target="_blank"
           rel="noopener noreferrer"
