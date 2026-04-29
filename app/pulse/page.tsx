@@ -102,6 +102,27 @@ function MultiplierBadge({ multiplier }: { multiplier: number | null }) {
   );
 }
 
+function buildShareUrl(signal: Signal): string {
+  const base = "https://teftlegion.com/pulse";
+  const params = new URLSearchParams({
+    name: signal.token_name || "",
+    symbol: signal.token_symbol || "",
+    w: String(signal.wallet_count),
+    ...(signal.multiplier ? { mx: signal.multiplier.toFixed(2) } : {}),
+    ...(signal.entry_market_cap ? { em: formatUsd(signal.entry_market_cap) } : {}),
+    ...(signal.current_market_cap ? { cm: formatUsd(signal.current_market_cap) } : {}),
+    ...(signal.volume_h24 ? { v24: formatUsd(signal.volume_h24) } : {}),
+    ...(signal.buy_sell_ratio_1h ? { bs: String(signal.buy_sell_ratio_1h) } : {}),
+  });
+  return `https://teftlegion.com/api/og/${signal.token_address}?${params.toString()}`;
+}
+
+function buildTweetUrl(signal: Signal): string {
+  const multiplierStr = signal.multiplier ? `+${((signal.multiplier - 1) * 100).toFixed(0)}%` : "";
+  const text = `⚡ TEFT Pulse Signal\n\n${signal.token_symbol} ${multiplierStr} | ${signal.wallet_count}x Smart Wallets\nEntry MCap: ${formatUsd(signal.entry_market_cap)} → Now: ${formatUsd(signal.current_market_cap)}\n\nSee what others don't 👇\nteftlegion.com/pulse\n\n#Solana #TEFTPulse`;
+  return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+}
+
 function SignalCard({ signal }: { signal: Signal }) {
   const isRugged = signal.multiplier !== null && signal.multiplier < 0.3;
   const badge = isRugged 
@@ -330,6 +351,23 @@ function SignalCard({ signal }: { signal: Signal }) {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Share Button */}
+      <div style={{ padding: "0 16px 8px" }}>
+        <button
+          onClick={() => window.open(buildTweetUrl(signal), "_blank")}
+          style={{
+            width: "100%", background: "transparent",
+            border: "1px solid #1e3a5f", borderRadius: 12,
+            padding: "10px", color: "#60a5fa",
+            fontSize: 10, fontWeight: 800,
+            letterSpacing: "0.15em", cursor: "pointer",
+            textTransform: "uppercase",
+          }}
+        >
+          ✕ SHARE SIGNAL ON X
+        </button>
       </div>
 
       {/* Buy Buttons */}
