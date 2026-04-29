@@ -332,22 +332,26 @@ function SignalCard({ signal }: { signal: Signal }) {
         ))}
       </div>
 
-      {/* Buy Button */}
-      <div style={{ padding: "0 16px 16px" }}>
-        <button
-          onClick={() => window.open(`https://jup.ag/swap/SOL-${signal.token_address}?referralAccount=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&referralName=TEFTPulse`, "_blank")}
-          style={{
-            width: "100%", display: "flex", alignItems: "center",
-            justifyContent: "center", gap: 8,
-            background: "#fff", color: "#000",
-            borderRadius: 14, padding: "13px",
-            fontWeight: 900, fontSize: 13,
-            letterSpacing: "0.1em", border: "none",
-            cursor: "pointer", textTransform: "uppercase",
-          }}
-        >
-          Buy on Jupiter
-        </button>
+      {/* Buy Buttons */}
+      <div style={{ padding: "0 16px 16px", display: "flex", gap: 8 }}>
+        {["0.01", "0.05", "0.1"].map((amount) => (
+          <button
+            key={amount}
+            onClick={() => window.open(`https://jup.ag/swap/SOL-${signal.token_address}?referralAccount=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&referralName=TEFTPulse&inAmount=${Math.round(parseFloat(amount) * 1e9)}`, "_blank")}
+            style={{
+              flex: 1,
+              background: amount === "0.1" ? "#fff" : "#1a1a1a",
+              color: amount === "0.1" ? "#000" : "#fff",
+              border: amount === "0.1" ? "none" : "1px solid #333",
+              borderRadius: 12, padding: "12px 4px",
+              fontWeight: 900, fontSize: 11,
+              letterSpacing: "0.05em", cursor: "pointer",
+              textTransform: "uppercase",
+            }}
+          >
+            {amount} SOL
+          </button>
+        ))}
       </div>
     </div>
   );
