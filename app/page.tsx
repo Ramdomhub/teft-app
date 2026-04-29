@@ -48,7 +48,7 @@ export default function Home() {
           </a>
           
           <div className="bg-[#e9e9e9] text-zinc-400 py-4 rounded-2xl text-center text-xs font-bold opacity-60 cursor-not-allowed flex items-center justify-center">
-            Creator Hub
+            TEFT Pulse
           </div>
         </div>
 
