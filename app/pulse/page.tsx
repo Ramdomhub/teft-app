@@ -355,6 +355,7 @@ function SignalCard({ signal }: { signal: Signal }) {
 
 export default function PulsePage() {
   const [signals, setSignals] = useState<Signal[]>([]);
+  const [showWeak, setShowWeak] = useState(false);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -526,9 +527,42 @@ export default function PulsePage() {
               Watching 24 smart wallets on-chain
             </div>
           </div>
-        ) : (
-          signals.map(signal => <SignalCard key={signal.id} signal={signal} />)
-        )}
+        ) : (() => {
+          const strong = signals.filter(s => s.wallet_count >= 2);
+          const weak = signals.filter(s => s.wallet_count < 2);
+          return (
+            <>
+              {strong.length === 0 && !showWeak && (
+                <div style={{ textAlign: "center", padding: "40px 0" }}>
+                  <div style={{ fontSize: 32, marginBottom: 12 }}>⚡</div>
+                  <div style={{ color: "#333", fontSize: 12, fontWeight: 800, letterSpacing: "0.2em" }}>
+                    NO STRONG SIGNALS RIGHT NOW
+                  </div>
+                  <div style={{ color: "#222", fontSize: 11, marginTop: 8 }}>
+                    Watching 24 smart wallets — waiting for 2+ to agree
+                  </div>
+                </div>
+              )}
+              {strong.map(signal => <SignalCard key={signal.id} signal={signal} />)}
+              {weak.length > 0 && (
+                <button
+                  onClick={() => setShowWeak(!showWeak)}
+                  style={{
+                    width: "100%", background: "transparent",
+                    border: "1px solid #222", borderRadius: 12,
+                    padding: "12px", color: "#444",
+                    fontSize: 10, fontWeight: 800,
+                    letterSpacing: "0.1em", cursor: "pointer",
+                    marginTop: 8,
+                  }}
+                >
+                  {showWeak ? "HIDE" : "SHOW"} {weak.length} WEAK SIGNAL{weak.length > 1 ? "S" : ""} (1x wallet)
+                </button>
+              )}
+              {showWeak && weak.map(signal => <SignalCard key={signal.id} signal={signal} />)}
+            </>
+          );
+        })()}
       </div>
     </main>
   );
