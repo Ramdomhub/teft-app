@@ -44,6 +44,8 @@ type Signal = {
   buy_sell_ratio_1h?: number | null;
   makers_5m?: number | null;
   makers_1h?: number | null;
+  sell_count?: number;
+  holders_count?: number;
   volume_h24?: number | null;
   price_change_24h?: number | null;
 };
@@ -240,7 +242,7 @@ function SignalCard({ signal }: { signal: Signal }) {
 
       {/* Stats Grid */}
       <div style={{
-        display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
+        display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr",
         gap: 1, background: "#111",
         margin: "0 16px 10px", borderRadius: 12, overflow: "hidden",
       }}>

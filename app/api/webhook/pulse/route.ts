@@ -90,12 +90,27 @@ function isDexSwap(tx: HeliusTransaction): boolean {
 }
 
 function extractBoughtToken(tx: HeliusTransaction, walletAddress: string): string | null {
-  // Token-Transfer ZU der Wallet = gekaufter Token
   if (!tx.tokenTransfers) return null;
   const incoming = tx.tokenTransfers.find(
     (t) => t.toUserAccount === walletAddress && t.mint !== "So11111111111111111111111111111111111111112"
   );
   return incoming?.mint || null;
+}
+
+function extractSoldToken(tx: HeliusTransaction, walletAddress: string): string | null {
+  if (!tx.tokenTransfers) return null;
+  const outgoing = tx.tokenTransfers.find(
+    (t) => t.fromUserAccount === walletAddress && t.mint !== "So11111111111111111111111111111111111111112"
+  );
+  return outgoing?.mint || null;
+}
+
+function extractSolReceived(tx: HeliusTransaction, walletAddress: string): number {
+  if (!tx.nativeTransfers) return 0;
+  const incoming = tx.nativeTransfers
+    .filter((t) => t.toUserAccount === walletAddress)
+    .reduce((sum, t) => sum + t.amount, 0);
+  return incoming / 1e9;
 }
 
 function extractSolSpent(tx: HeliusTransaction, walletAddress: string): number {
@@ -123,37 +138,55 @@ export async function POST(req: NextRequest) {
       const walletAddress = tx.feePayer;
       if (!smartWallets.has(walletAddress)) continue;
 
-      // Welcher Token wurde gekauft?
+      // BUY: Welcher Token wurde gekauft?
       const tokenMint = extractBoughtToken(tx, walletAddress);
-      if (!tokenMint) continue;
-
-      // Wieviel SOL wurde ausgegeben?
-      const amountSol = extractSolSpent(tx, walletAddress);
-      if (amountSol < 0.01) continue; // Dust-Trades ignorieren
-
-      // Token-Info von DexScreener holen
-      const tokenInfo = await getTokenInfo(tokenMint);
-
-      // Signal in Supabase speichern
-      const { error } = await supabase.from("pulse_signals").insert({
-        wallet_address: walletAddress,
-        token_address: tokenMint,
-        token_name: tokenInfo?.name || "Unknown",
-        token_symbol: tokenInfo?.symbol || "?",
-        token_image_url: tokenInfo?.imageUrl || null,
-        amount_sol: amountSol,
-        tx_signature: tx.signature,
-        dex_id: tokenInfo?.dexId || null,
-        pair_address: tokenInfo?.pairAddress || null,
-        liquidity_usd: tokenInfo?.liquidityUsd || null,
-        market_cap: tokenInfo?.marketCap || null,
-        dexscreener_url: tokenInfo?.dexscreenerUrl || null,
-      });
-
-      if (!error) {
-        processed.push(tx.signature);
-        console.log(`[Pulse] Signal: ${tokenInfo?.name} bought by ${walletAddress.slice(0, 8)}... for ${amountSol.toFixed(3)} SOL`);
+      
+      if (tokenMint) {
+        const amountSol = extractSolSpent(tx, walletAddress);
+        if (amountSol >= 0.01) {
+          const tokenInfo = await getTokenInfo(tokenMint);
+          const { error } = await supabase.from("pulse_signals").insert({
+            wallet_address: walletAddress,
+            token_address: tokenMint,
+            token_name: tokenInfo?.name || "Unknown",
+            token_symbol: tokenInfo?.symbol || "?",
+            token_image_url: tokenInfo?.imageUrl || null,
+            amount_sol: amountSol,
+            tx_signature: tx.signature,
+            dex_id: tokenInfo?.dexId || null,
+            pair_address: tokenInfo?.pairAddress || null,
+            liquidity_usd: tokenInfo?.liquidityUsd || null,
+            market_cap: tokenInfo?.marketCap || null,
+            dexscreener_url: tokenInfo?.dexscreenerUrl || null,
+          });
+          if (!error) {
+            processed.push(tx.signature);
+            console.log(`[Pulse] BUY: ${tokenInfo?.name} by ${walletAddress.slice(0, 8)}... for ${amountSol.toFixed(3)} SOL`);
+          }
+        }
       }
+
+      // SELL: Welcher Token wurde verkauft?
+      const soldMint = extractSoldToken(tx, walletAddress);
+      if (soldMint && soldMint !== tokenMint) {
+        const solReceived = extractSolReceived(tx, walletAddress);
+        if (solReceived >= 0.001) {
+          const tokenInfo = await getTokenInfo(soldMint);
+          const { error } = await supabase.from("smart_wallet_sells").insert({
+            wallet_address: walletAddress,
+            token_address: soldMint,
+            token_name: tokenInfo?.name || "Unknown",
+            token_symbol: tokenInfo?.symbol || "?",
+            amount_sol: solReceived,
+            tx_signature: tx.signature + "_sell",
+          });
+          if (!error) {
+            console.log(`[Pulse] SELL: ${tokenInfo?.name} by ${walletAddress.slice(0, 8)}... received ${solReceived.toFixed(3)} SOL`);
+          }
+        }
+      }
+      
+      if (tokenMint || soldMint) processed.push(tx.signature);
     }
 
     return NextResponse.json({

@@ -129,6 +129,19 @@ export async function GET() {
 
     if (error) throw error;
 
+    // Sells der letzten 2h holen
+    const { data: sellData } = await supabase
+      .from("smart_wallet_sells")
+      .select("token_address, wallet_address")
+      .gte("detected_at", twoHoursAgo);
+
+    // Sell-Count pro Token
+    const sellCounts: Record<string, Set<string>> = {};
+    for (const sell of sellData || []) {
+      if (!sellCounts[sell.token_address]) sellCounts[sell.token_address] = new Set();
+      sellCounts[sell.token_address].add(sell.wallet_address);
+    }
+
     const grouped: Record<string, any> = {};
     for (const row of data || []) {
       const key = row.token_address;
@@ -182,6 +195,9 @@ export async function GET() {
           token.telegram_url = live.telegramUrl;
           token.website_url = live.websiteUrl;
           if (live.dexscreenerUrl) token.dexscreener_url = live.dexscreenerUrl;
+          // Sell-Count
+          token.sell_count = sellCounts[token.token_address]?.size || 0;
+          token.holders_count = Math.max(0, token.wallet_count - token.sell_count);
           if (token.entry_market_cap && live.currentMarketCap) {
             token.multiplier = live.currentMarketCap / token.entry_market_cap;
           }
