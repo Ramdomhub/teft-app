@@ -113,6 +113,7 @@ function openJupiter(tokenAddress: string, amount: string) {
     jup.init({
       displayMode: "modal",
       endpoint: `${window.location.origin}/api/rpc`,
+      strictTokenList: false,
       formProps: {
         initialInputMint: solMint,
         initialOutputMint: tokenAddress,
