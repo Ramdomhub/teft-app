@@ -18,6 +18,20 @@ export async function GET(
   const vol24h = searchParams.get("v24") || null;
   const bsRatio = searchParams.get("bs") || null;
   const imgUrl = searchParams.get("img") || null;
+  
+  // Token image als base64 laden für Edge Runtime
+  let tokenImageData: string | null = null;
+  if (imgUrl) {
+    try {
+      const imgRes = await fetch(imgUrl);
+      if (imgRes.ok) {
+        const imgBuffer = await imgRes.arrayBuffer();
+        const imgBase64 = Buffer.from(imgBuffer).toString("base64");
+        const contentType = imgRes.headers.get("content-type") || "image/png";
+        tokenImageData = `data:${contentType};base64,${imgBase64}`;
+      }
+    } catch {}
+  }
   const isUp = multiplier ? parseFloat(multiplier) >= 1 : true;
   const pct = multiplier ? `${isUp ? "+" : ""}${((parseFloat(multiplier) - 1) * 100).toFixed(0)}%` : null;
   const walletCount = parseInt(wallets);

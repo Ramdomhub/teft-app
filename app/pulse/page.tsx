@@ -126,7 +126,7 @@ function buildTweetUrl(signal: Signal): string {
 }
 
 function SignalCard({ signal }: { signal: Signal }) {
-  const isRugged = signal.multiplier !== null && signal.multiplier < 0.3;
+  const isRugged = signal.multiplier !== null && signal.multiplier < 0.4;
   const badge = isRugged 
     ? { label: 'RUGGED', bg: '#2a0a0a', color: '#f87171' }
     : signalBadge(signal.wallet_count);
@@ -186,7 +186,7 @@ function SignalCard({ signal }: { signal: Signal }) {
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 11, fontWeight: 900,
           }}>
-            {Math.min(100, signal.wallet_count * 20 + 40)}
+            {[3,4,5,6,7,8,9,10].includes(signal.wallet_count) ? [60,70,78,84,88,92,96,100][signal.wallet_count-3] : signal.wallet_count > 10 ? 100 : 50}
           </span>
         </div>
       </div>
@@ -358,19 +358,23 @@ function SignalCard({ signal }: { signal: Signal }) {
 
       {/* Share Button */}
       <div style={{ padding: "0 16px 8px" }}>
-        <button
-          onClick={() => window.open(buildTweetUrl(signal), "_blank")}
+        
+          href={buildTweetUrl(signal)}
+          target="_blank"
+          rel="noopener noreferrer"
           style={{
-            width: "100%", background: "transparent",
+            display: "block", width: "100%",
+            background: "transparent",
             border: "1px solid #1e3a5f", borderRadius: 12,
             padding: "10px", color: "#60a5fa",
             fontSize: 10, fontWeight: 800,
             letterSpacing: "0.15em", cursor: "pointer",
-            textTransform: "uppercase",
+            textTransform: "uppercase", textDecoration: "none",
+            textAlign: "center", boxSizing: "border-box",
           }}
         >
           ✕ SHARE SIGNAL ON X
-        </button>
+        </a>
       </div>
 
       {/* Buy Buttons */}
