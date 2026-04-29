@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { Connection, PublicKey } from "@solana/web3.js";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Link from "next/link";
 import { ArrowLeft, RefreshCw } from "lucide-react";
 
@@ -49,6 +52,166 @@ type Signal = {
   volume_h24?: number | null;
   price_change_24h?: number | null;
 };
+
+const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
+const RPC = "https://mainnet.helius-rpc.com/?api-key=f88b1149-1fc7-4510-990f-29b312fe76d5";
+
+// ── Disclaimer Modal ──────────────────────────────────────────
+function DisclaimerModal({ onAccept }: { onAccept: () => void }) {
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)",
+      zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center",
+      padding: 24,
+    }}>
+      <div style={{
+        background: "#111", border: "1px solid #333", borderRadius: 16,
+        padding: 32, maxWidth: 480, width: "100%",
+      }}>
+        <div style={{ fontSize: 28, marginBottom: 8 }}>⚠️</div>
+        <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 800, marginBottom: 16 }}>
+          Risk Disclaimer
+        </h2>
+        <p style={{ color: "#aaa", fontSize: 14, lineHeight: 1.7, marginBottom: 12 }}>
+          TEFT Pulse zeigt Aktivitäten von Smart Wallets — <strong style={{color:"#fff"}}>kein Finanzrat</strong>. 
+          Trading mit Meme Coins ist hochriskant und kann zum Totalverlust führen.
+        </p>
+        <p style={{ color: "#aaa", fontSize: 14, lineHeight: 1.7, marginBottom: 12 }}>
+          Signale sind <strong style={{color:"#fff"}}>keine Kaufempfehlungen</strong>. 
+          DYOR. Investiere nur was du bereit bist zu verlieren.
+        </p>
+        <p style={{ color: "#666", fontSize: 12, lineHeight: 1.6, marginBottom: 24 }}>
+          Tokens auf Jupiter können mit "2 Warnings" markiert sein — das bedeutet der Token 
+          ist nicht verifiziert. Prüfe immer die Contract Address bevor du kaufst.
+        </p>
+        <button
+          onClick={onAccept}
+          style={{
+            width: "100%", background: "#4ade80", color: "#000",
+            border: "none", borderRadius: 10, padding: "14px 0",
+            fontSize: 15, fontWeight: 800, cursor: "pointer",
+          }}
+        >
+          Verstanden — Pulse öffnen
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Token Gate ────────────────────────────────────────────────
+function TokenGate({ children }: { children: React.ReactNode }) {
+  const { publicKey, connected } = useWallet();
+  const [hasAccess, setHasAccess] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    if (!connected || !publicKey) { setHasAccess(false); setChecked(false); return; }
+    setChecking(true);
+    const conn = new Connection(RPC);
+    conn.getParsedTokenAccountsByOwner(publicKey, { mint: new PublicKey(TEFT_MINT) })
+      .then(res => {
+        const amount = res.value?.[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount ?? 0;
+        setHasAccess(amount >= 1);
+        setChecked(true);
+      })
+      .catch(() => { setHasAccess(false); setChecked(true); })
+      .finally(() => setChecking(false));
+  }, [connected, publicKey]);
+
+  if (!connected) return (
+    <div style={{
+      minHeight: "100vh", background: "#0a0a0a", display: "flex",
+      flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20,
+    }}>
+      <div style={{ fontSize: 48 }}>🔒</div>
+      <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800 }}>TEFT Pulse</h2>
+      <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>
+        Verbinde dein Wallet um zu prüfen ob du TEFT hältst.
+      </p>
+      <WalletMultiButton />
+    </div>
+  );
+
+  if (checking) return (
+    <div style={{
+      minHeight: "100vh", background: "#0a0a0a", display: "flex",
+      alignItems: "center", justifyContent: "center",
+    }}>
+      <p style={{ color: "#888" }}>Prüfe TEFT Balance...</p>
+    </div>
+  );
+
+  if (checked && !hasAccess) return (
+    <div style={{
+      minHeight: "100vh", background: "#0a0a0a", display: "flex",
+      flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20,
+    }}>
+      <div style={{ fontSize: 48 }}>🚫</div>
+      <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800 }}>Kein Zugang</h2>
+      <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>
+        Du benötigst mindestens <strong style={{color:"#fff"}}>1 TEFT</strong> um Pulse zu nutzen.
+      </p>
+      <a
+        href={`https://jup.ag/swap/SOL-${TEFT_MINT}`}
+        target="_blank"
+        style={{
+          background: "#4ade80", color: "#000", borderRadius: 10,
+          padding: "12px 28px", fontWeight: 800, fontSize: 14,
+          textDecoration: "none",
+        }}
+      >
+        TEFT kaufen
+      </a>
+      <WalletMultiButton />
+    </div>
+  );
+
+  return <>{children}</>;
+}
+
+// ── Legend Modal ──────────────────────────────────────────────
+function LegendModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)",
+      zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center",
+      padding: 24,
+    }} onClick={onClose}>
+      <div style={{
+        background: "#111", border: "1px solid #333", borderRadius: 16,
+        padding: 28, maxWidth: 480, width: "100%",
+      }} onClick={e => e.stopPropagation()}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <h2 style={{ color: "#fff", fontSize: 18, fontWeight: 800 }}>Legende & Erklärung</h2>
+          <button onClick={onClose} style={{ background: "none", border: "none", color: "#888", fontSize: 20, cursor: "pointer" }}>✕</button>
+        </div>
+
+        {[
+          { label: "🟢 Strong", desc: "≥3 Smart Wallets haben diesen Token gekauft" },
+          { label: "🟡 Watch", desc: "2 Smart Wallets haben gekauft — beobachten" },
+          { label: "⚫ Weak", desc: "1 Smart Wallet — schwaches Signal" },
+          { label: "💀 Rugged", desc: "Liquidität unter $1.500 — Token vermutlich gerugged" },
+          { label: "B/S Ratio", desc: "Käufe ÷ Verkäufe. >2x = starke Kaufaktivität" },
+          { label: "MCap", desc: "Aktuelle Market Capitalization des Tokens" },
+          { label: "Vol", desc: "Handelsvolumen in den letzten 5min / 1h" },
+          { label: "Multiplier", desc: "Preisentwicklung seit Signal-Erkennung" },
+          { label: "Smart Wallet", desc: "Wallet mit nachgewiesener Trading-Performance" },
+        ].map(({ label, desc }) => (
+          <div key={label} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: "1px solid #222" }}>
+            <div style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>{label}</div>
+            <div style={{ color: "#888", fontSize: 12, marginTop: 2 }}>{desc}</div>
+          </div>
+        ))}
+
+        <p style={{ color: "#555", fontSize: 11, marginTop: 8 }}>
+          ⚠️ Kein Finanzrat. DYOR. Nur für Infozwecke.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -426,15 +589,11 @@ function SignalCard({ signal }: { signal: Signal }) {
 }
 
 export default function PulsePage() {
-  // Jupiter Terminal Script laden
-  useEffect(() => {
-    if (document.querySelector('script[src*="terminal.jup.ag"]')) return;
-    const script = document.createElement('script');
-    script.src = 'https://terminal.jup.ag/main-v3.js';
-    script.async = true;
-    document.head.appendChild(script);
-  }, []);
-
+  const [showDisclaimer, setShowDisclaimer] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !localStorage.getItem('teft_disclaimer_accepted');
+  });
+  const [showLegend, setShowLegend] = useState(false);
   const [signals, setSignals] = useState<Signal[]>([]);
   const [showWeak, setShowWeak] = useState(false);
   const [showWatch, setShowWatch] = useState(false);
@@ -473,6 +632,14 @@ export default function PulsePage() {
   };
 
   return (
+    <TokenGate>
+    {showDisclaimer && (
+      <DisclaimerModal onAccept={() => {
+        localStorage.setItem('teft_disclaimer_accepted', '1');
+        setShowDisclaimer(false);
+      }} />
+    )}
+    {showLegend && <LegendModal onClose={() => setShowLegend(false)} />}
     <main style={{
       minHeight: "100vh", background: "#000", color: "#fff",
       fontFamily: "'Inter', -apple-system, sans-serif",
@@ -545,6 +712,16 @@ export default function PulsePage() {
             color: "rgba(255,255,255,0.7)", fontSize: 10,
             fontWeight: 800, cursor: "pointer", letterSpacing: "0.1em",
           }}>
+            <button
+              onClick={() => setShowLegend(true)}
+              style={{
+                background: "rgba(255,255,255,0.1)", border: "none",
+                borderRadius: 8, padding: "6px 12px", color: "#fff",
+                fontSize: 12, fontWeight: 700, cursor: "pointer",
+              }}
+            >
+              ? Legende
+            </button>
             <RefreshCw size={10} strokeWidth={3}
               style={{ animation: refreshing ? "spin 1s linear infinite" : "none" }} />
             {refreshing ? "LOADING..." : "REFRESH"}
@@ -697,6 +874,7 @@ export default function PulsePage() {
       </div>
     {/* Jupiter Terminal Mount Point */}
       <div id="jupiter-terminal" />
-    </main>
+        </main>
+    </TokenGate>
   );
 }
