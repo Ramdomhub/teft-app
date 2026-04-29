@@ -27,9 +27,11 @@ async function getLiveTokenData(tokenAddress: string) {
     const pairs = Array.isArray(data) ? data : (data?.pairs ?? []);
     if (!pairs.length) return null;
 
-    const best = pairs.sort(
-      (a: any, b: any) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0)
-    )[0];
+    // Neuestes aktives Pair bevorzugen (nach pairCreatedAt)
+    const best = pairs
+      .filter((p: any) => p.liquidity?.usd > 100)
+      .sort((a: any, b: any) => (b.pairCreatedAt || 0) - (a.pairCreatedAt || 0))[0] 
+      || pairs[0];
 
     const result = {
       currentMarketCap: best.marketCap ? Number(best.marketCap) : null,
