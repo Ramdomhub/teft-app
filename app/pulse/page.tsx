@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
@@ -99,6 +100,14 @@ function MultiplierBadge({ multiplier }: { multiplier: number | null }) {
     }}>
       {label}
     </span>
+  );
+}
+
+function ShareLink({ href, children, style }: { href: string; children: React.ReactNode; style?: React.CSSProperties }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" style={style}>
+      {children}
+    </a>
   );
 }
 
@@ -358,19 +367,20 @@ function SignalCard({ signal }: { signal: Signal }) {
 
       {/* Share Button */}
       <div style={{ padding: "0 16px 8px" }}>
-        <button
-          onClick={() => { const a = document.createElement('a'); a.href = buildTweetUrl(signal); a.target = '_blank'; a.rel = 'noopener noreferrer'; document.body.appendChild(a); a.click(); document.body.removeChild(a); }}
+        <ShareLink
+          href={buildTweetUrl(signal)}
           style={{
-            width: "100%", background: "transparent",
+            display: "block", textAlign: "center",
+            background: "transparent",
             border: "1px solid #1e3a5f", borderRadius: 12,
             padding: "10px", color: "#60a5fa",
             fontSize: 10, fontWeight: 800,
-            letterSpacing: "0.15em", cursor: "pointer",
-            textTransform: "uppercase",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase", textDecoration: "none",
           }}
         >
           Share Signal on X
-        </button>
+        </ShareLink>
       </div>
 
       {/* Buy Buttons */}
