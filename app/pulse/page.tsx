@@ -107,10 +107,9 @@ function MultiplierBadge({ multiplier }: { multiplier: number | null }) {
 function openJupiter(tokenAddress: string, amount: string) {
   const referral = "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere";
   const lamports = Math.round(parseFloat(amount) * 1e9);
-  const webUrl = `https://jup.ag/swap/SOL-${tokenAddress}?referralAccount=${referral}&referralName=TEFTPulse&inAmount=${lamports}`;
-  
-  // Versuche zuerst die App zu öffnen (funktioniert in Safari)
-  // In-App Browser von X/Telegram: direkt zur Web-URL
+  // SOL Mint Adresse = So11111111111111111111111111111111111111112
+  const solMint = "So11111111111111111111111111111111111111112";
+  const webUrl = `https://jup.ag/swap/${solMint}-${tokenAddress}?referralAccount=${referral}&referralName=TEFTPulse&inAmount=${lamports}`;
   window.location.href = webUrl;
 }
 
