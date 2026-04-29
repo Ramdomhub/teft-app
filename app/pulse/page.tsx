@@ -162,7 +162,7 @@ function SignalCard({ signal }: { signal: Signal }) {
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 11, fontWeight: 900,
           }}>
-            {signal.wallet_count * 10 + 60}
+            {Math.min(100, signal.wallet_count * 20 + 40)}
           </span>
         </div>
       </div>
@@ -532,8 +532,12 @@ export default function PulsePage() {
             </div>
           </div>
         ) : (() => {
-          const strong = signals.filter(s => s.wallet_count >= 2);
-          const weak = signals.filter(s => s.wallet_count < 2);
+          const rugged = signals.filter(s => s.multiplier !== null && s.multiplier !== undefined && s.multiplier < 0.3);
+          const ruggedAddresses = new Set(rugged.map(s => s.token_address));
+          const active = signals.filter(s => !ruggedAddresses.has(s.token_address));
+          const strong = active.filter(s => s.wallet_count >= 3);
+          const watch = active.filter(s => s.wallet_count === 2);
+          const weak = active.filter(s => s.wallet_count < 2);
           return (
             <>
               {strong.length === 0 && !showWeak && (
@@ -548,6 +552,25 @@ export default function PulsePage() {
                 </div>
               )}
               {strong.map(signal => <SignalCard key={signal.id} signal={signal} />)}
+              {watch.length > 0 && watch.map(signal => <SignalCard key={signal.id} signal={signal} />)}
+              {rugged.length > 0 && (
+                <>
+                  <button
+                    onClick={() => setShowWeak(!showWeak)}
+                    style={{
+                      width: "100%", background: "transparent",
+                      border: "1px solid #3a1a1a", borderRadius: 12,
+                      padding: "12px", color: "#f87171",
+                      fontSize: 10, fontWeight: 800,
+                      letterSpacing: "0.1em", cursor: "pointer",
+                      marginTop: 8,
+                    }}
+                  >
+                    {showWeak ? "HIDE" : "SHOW"} {rugged.length} RUGGED TOKEN{rugged.length > 1 ? "S" : ""}
+                  </button>
+                  {showWeak && rugged.map(signal => <SignalCard key={signal.id} signal={signal} />)}
+                </>
+              )}
               {weak.length > 0 && (
                 <button
                   onClick={() => setShowWeak(!showWeak)}
