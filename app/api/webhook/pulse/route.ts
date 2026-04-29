@@ -122,6 +122,11 @@ function extractSolSpent(tx: HeliusTransaction, walletAddress: string): number {
 }
 
 export async function POST(req: NextRequest) {
+  // Helius Webhook Secret prüfen
+  const secret = req.headers.get('authorization');
+  if (process.env.WEBHOOK_SECRET && secret !== `Bearer ${process.env.WEBHOOK_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     // Helius sendet ein Array von Transaktionen
     const body = await req.json();
