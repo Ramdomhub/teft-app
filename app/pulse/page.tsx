@@ -335,7 +335,7 @@ function SignalCard({ signal }: { signal: Signal }) {
       {/* Buy Button */}
       <div style={{ padding: "0 16px 16px" }}>
         <button
-          onClick={() => window.open(`https://jup.ag/swap/SOL-${signal.token_address}`, "_blank")}
+          onClick={() => window.open(`https://jup.ag/swap/SOL-${signal.token_address}?referralAccount=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&referralName=TEFTPulse`, "_blank")}
           style={{
             width: "100%", display: "flex", alignItems: "center",
             justifyContent: "center", gap: 8,
