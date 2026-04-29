@@ -44,6 +44,8 @@ type Signal = {
   buy_sell_ratio_1h?: number | null;
   makers_5m?: number | null;
   makers_1h?: number | null;
+  volume_h24?: number | null;
+  price_change_24h?: number | null;
 };
 
 function timeAgo(dateStr: string): string {

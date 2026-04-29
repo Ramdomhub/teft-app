@@ -74,6 +74,8 @@ async function getLiveTokenData(tokenAddress: string) {
       volumeM5: Number(best.volume?.m5 || 0),
       volumeH1: Number(best.volume?.h1 || 0),
       volumeH6: Number(best.volume?.h6 || 0),
+      volumeH24: Number(best.volume?.h24 || 0),
+      priceChange24h: Number(best.priceChange?.h24 || 0),
       priceChangeM5: Number(best.priceChange?.m5 || 0),
       priceChangeH1: Number(best.priceChange?.h1 || 0),
       buys5m,
@@ -159,6 +161,8 @@ export async function GET() {
           token.volume_m5 = live.volumeM5;
           token.volume_h1 = live.volumeH1;
           token.volume_h6 = live.volumeH6;
+          token.volume_h24 = live.volumeH24;
+          token.price_change_24h = live.priceChange24h;
           token.price_change_m5 = live.priceChangeM5;
           token.price_change_h1 = live.priceChangeH1;
           token.buys_5m = live.buys5m;
