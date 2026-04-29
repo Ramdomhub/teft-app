@@ -27,10 +27,16 @@ async function getLiveTokenData(tokenAddress: string) {
     const pairs = Array.isArray(data) ? data : (data?.pairs ?? []);
     if (!pairs.length) return null;
 
-    // Neuestes aktives Pair bevorzugen (nach pairCreatedAt)
-    const best = pairs
+    // Raydium/PumpSwap bevorzugen, dann neuestes aktives Pair
+    const raydium = pairs.find((p: any) => 
+      p.dexId === 'raydium' && p.liquidity?.usd > 500
+    );
+    const pumpswap = pairs.find((p: any) => 
+      p.dexId === 'pumpswap' && p.liquidity?.usd > 500
+    );
+    const best = raydium || pumpswap || pairs
       .filter((p: any) => p.liquidity?.usd > 100)
-      .sort((a: any, b: any) => (b.pairCreatedAt || 0) - (a.pairCreatedAt || 0))[0] 
+      .sort((a: any, b: any) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0] 
       || pairs[0];
 
     const result = {
