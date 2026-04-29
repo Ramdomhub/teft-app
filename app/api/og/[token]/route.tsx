@@ -17,6 +17,7 @@ export async function GET(
   const currentMcap = searchParams.get("cm") || null;
   const vol24h = searchParams.get("v24") || null;
   const bsRatio = searchParams.get("bs") || null;
+  const imgUrl = searchParams.get("img") || null;
   const isUp = multiplier ? parseFloat(multiplier) >= 1 : true;
   const pct = multiplier ? `${isUp ? "+" : ""}${((parseFloat(multiplier) - 1) * 100).toFixed(0)}%` : null;
   const walletCount = parseInt(wallets);

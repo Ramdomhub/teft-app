@@ -113,6 +113,7 @@ function buildShareUrl(signal: Signal): string {
     ...(signal.current_market_cap ? { cm: formatUsd(signal.current_market_cap) } : {}),
     ...(signal.volume_h24 ? { v24: formatUsd(signal.volume_h24) } : {}),
     ...(signal.buy_sell_ratio_1h ? { bs: String(signal.buy_sell_ratio_1h) } : {}),
+    ...(signal.token_image_url ? { img: signal.token_image_url } : {}),
   });
   return `https://teftlegion.com/api/og/${signal.token_address}?${params.toString()}`;
 }
