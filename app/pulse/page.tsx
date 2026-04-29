@@ -443,6 +443,15 @@ function SignalCard({ signal }: { signal: Signal }) {
 }
 
 export default function PulsePage() {
+  // Jupiter Terminal Script laden
+  useEffect(() => {
+    if (document.querySelector('script[src*="terminal.jup.ag"]')) return;
+    const script = document.createElement('script');
+    script.src = 'https://terminal.jup.ag/main-v3.js';
+    script.async = true;
+    document.head.appendChild(script);
+  }, []);
+
   const [signals, setSignals] = useState<Signal[]>([]);
   const [showWeak, setShowWeak] = useState(false);
   const [showWatch, setShowWatch] = useState(false);
