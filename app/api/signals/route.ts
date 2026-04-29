@@ -9,7 +9,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Cache für DexScreener Live-Daten (30 Sek)
 const liveCache = new Map<string, { data: any; ts: number }>();
 const CACHE_TTL = 30_000;
 
@@ -25,19 +24,28 @@ async function getLiveTokenData(tokenAddress: string) {
     if (!res.ok) return null;
     const data = await res.json();
     const pairs = Array.isArray(data) ? data : (data?.pairs ?? []);
-    if (!pairs.length) return null;
 
-    // Raydium/PumpSwap bevorzugen, dann neuestes aktives Pair
-    const raydium = pairs.find((p: any) => 
-      p.dexId === 'raydium' && p.liquidity?.usd > 500
+    if (!pairs.length || pairs.every((p: any) => !p.marketCap && !p.liquidity?.usd)) {
+      return null;
+    }
+
+    const raydium = pairs.find((p: any) => p.dexId === "raydium" && (p.liquidity?.usd || 0) > 500);
+    const pumpswap = pairs.find((p: any) => p.dexId === "pumpswap" && (p.liquidity?.usd || 0) > 500);
+    const byLiquidity = pairs
+      .filter((p: any) => (p.liquidity?.usd || 0) > 100)
+      .sort((a: any, b: any) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0];
+
+    const best = raydium || pumpswap || byLiquidity || pairs[0];
+
+    const isMigrated =
+      best.dexId === "raydium" ||
+      best.dexId === "pumpswap" ||
+      pairs.some((p: any) => p.dexId === "raydium" && (p.liquidity?.usd || 0) > 100);
+
+    const isDexPaid = !!(
+      (best.info?.websites && best.info.websites.length > 0) ||
+      (best.info?.socials && best.info.socials.length > 0)
     );
-    const pumpswap = pairs.find((p: any) => 
-      p.dexId === 'pumpswap' && p.liquidity?.usd > 500
-    );
-    const best = raydium || pumpswap || pairs
-      .filter((p: any) => p.liquidity?.usd > 100)
-      .sort((a: any, b: any) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0] 
-      || pairs[0];
 
     const result = {
       currentMarketCap: best.marketCap ? Number(best.marketCap) : null,
@@ -49,6 +57,9 @@ async function getLiveTokenData(tokenAddress: string) {
       priceChangeH1: Number(best.priceChange?.h1 || 0),
       buys5m: Number(best.txns?.m5?.buys || 0),
       sells5m: Number(best.txns?.m5?.sells || 0),
+      dexscreenerUrl: best.url || null,
+      isMigrated,
+      isDexPaid,
     };
 
     liveCache.set(tokenAddress, { data: result, ts: Date.now() });
@@ -78,7 +89,6 @@ export async function GET() {
 
     if (error) throw error;
 
-    // Aggregieren: mehrere Wallets auf gleichem Token
     const grouped: Record<string, any> = {};
     for (const row of data || []) {
       const key = row.token_address;
@@ -98,9 +108,8 @@ export async function GET() {
       }
     }
 
-    // Live-Daten von DexScreener holen (parallel, max 10 gleichzeitig)
     const tokens = Object.values(grouped);
-    const chunks = [];
+    const chunks: any[][] = [];
     for (let i = 0; i < tokens.length; i += 10) chunks.push(tokens.slice(i, i + 10));
 
     for (const chunk of chunks) {
@@ -116,8 +125,9 @@ export async function GET() {
           token.price_change_h1 = live.priceChangeH1;
           token.buys_5m = live.buys5m;
           token.sells_5m = live.sells5m;
-
-          // X-Multiplikator berechnen
+          token.is_migrated = live.isMigrated;
+          token.is_dex_paid = live.isDexPaid;
+          if (live.dexscreenerUrl) token.dexscreener_url = live.dexscreenerUrl;
           if (token.entry_market_cap && live.currentMarketCap) {
             token.multiplier = live.currentMarketCap / token.entry_market_cap;
           }

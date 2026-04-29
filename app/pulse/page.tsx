@@ -30,6 +30,8 @@ type Signal = {
   wallet_address: string;
   wallet_label: string | null;
   wallet_count: number;
+  is_migrated?: boolean;
+  is_dex_paid?: boolean;
 };
 
 function timeAgo(dateStr: string): string {
@@ -250,6 +252,16 @@ function SignalCard({ signal }: { signal: Signal }) {
             Freeze: Clear
           </span>
         </div>
+        {signal.is_migrated && (
+          <div style={{ background: "#1a1a3a", borderRadius: 8, padding: "4px 10px", display: "flex", alignItems: "center", gap: 4 }}>
+            <span style={{ color: "#60a5fa", fontSize: 9, fontWeight: 800 }}>MIGRATED</span>
+          </div>
+        )}
+        {signal.is_dex_paid && (
+          <div style={{ background: "#2a1a3a", borderRadius: 8, padding: "4px 10px", display: "flex", alignItems: "center", gap: 4 }}>
+            <span style={{ color: "#c084fc", fontSize: 9, fontWeight: 800 }}>DEX PAID</span>
+          </div>
+        )}
         {signal.dexscreener_url && (
           <a href={signal.dexscreener_url} target="_blank" rel="noopener noreferrer"
             style={{
