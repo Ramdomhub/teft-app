@@ -247,9 +247,10 @@ function SignalCard({ signal }: { signal: Signal }) {
         margin: "0 16px 10px", borderRadius: 12, overflow: "hidden",
       }}>
         {[
-          { label: "Wallets", value: `${signal.wallet_count}x` },
-          { label: "Liquidity", value: formatUsd(signal.current_liquidity || signal.liquidity_usd) },
-          { label: "Buys 5m", value: signal.buys_5m ? `${signal.buys_5m}` : "—" },
+          { label: "Bought", value: `${signal.wallet_count}x`, color: "#fff" },
+          { label: "Sold", value: signal.sell_count !== undefined ? `${signal.sell_count}x` : "0x", color: signal.sell_count && signal.sell_count > 0 ? "#f87171" : "#666" },
+          { label: "Holding", value: signal.holders_count !== undefined ? `${signal.holders_count}x` : `${signal.wallet_count}x`, color: "#4ade80" },
+          { label: "Liquidity", value: formatUsd(signal.current_liquidity || signal.liquidity_usd), color: "#fff" },
         ].map(({ label, value }) => (
           <div key={label} style={{
             background: "#0d0d0d", padding: "10px 8px", textAlign: "center",
