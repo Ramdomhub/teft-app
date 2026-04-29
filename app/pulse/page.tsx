@@ -691,6 +691,8 @@ export default function PulsePage() {
           );
         })()}
       </div>
+    {/* Jupiter Terminal Mount Point */}
+      <div id="jupiter-terminal" />
     </main>
   );
 }
