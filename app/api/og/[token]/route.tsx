@@ -7,7 +7,6 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ token: string }> }
 ) {
-  const { token } = await params;
   const { searchParams } = new URL(req.url);
 
   const name = searchParams.get("name") || "Unknown Token";
@@ -20,232 +19,164 @@ export async function GET(
   const bsRatio = searchParams.get("bs") || null;
   const isUp = multiplier ? parseFloat(multiplier) >= 1 : true;
   const pct = multiplier ? `${isUp ? "+" : ""}${((parseFloat(multiplier) - 1) * 100).toFixed(0)}%` : null;
+  const walletCount = parseInt(wallets);
+  const isStrong = walletCount >= 3;
+  const score = Math.min(100, walletCount * 20 + 40);
 
   return new ImageResponse(
     (
       <div style={{
         width: "1200px", height: "630px",
-        background: "#000000",
-        display: "flex", flexDirection: "column",
-        padding: "56px 64px",
+        background: "#000",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         fontFamily: "sans-serif",
-        position: "relative",
-        overflow: "hidden",
       }}>
-
-        {/* Background subtle grid */}
+        {/* Signal Card — exakt wie in der App */}
         <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: "radial-gradient(circle at 15% 50%, rgba(255,255,255,0.04) 0%, transparent 50%), radial-gradient(circle at 85% 20%, rgba(74,222,128,0.06) 0%, transparent 40%)",
+          width: "680px",
+          background: "#0d0d0d",
+          border: "1px solid #1e1e1e",
+          borderRadius: "20px",
+          overflow: "hidden",
           display: "flex",
-        }} />
-
-        {/* Top bar */}
-        <div style={{
-          display: "flex", alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "44px",
+          flexDirection: "column",
         }}>
+          {/* Header */}
           <div style={{
-            display: "flex", alignItems: "center", gap: "10px",
+            padding: "20px 20px 16px",
+            display: "flex", alignItems: "center", gap: "16px",
           }}>
-            <div style={{ fontSize: "18px", display: "flex" }}>⚡</div>
+            {/* Token Avatar */}
             <div style={{
-              fontSize: "18px", color: "#ffffff",
-              fontWeight: 900, letterSpacing: "0.15em",
-              display: "flex",
+              width: "52px", height: "52px", borderRadius: "50%",
+              background: "#1a1a1a", flexShrink: 0,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "18px", color: "#444", fontWeight: 800,
             }}>
-              TEFT PULSE
+              {symbol.slice(0, 2).toUpperCase()}
             </div>
+
+            {/* Name + DEX */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "4px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ color: "#fff", fontWeight: 800, fontSize: "18px", display: "flex" }}>
+                  {name}
+                </span>
+                <span style={{ color: "#444", fontSize: "13px", fontWeight: 700, display: "flex" }}>
+                  {symbol}
+                </span>
+                {pct && (
+                  <div style={{
+                    background: isUp ? "#0a2a1a" : "#2a0a0a",
+                    borderRadius: "8px", padding: "3px 10px",
+                    color: isUp ? "#4ade80" : "#f87171",
+                    fontSize: "13px", fontWeight: 900,
+                    display: "flex",
+                  }}>
+                    {pct}
+                  </div>
+                )}
+              </div>
+              <span style={{ color: "#444", fontSize: "12px", display: "flex" }}>
+                Pump.fun · Smart Signal
+              </span>
+            </div>
+
+            {/* Badge */}
             <div style={{
-              background: "#111", border: "1px solid #333",
-              borderRadius: "6px", padding: "3px 10px",
-              color: "#444", fontSize: "11px", fontWeight: 700,
-              letterSpacing: "0.15em", marginLeft: "8px",
-              display: "flex",
+              background: isStrong ? "#1a3a2a" : "#3a2a10",
+              borderRadius: "20px", padding: "6px 14px",
+              display: "flex", alignItems: "center", gap: "8px",
             }}>
-              SMART SIGNAL
+              <span style={{
+                color: isStrong ? "#4ade80" : "#fbbf24",
+                fontSize: "13px", fontWeight: 900,
+                display: "flex",
+              }}>
+                {isStrong ? "Strong" : "Watch"}
+              </span>
+              <div style={{
+                background: isStrong ? "#4ade8030" : "#fbbf2430",
+                borderRadius: "50%", width: "24px", height: "24px",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: isStrong ? "#4ade80" : "#fbbf24",
+                fontSize: "12px", fontWeight: 900,
+              }}>
+                {score}
+              </div>
             </div>
           </div>
+
+          {/* MCap Row */}
           <div style={{
-            color: "#333", fontSize: "13px", fontWeight: 600,
-            letterSpacing: "0.05em", display: "flex",
+            margin: "0 20px 12px",
+            background: "#111", borderRadius: "12px",
+            padding: "14px 18px",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
           }}>
-            teftlegion.com/pulse
-          </div>
-        </div>
-
-        {/* Main row */}
-        <div style={{ display: "flex", gap: "40px", flex: 1 }}>
-
-          {/* Left */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "20px" }}>
-
-            {/* Symbol + % */}
-            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-              <div style={{
-                fontSize: "80px", fontWeight: 900,
-                color: "#ffffff", letterSpacing: "-0.04em",
-                lineHeight: 1, display: "flex",
-              }}>
-                {symbol}
-              </div>
-              {pct && (
-                <div style={{
-                  background: isUp ? "#052a14" : "#2a0505",
-                  border: `2px solid ${isUp ? "#22c55e" : "#ef4444"}`,
-                  borderRadius: "14px", padding: "8px 20px",
-                  color: isUp ? "#22c55e" : "#ef4444",
-                  fontSize: "36px", fontWeight: 900,
-                  display: "flex",
-                }}>
-                  {pct}
-                </div>
-              )}
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <span style={{ color: "#444", fontSize: "10px", fontWeight: 800, letterSpacing: "0.1em", display: "flex" }}>
+                MCAP AT SIGNAL
+              </span>
+              <span style={{ color: "#fff", fontSize: "22px", fontWeight: 900, display: "flex" }}>
+                {entryMcap || "—"}
+              </span>
             </div>
-
-            {/* Token name */}
-            <div style={{
-              fontSize: "22px", color: "#555",
-              fontWeight: 600, letterSpacing: "0.02em",
-              display: "flex",
-            }}>
-              {name}
-            </div>
-
-            {/* MCap row */}
-            {entryMcap && currentMcap && (
-              <div style={{
-                display: "flex", alignItems: "center", gap: "20px",
-                background: "#0a0a0a",
-                border: "1px solid #222",
-                borderRadius: "16px", padding: "20px 28px",
-                marginTop: "8px",
+            <span style={{ color: "#333", fontSize: "20px", display: "flex" }}>→</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", textAlign: "right" }}>
+              <span style={{ color: "#444", fontSize: "10px", fontWeight: 800, letterSpacing: "0.1em", display: "flex" }}>
+                CURRENT MCAP
+              </span>
+              <span style={{
+                color: isUp ? "#4ade80" : "#f87171",
+                fontSize: "22px", fontWeight: 900, display: "flex",
               }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                  <div style={{
-                    color: "#444", fontSize: "11px",
-                    fontWeight: 800, letterSpacing: "0.12em",
-                    display: "flex",
-                  }}>
-                    ENTRY MCAP
-                  </div>
-                  <div style={{
-                    color: "#888", fontSize: "30px",
-                    fontWeight: 900, display: "flex",
-                  }}>
-                    {entryMcap}
-                  </div>
-                </div>
-                <div style={{
-                  color: "#333", fontSize: "28px",
-                  display: "flex", paddingTop: "12px",
-                }}>
-                  →
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                  <div style={{
-                    color: "#444", fontSize: "11px",
-                    fontWeight: 800, letterSpacing: "0.12em",
-                    display: "flex",
-                  }}>
-                    CURRENT MCAP
-                  </div>
-                  <div style={{
-                    color: isUp ? "#22c55e" : "#ef4444",
-                    fontSize: "30px", fontWeight: 900,
-                    display: "flex",
-                  }}>
-                    {currentMcap}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Wallets badge */}
-            <div style={{
-              display: "flex", alignItems: "center", gap: "10px",
-              marginTop: "4px",
-            }}>
-              <div style={{
-                background: "#0a1a0a", border: "1px solid #1a3a1a",
-                borderRadius: "10px", padding: "8px 16px",
-                display: "flex", alignItems: "center", gap: "8px",
-              }}>
-                <div style={{ color: "#22c55e", fontSize: "22px", fontWeight: 900, display: "flex" }}>
-                  {wallets}x
-                </div>
-                <div style={{ color: "#2a6a2a", fontSize: "12px", fontWeight: 800, letterSpacing: "0.1em", display: "flex" }}>
-                  SMART WALLETS
-                </div>
-              </div>
+                {currentMcap || "—"}
+              </span>
             </div>
           </div>
 
-          {/* Right: Stats */}
+          {/* Stats Grid */}
           <div style={{
-            width: "280px", display: "flex",
-            flexDirection: "column", gap: "12px",
+            margin: "0 20px 12px",
+            display: "flex", gap: "1px",
+            background: "#111", borderRadius: "12px", overflow: "hidden",
           }}>
             {[
-              {
-                label: "VOL 24H",
-                value: vol24h || "—",
-                color: "#ffffff",
-              },
-              {
-                label: "BUY/SELL 1H",
-                value: bsRatio ? bsRatio + "x" : "—",
-                color: bsRatio && parseFloat(bsRatio) >= 2 ? "#22c55e" :
-                       bsRatio && parseFloat(bsRatio) < 1 ? "#ef4444" : "#ffffff",
-              },
-              {
-                label: "SIGNAL",
-                value: parseInt(wallets) >= 3 ? "STRONG" : "WATCH",
-                color: parseInt(wallets) >= 3 ? "#22c55e" : "#f59e0b",
-              },
-            ].map(({ label, value, color }) => (
+              { label: "WALLETS", value: `${wallets}x` },
+              { label: "VOL 24H", value: vol24h || "—" },
+              { label: "B/S 1H", value: bsRatio ? bsRatio + "x" : "—" },
+            ].map(({ label, value }) => (
               <div key={label} style={{
-                background: "#080808",
-                border: "1px solid #1a1a1a",
-                borderRadius: "14px",
-                padding: "18px 22px",
-                display: "flex", flexDirection: "column", gap: "6px",
-                flex: 1,
+                flex: 1, background: "#0d0d0d",
+                padding: "12px 8px", textAlign: "center",
+                display: "flex", flexDirection: "column", gap: "4px",
+                alignItems: "center",
               }}>
-                <div style={{
-                  color: "#333", fontSize: "10px",
-                  fontWeight: 800, letterSpacing: "0.15em",
-                  display: "flex",
-                }}>
+                <span style={{ color: "#444", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", display: "flex" }}>
                   {label}
-                </div>
-                <div style={{
-                  color, fontSize: "26px",
-                  fontWeight: 900, display: "flex",
-                }}>
+                </span>
+                <span style={{ color: "#fff", fontSize: "18px", fontWeight: 900, display: "flex" }}>
                   {value}
-                </div>
+                </span>
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Bottom */}
-        <div style={{
-          marginTop: "24px",
-          display: "flex", alignItems: "center",
-          justifyContent: "space-between",
-        }}>
+          {/* Footer */}
           <div style={{
-            color: "#222", fontSize: "11px", display: "flex",
+            padding: "12px 20px",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            borderTop: "1px solid #111",
           }}>
-            Not financial advice. High risk. DYOR.
-          </div>
-          <div style={{
-            color: "#222", fontSize: "11px", display: "flex",
-          }}>
-            Powered by TEFT Smart Wallet Tracker
+            <span style={{ color: "#333", fontSize: "11px", display: "flex" }}>
+              ⚡ TEFT Pulse · See what others don't.
+            </span>
+            <span style={{ color: "#333", fontSize: "11px", display: "flex" }}>
+              teftlegion.com/pulse
+            </span>
           </div>
         </div>
       </div>
