@@ -112,7 +112,7 @@ function openJupiter(tokenAddress: string, amount: string) {
   if (jup) {
     jup.init({
       displayMode: "modal",
-      endpoint: "https://api.mainnet-beta.solana.com",
+      endpoint: "https://mainnet.helius-rpc.com/?api-key=f88b1149-1fc7-4510-990f-29b312fe76d5",
       formProps: {
         initialInputMint: solMint,
         initialOutputMint: tokenAddress,
