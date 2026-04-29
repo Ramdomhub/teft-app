@@ -128,8 +128,18 @@ function buildShareUrl(signal: Signal): string {
 
 function buildTweetUrl(signal: Signal): string {
   const multiplierStr = signal.multiplier ? `+${((signal.multiplier - 1) * 100).toFixed(0)}%` : "";
-  const text = `⚡ TEFT Pulse Signal\n\n${signal.token_symbol} ${multiplierStr} | ${signal.wallet_count}x Smart Wallets\nEntry MCap: ${formatUsd(signal.entry_market_cap)} → Now: ${formatUsd(signal.current_market_cap)}\n\nSee what others don't 👇\nteftlegion.com/pulse\n\n#Solana #TEFTPulse`;
-  const signalUrl = `https://teftlegion.com/pulse/signal/${signal.token_address}?${params.toString()}`;
+  const tweetParams = new URLSearchParams({
+    name: signal.token_name || "",
+    symbol: signal.token_symbol || "",
+    w: String(signal.wallet_count),
+    ...(signal.multiplier ? { mx: signal.multiplier.toFixed(2) } : {}),
+    ...(signal.entry_market_cap ? { em: formatUsd(signal.entry_market_cap) } : {}),
+    ...(signal.current_market_cap ? { cm: formatUsd(signal.current_market_cap) } : {}),
+    ...(signal.volume_h24 ? { v24: formatUsd(signal.volume_h24) } : {}),
+    ...(signal.buy_sell_ratio_1h ? { bs: String(signal.buy_sell_ratio_1h) } : {}),
+  });
+  const signalUrl = `https://teftlegion.com/pulse/signal/${signal.token_address}?${tweetParams.toString()}`;
+  const text = `⚡ TEFT Pulse Signal\n\n${signal.token_symbol} ${multiplierStr} | ${signal.wallet_count}x Smart Wallets\nEntry MCap: ${formatUsd(signal.entry_market_cap)} → Now: ${formatUsd(signal.current_market_cap)}\n\nSee what others don't 👇\n\n#Solana #TEFTPulse`;
   return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(signalUrl)}`;
 }
 
