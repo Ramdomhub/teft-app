@@ -108,8 +108,9 @@ function openJupiter(tokenAddress: string, amount: string) {
   const referral = "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere";
   const lamports = Math.round(parseFloat(amount) * 1e9);
   // SOL Mint Adresse = So11111111111111111111111111111111111111112
-  // Jupiter URL: inputMint=SOL, outputMint=Token, amount in SOL
-  const webUrl = `https://jup.ag/swap?inputMint=So11111111111111111111111111111111111111112&outputMint=${tokenAddress}&amount=${amount}&referralAccount=${referral}&referralName=TEFTPulse`;
+  const referrer = "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere";
+  const feeBps = 50; // 0.5%
+  const webUrl = `https://jup.ag/swap/SOL-${tokenAddress}?referrer=${referrer}&feeBps=${feeBps}`;
   window.location.href = webUrl;
 }
 
