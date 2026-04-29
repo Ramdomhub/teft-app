@@ -553,7 +553,11 @@ export default function PulsePage() {
               boxShadow: loading ? "none" : "0 0 6px #22c55e",
             }} />
             <span style={{ color: "#555", fontSize: 10, fontWeight: 800, letterSpacing: "0.1em" }}>
-              {loading ? "SCANNING..." : `LIVE · ${signals.filter(s => s.wallet_count >= 3 && !(s.multiplier !== null && s.multiplier !== undefined && s.multiplier < 0.3)).length} SIGNALS`}
+              {loading ? "SCANNING..." : `LIVE · ${signals.filter(s => s.wallet_count >= 3 && !(
+    (s.multiplier !== null && s.multiplier !== undefined && s.multiplier < 0.4) ||
+    (s.current_market_cap !== null && s.current_market_cap !== undefined && s.current_market_cap < 2000) ||
+    (s.current_liquidity !== null && s.current_liquidity !== undefined && s.current_liquidity < 500)
+  )).length} SIGNALS`}
             </span>
           </div>
           {lastUpdate && (
@@ -596,7 +600,11 @@ export default function PulsePage() {
             </div>
           </div>
         ) : (() => {
-          const rugged = signals.filter(s => s.multiplier !== null && s.multiplier !== undefined && s.multiplier < 0.3);
+          const rugged = signals.filter(s => 
+    (s.multiplier !== null && s.multiplier !== undefined && s.multiplier < 0.4) ||
+    (s.current_market_cap !== null && s.current_market_cap !== undefined && s.current_market_cap < 2000) ||
+    (s.current_liquidity !== null && s.current_liquidity !== undefined && s.current_liquidity < 500)
+  );
           const ruggedAddresses = new Set(rugged.map(s => s.token_address));
           const active = signals.filter(s => !ruggedAddresses.has(s.token_address));
           const strong = active.filter(s => s.wallet_count >= 3);
