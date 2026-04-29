@@ -225,13 +225,14 @@ function SignalCard({ signal }: { signal: Signal }) {
         margin: "0 16px 10px",
         background: "#111", borderRadius: 12,
         padding: "10px 14px",
-        display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
-        gap: 8,
+        display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr",
+        gap: 6,
       }}>
         {[
           { label: "Vol 5m", value: formatUsd(signal.volume_m5), pct: signal.price_change_m5 },
           { label: "Vol 1h", value: formatUsd(signal.volume_h1), pct: signal.price_change_h1 },
-          { label: "Vol 2h", value: formatUsd(signal.volume_h6), pct: null },
+          { label: "Vol 6h", value: formatUsd(signal.volume_h6), pct: null },
+          { label: "Vol 24h", value: formatUsd(signal.volume_h24 ?? null), pct: signal.price_change_24h ?? null },
         ].map(({ label, value, pct }) => (
           <div key={label} style={{ textAlign: "center" }}>
             <div style={{ color: "#444", fontSize: 9, fontWeight: 800, letterSpacing: "0.08em" }}>
