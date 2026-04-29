@@ -104,6 +104,16 @@ function MultiplierBadge({ multiplier }: { multiplier: number | null }) {
   );
 }
 
+function openJupiter(tokenAddress: string, amount: string) {
+  const referral = "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere";
+  const lamports = Math.round(parseFloat(amount) * 1e9);
+  const webUrl = `https://jup.ag/swap/SOL-${tokenAddress}?referralAccount=${referral}&referralName=TEFTPulse&inAmount=${lamports}`;
+  
+  // Versuche zuerst die App zu öffnen (funktioniert in Safari)
+  // In-App Browser von X/Telegram: direkt zur Web-URL
+  window.location.href = webUrl;
+}
+
 function ShareLink({ href, children, style }: { href: string; children: React.ReactNode; style?: React.CSSProperties }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" style={style}>
@@ -400,7 +410,7 @@ function SignalCard({ signal }: { signal: Signal }) {
         {["0.01", "0.05", "0.1"].map((amount) => (
           <button
             key={amount}
-            onClick={() => window.open(`https://jup.ag/swap/SOL-${signal.token_address}?referralAccount=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&referralName=TEFTPulse&inAmount=${Math.round(parseFloat(amount) * 1e9)}`, "_blank")}
+            onClick={() => openJupiter(signal.token_address, amount)}
             style={{
               flex: 1,
               background: amount === "0.1" ? "#fff" : "#1a1a1a",
