@@ -358,23 +358,19 @@ function SignalCard({ signal }: { signal: Signal }) {
 
       {/* Share Button */}
       <div style={{ padding: "0 16px 8px" }}>
-        
-          href={buildTweetUrl(signal)}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={() => { const a = document.createElement('a'); a.href = buildTweetUrl(signal); a.target = '_blank'; a.rel = 'noopener noreferrer'; document.body.appendChild(a); a.click(); document.body.removeChild(a); }}
           style={{
-            display: "block", width: "100%",
-            background: "transparent",
+            width: "100%", background: "transparent",
             border: "1px solid #1e3a5f", borderRadius: 12,
             padding: "10px", color: "#60a5fa",
             fontSize: 10, fontWeight: 800,
             letterSpacing: "0.15em", cursor: "pointer",
-            textTransform: "uppercase", textDecoration: "none",
-            textAlign: "center", boxSizing: "border-box",
+            textTransform: "uppercase",
           }}
         >
           Share Signal on X
-        </a>
+        </button>
       </div>
 
       {/* Buy Buttons */}
