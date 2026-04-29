@@ -128,6 +128,7 @@ function SignalCard({ signal }: { signal: Signal }) {
   const badge = isRugged 
     ? { label: 'RUGGED', bg: '#2a0a0a', color: '#f87171' }
     : signalBadge(signal.wallet_count);
+  const showScore = !isRugged;
   const mcapUp = signal.current_market_cap && signal.entry_market_cap
     ? signal.current_market_cap >= signal.entry_market_cap
     : null;
@@ -398,6 +399,7 @@ function SignalCard({ signal }: { signal: Signal }) {
 export default function PulsePage() {
   const [signals, setSignals] = useState<Signal[]>([]);
   const [showWeak, setShowWeak] = useState(false);
+  const [showRugged, setShowRugged] = useState(false);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -594,7 +596,7 @@ export default function PulsePage() {
               {rugged.length > 0 && (
                 <>
                   <button
-                    onClick={() => setShowWeak(!showWeak)}
+                    onClick={() => setShowRugged(!showRugged)}
                     style={{
                       width: "100%", background: "transparent",
                       border: "1px solid #3a1a1a", borderRadius: 12,
@@ -604,9 +606,9 @@ export default function PulsePage() {
                       marginTop: 8,
                     }}
                   >
-                    {showWeak ? "HIDE" : "SHOW"} {rugged.length} RUGGED TOKEN{rugged.length > 1 ? "S" : ""}
+                    {showRugged ? "HIDE" : "SHOW"} {rugged.length} RUGGED TOKEN{rugged.length > 1 ? "S" : ""}
                   </button>
-                  {showWeak && rugged.map(signal => <SignalCard key={signal.id} signal={signal} />)}
+                  {showRugged && rugged.map(signal => <SignalCard key={signal.id} signal={signal} />)}
                 </>
               )}
               {weak.length > 0 && (
