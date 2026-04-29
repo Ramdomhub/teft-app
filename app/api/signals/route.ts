@@ -52,7 +52,7 @@ async function getLiveTokenData(tokenAddress: string) {
       (s.type || s.platform || "").toLowerCase().includes("telegram")
     );
     const hasWebsite = !!(best.info?.websites && best.info.websites.length > 0);
-    const isDexPaid = !!(hasTwitter || hasTelegram || hasWebsite);
+    const isDexPaid = !!(best.boosts?.active);
 
     // Buy/Sell Ratio (5m)
     const buys5m = Number(best.txns?.m5?.buys || 0);
