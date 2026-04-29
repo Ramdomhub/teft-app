@@ -86,7 +86,7 @@ async function getLiveTokenData(tokenAddress: string) {
       makers1h,
       dexscreenerUrl: best.url || null,
       isMigrated,
-      isDexPaid,
+      isDexPaid: !!(best.boosts?.active),
       hasTwitter,
       hasTelegram,
       hasWebsite,
