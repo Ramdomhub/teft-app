@@ -104,28 +104,9 @@ function MultiplierBadge({ multiplier }: { multiplier: number | null }) {
   );
 }
 
-function openJupiter(tokenAddress: string, amount: string) {
+function openJupiter(tokenAddress: string) {
   const referrer = "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere";
-  const solMint = "So11111111111111111111111111111111111111112";
-  const lamports = String(Math.round(parseFloat(amount) * 1e9));
-  const jup = (window as any).Jupiter;
-  if (jup) {
-    jup.init({
-      displayMode: "modal",
-      endpoint: `${window.location.origin}/api/rpc`,
-      strictTokenList: false,
-      formProps: {
-        initialInputMint: solMint,
-        initialOutputMint: tokenAddress,
-        initialAmount: lamports,
-        fixedOutputMint: true,
-      },
-      referralAccount: referrer,
-      referralFee: 50,
-    });
-  } else {
-    window.open(`https://jup.ag/swap/SOL-${tokenAddress}?referrer=${referrer}&feeBps=50`, "_blank");
-  }
+  window.open(`https://jup.ag/swap/SOL-${tokenAddress}?referrer=${referrer}&feeBps=50`, "_blank");
 }
 
 function ShareLink({ href, children, style }: { href: string; children: React.ReactNode; style?: React.CSSProperties }) {
