@@ -120,7 +120,8 @@ function buildShareUrl(signal: Signal): string {
 function buildTweetUrl(signal: Signal): string {
   const multiplierStr = signal.multiplier ? `+${((signal.multiplier - 1) * 100).toFixed(0)}%` : "";
   const text = `⚡ TEFT Pulse Signal\n\n${signal.token_symbol} ${multiplierStr} | ${signal.wallet_count}x Smart Wallets\nEntry MCap: ${formatUsd(signal.entry_market_cap)} → Now: ${formatUsd(signal.current_market_cap)}\n\nSee what others don't 👇\nteftlegion.com/pulse\n\n#Solana #TEFTPulse`;
-  return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  const signalUrl = `https://teftlegion.com/pulse/signal/${signal.token_address}?${params.toString()}`;
+  return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(signalUrl)}`;
 }
 
 function SignalCard({ signal }: { signal: Signal }) {
