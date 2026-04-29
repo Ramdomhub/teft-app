@@ -25,11 +25,11 @@ export default function Home() {
         {/* Button Grid */}
         <div className="grid grid-cols-2 gap-3 px-2">
           <a 
-            href="https://trade.phantom.com/token/8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump" 
+            href="https://jup.ag/swap/SOL-8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump?referral=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&feeBps=50" 
             target="_blank" 
             className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95"
           >
-            Swap via Phantom
+            Buy TEFT
           </a>
           
           <a 
@@ -47,9 +47,12 @@ export default function Home() {
             NFT Staking
           </a>
           
-          <div className="bg-[#e9e9e9] text-zinc-400 py-4 rounded-2xl text-center text-xs font-bold opacity-60 cursor-not-allowed flex items-center justify-center">
-            TEFT Pulse
-          </div>
+          
+            href="/pulse"
+            className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95 flex items-center justify-center gap-1"
+          >
+            TEFT Pulse ⚡
+          </a>
         </div>
 
         {/* Footer Links - Mit korrigiertem X Link */}
