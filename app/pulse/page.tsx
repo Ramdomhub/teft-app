@@ -106,7 +106,7 @@ function MultiplierBadge({ multiplier }: { multiplier: number | null }) {
 
 function openJupiter(tokenAddress: string, amount: number) {
   const referrer = "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere";
-  window.open(`https://jup.ag/swap?sell=So11111111111111111111111111111111111111112&buy=${tokenAddress}&referral=${referrer}&feeBps=50`, "_blank");
+  window.open(`https://jup.ag/swap?sell=So11111111111111111111111111111111111111112&buy=${tokenAddress}&amount=${amount}&referral=${referrer}&feeBps=50`, "_blank");
 }
 
 function ShareLink({ href, children, style }: { href: string; children: React.ReactNode; style?: React.CSSProperties }) {
