@@ -400,6 +400,7 @@ function SignalCard({ signal }: { signal: Signal }) {
 export default function PulsePage() {
   const [signals, setSignals] = useState<Signal[]>([]);
   const [showWeak, setShowWeak] = useState(false);
+  const [showWatch, setShowWatch] = useState(false);
   const [showRugged, setShowRugged] = useState(false);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
@@ -530,7 +531,7 @@ export default function PulsePage() {
               boxShadow: loading ? "none" : "0 0 6px #22c55e",
             }} />
             <span style={{ color: "#555", fontSize: 10, fontWeight: 800, letterSpacing: "0.1em" }}>
-              {loading ? "SCANNING..." : `LIVE · ${signals.length} SIGNALS`}
+              {loading ? "SCANNING..." : `LIVE · ${signals.filter(s => s.wallet_count >= 3 && !(s.multiplier !== null && s.multiplier !== undefined && s.multiplier < 0.3)).length} SIGNALS`}
             </span>
           </div>
           {lastUpdate && (
@@ -593,7 +594,24 @@ export default function PulsePage() {
                 </div>
               )}
               {strong.map(signal => <SignalCard key={signal.id} signal={signal} />)}
-              {watch.length > 0 && watch.map(signal => <SignalCard key={signal.id} signal={signal} />)}
+              {watch.length > 0 && (
+                <>
+                  <button
+                    onClick={() => setShowWatch(!showWatch)}
+                    style={{
+                      width: "100%", background: "transparent",
+                      border: "1px solid #3a2a10", borderRadius: 12,
+                      padding: "12px", color: "#fbbf24",
+                      fontSize: 10, fontWeight: 800,
+                      letterSpacing: "0.1em", cursor: "pointer",
+                      marginTop: 8,
+                    }}
+                  >
+                    {showWatch ? "HIDE" : "SHOW"} {watch.length} WATCH SIGNAL{watch.length > 1 ? "S" : ""} (2x wallets)
+                  </button>
+                  {showWatch && watch.map(signal => <SignalCard key={signal.id} signal={signal} />)}
+                </>
+              )}
               {rugged.length > 0 && (
                 <>
                   <button
