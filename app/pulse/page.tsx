@@ -373,7 +373,7 @@ function SignalCard({ signal }: { signal: Signal }) {
             textAlign: "center", boxSizing: "border-box",
           }}
         >
-          ✕ SHARE SIGNAL ON X
+          Share Signal on X
         </a>
       </div>
 
