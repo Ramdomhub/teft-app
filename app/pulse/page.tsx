@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { ArrowLeft, RefreshCw, ShieldCheck } from "lucide-react";
+import { ArrowLeft, RefreshCw } from "lucide-react";
 
 type Signal = {
   id: string;
@@ -32,6 +32,18 @@ type Signal = {
   wallet_count: number;
   is_migrated?: boolean;
   is_dex_paid?: boolean;
+  has_twitter?: boolean;
+  has_telegram?: boolean;
+  has_website?: boolean;
+  twitter_url?: string | null;
+  telegram_url?: string | null;
+  website_url?: string | null;
+  buys_1h?: number | null;
+  sells_1h?: number | null;
+  buy_sell_ratio_5m?: number | null;
+  buy_sell_ratio_1h?: number | null;
+  makers_5m?: number | null;
+  makers_1h?: number | null;
 };
 
 function timeAgo(dateStr: string): string {
@@ -238,40 +250,83 @@ function SignalCard({ signal }: { signal: Signal }) {
         ))}
       </div>
 
-      {/* Safety + Links */}
+      {/* Info Row: Socials + Badges */}
       <div style={{
         padding: "0 16px 10px",
-        display: "flex", alignItems: "center", gap: 8,
+        display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap",
       }}>
-        <div style={{
-          background: "#0a2a1a", borderRadius: 8,
-          padding: "4px 10px", display: "flex", alignItems: "center", gap: 4,
-        }}>
-          <ShieldCheck size={10} color="#4ade80" />
-          <span style={{ color: "#4ade80", fontSize: 9, fontWeight: 800 }}>
-            Freeze: Clear
-          </span>
-        </div>
         {signal.is_migrated && (
-          <div style={{ background: "#1a1a3a", borderRadius: 8, padding: "4px 10px", display: "flex", alignItems: "center", gap: 4 }}>
+          <div style={{ background: "#1a1a3a", borderRadius: 8, padding: "4px 10px" }}>
             <span style={{ color: "#60a5fa", fontSize: 9, fontWeight: 800 }}>MIGRATED</span>
           </div>
         )}
         {signal.is_dex_paid && (
-          <div style={{ background: "#2a1a3a", borderRadius: 8, padding: "4px 10px", display: "flex", alignItems: "center", gap: 4 }}>
+          <div style={{ background: "#2a1a3a", borderRadius: 8, padding: "4px 10px" }}>
             <span style={{ color: "#c084fc", fontSize: 9, fontWeight: 800 }}>DEX PAID</span>
           </div>
         )}
-        {signal.dexscreener_url && (
-          <a href={signal.dexscreener_url} target="_blank" rel="noopener noreferrer"
-            style={{
-              background: "#1a1a1a", borderRadius: 8,
-              padding: "4px 10px", color: "#666",
-              fontSize: 9, fontWeight: 800, textDecoration: "none",
-            }}>
-            CHART
+        {signal.has_twitter && signal.twitter_url && (
+          <a href={signal.twitter_url} target="_blank" rel="noopener noreferrer"
+            style={{ background: "#1a1a2a", borderRadius: 8, padding: "4px 10px", textDecoration: "none" }}>
+            <span style={{ color: "#60a5fa", fontSize: 9, fontWeight: 800 }}>X</span>
           </a>
         )}
+        {signal.has_telegram && signal.telegram_url && (
+          <a href={signal.telegram_url} target="_blank" rel="noopener noreferrer"
+            style={{ background: "#1a2a3a", borderRadius: 8, padding: "4px 10px", textDecoration: "none" }}>
+            <span style={{ color: "#38bdf8", fontSize: 9, fontWeight: 800 }}>TG</span>
+          </a>
+        )}
+        {signal.has_website && signal.website_url && (
+          <a href={signal.website_url} target="_blank" rel="noopener noreferrer"
+            style={{ background: "#1a1a1a", borderRadius: 8, padding: "4px 10px", textDecoration: "none" }}>
+            <span style={{ color: "#888", fontSize: 9, fontWeight: 800 }}>WEB</span>
+          </a>
+        )}
+        {signal.dexscreener_url && (
+          <a href={signal.dexscreener_url} target="_blank" rel="noopener noreferrer"
+            style={{ background: "#1a1a1a", borderRadius: 8, padding: "4px 10px", textDecoration: "none" }}>
+            <span style={{ color: "#666", fontSize: 9, fontWeight: 800 }}>CHART</span>
+          </a>
+        )}
+      </div>
+
+      {/* Buy/Sell Ratio Row */}
+      <div style={{
+        margin: "0 16px 10px",
+        background: "#111", borderRadius: 12,
+        padding: "10px 14px",
+        display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
+        gap: 8,
+      }}>
+        {[
+          {
+            label: "B/S 5m",
+            value: signal.buy_sell_ratio_5m ? signal.buy_sell_ratio_5m + "x" : "—",
+            color: signal.buy_sell_ratio_5m && signal.buy_sell_ratio_5m >= 2 ? "#4ade80" :
+                   signal.buy_sell_ratio_5m && signal.buy_sell_ratio_5m < 1 ? "#f87171" : "#fff"
+          },
+          {
+            label: "B/S 1h",
+            value: signal.buy_sell_ratio_1h ? signal.buy_sell_ratio_1h + "x" : "—",
+            color: signal.buy_sell_ratio_1h && signal.buy_sell_ratio_1h >= 2 ? "#4ade80" :
+                   signal.buy_sell_ratio_1h && signal.buy_sell_ratio_1h < 1 ? "#f87171" : "#fff"
+          },
+          {
+            label: "Makers 5m",
+            value: signal.makers_5m ? signal.makers_5m.toString() : "—",
+            color: "#fff"
+          },
+        ].map(({ label, value, color }) => (
+          <div key={label} style={{ textAlign: "center" }}>
+            <div style={{ color: "#444", fontSize: 9, fontWeight: 800, letterSpacing: "0.08em" }}>
+              {label}
+            </div>
+            <div style={{ color, fontSize: 13, fontWeight: 900, marginTop: 3 }}>
+              {value}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Buy Button */}

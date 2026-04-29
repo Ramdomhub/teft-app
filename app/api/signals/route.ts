@@ -42,10 +42,31 @@ async function getLiveTokenData(tokenAddress: string) {
       best.dexId === "pumpswap" ||
       pairs.some((p: any) => p.dexId === "raydium" && (p.liquidity?.usd || 0) > 100);
 
-    const isDexPaid = !!(
-      (best.info?.websites && best.info.websites.length > 0) ||
-      (best.info?.socials && best.info.socials.length > 0)
+    // Socials
+    const socials = best.info?.socials || [];
+    const hasTwitter = socials.some((s: any) =>
+      (s.type || s.platform || "").toLowerCase().includes("twitter") ||
+      (s.type || s.platform || "").toLowerCase().includes("x")
     );
+    const hasTelegram = socials.some((s: any) =>
+      (s.type || s.platform || "").toLowerCase().includes("telegram")
+    );
+    const hasWebsite = !!(best.info?.websites && best.info.websites.length > 0);
+    const isDexPaid = !!(hasTwitter || hasTelegram || hasWebsite);
+
+    // Buy/Sell Ratio (5m)
+    const buys5m = Number(best.txns?.m5?.buys || 0);
+    const sells5m = Number(best.txns?.m5?.sells || 0);
+    const buySellRatio5m = sells5m > 0 ? buys5m / sells5m : buys5m > 0 ? 99 : 0;
+
+    // Buy/Sell Ratio (1h)
+    const buys1h = Number(best.txns?.h1?.buys || 0);
+    const sells1h = Number(best.txns?.h1?.sells || 0);
+    const buySellRatio1h = sells1h > 0 ? buys1h / sells1h : buys1h > 0 ? 99 : 0;
+
+    // Unique Makers (echte unique Trader)
+    const makers5m = Number(best.txns?.m5?.makers || 0);
+    const makers1h = Number(best.txns?.h1?.makers || 0);
 
     const result = {
       currentMarketCap: best.marketCap ? Number(best.marketCap) : null,
@@ -55,11 +76,28 @@ async function getLiveTokenData(tokenAddress: string) {
       volumeH6: Number(best.volume?.h6 || 0),
       priceChangeM5: Number(best.priceChange?.m5 || 0),
       priceChangeH1: Number(best.priceChange?.h1 || 0),
-      buys5m: Number(best.txns?.m5?.buys || 0),
-      sells5m: Number(best.txns?.m5?.sells || 0),
+      buys5m,
+      sells5m,
+      buys1h,
+      sells1h,
+      buySellRatio5m: Math.round(buySellRatio5m * 10) / 10,
+      buySellRatio1h: Math.round(buySellRatio1h * 10) / 10,
+      makers5m,
+      makers1h,
       dexscreenerUrl: best.url || null,
       isMigrated,
       isDexPaid,
+      hasTwitter,
+      hasTelegram,
+      hasWebsite,
+      twitterUrl: socials.find((s: any) =>
+        (s.type || s.platform || "").toLowerCase().includes("twitter") ||
+        (s.type || s.platform || "").toLowerCase().includes("x")
+      )?.url || null,
+      telegramUrl: socials.find((s: any) =>
+        (s.type || s.platform || "").toLowerCase().includes("telegram")
+      )?.url || null,
+      websiteUrl: best.info?.websites?.[0]?.url || null,
     };
 
     liveCache.set(tokenAddress, { data: result, ts: Date.now() });
@@ -125,8 +163,20 @@ export async function GET() {
           token.price_change_h1 = live.priceChangeH1;
           token.buys_5m = live.buys5m;
           token.sells_5m = live.sells5m;
+          token.buys_1h = live.buys1h;
+          token.sells_1h = live.sells1h;
+          token.buy_sell_ratio_5m = live.buySellRatio5m;
+          token.buy_sell_ratio_1h = live.buySellRatio1h;
+          token.makers_5m = live.makers5m;
+          token.makers_1h = live.makers1h;
           token.is_migrated = live.isMigrated;
           token.is_dex_paid = live.isDexPaid;
+          token.has_twitter = live.hasTwitter;
+          token.has_telegram = live.hasTelegram;
+          token.has_website = live.hasWebsite;
+          token.twitter_url = live.twitterUrl;
+          token.telegram_url = live.telegramUrl;
+          token.website_url = live.websiteUrl;
           if (live.dexscreenerUrl) token.dexscreener_url = live.dexscreenerUrl;
           if (token.entry_market_cap && live.currentMarketCap) {
             token.multiplier = live.currentMarketCap / token.entry_market_cap;
