@@ -589,10 +589,10 @@ function SignalCard({ signal }: { signal: Signal }) {
 }
 
 export default function PulsePage() {
-  const [showDisclaimer, setShowDisclaimer] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return !localStorage.getItem('teft_disclaimer_accepted');
-  });
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  useEffect(() => {
+    setShowDisclaimer(!localStorage.getItem('teft_disclaimer_accepted'));
+  }, []);
   const [showLegend, setShowLegend] = useState(false);
   const [signals, setSignals] = useState<Signal[]>([]);
   const [showWeak, setShowWeak] = useState(false);
