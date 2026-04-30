@@ -49,7 +49,7 @@ export default function Home() {
           
           
           <a
-            className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95 flex items-center justify-center gap-1"
+            href="/pulse" className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95 flex items-center justify-center gap-1"
           >
             TEFT Pulse
           </a>
