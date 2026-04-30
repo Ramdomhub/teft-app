@@ -730,12 +730,9 @@ export default function PulsePage() {
             }}>
             <RefreshCw size={10} strokeWidth={3}
               style={{ animation: refreshing ? "spin 1s linear infinite" : "none" }} />
-            </button>
-          </div>
-            </button>
-          </div>
             {refreshing ? "LOADING..." : "REFRESH"}
-          </button>
+            </button>
+          </div>
         </div>
       </div>
 
