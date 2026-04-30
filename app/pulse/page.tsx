@@ -54,7 +54,7 @@ type Signal = {
 };
 
 const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
-const RPC = "https://api.mainnet-beta.solana.com";
+const RPC = typeof window !== "undefined" ? `${window.location.origin}/api/rpc` : "";
 
 // ── Disclaimer Modal ──────────────────────────────────────────
 function DisclaimerModal({ onAccept }: { onAccept: () => void }) {
