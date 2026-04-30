@@ -709,25 +709,31 @@ export default function PulsePage() {
               See what others don't.
             </p>
           </div>
-          <button onClick={handleRefresh} style={{
-            background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12,
-            padding: "8px 14px", display: "flex", alignItems: "center", gap: 6,
-            color: "rgba(255,255,255,0.7)", fontSize: 10,
-            fontWeight: 800, cursor: "pointer", letterSpacing: "0.1em",
-          }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <button
               onClick={() => setShowLegend(true)}
               style={{
-                background: "rgba(255,255,255,0.1)", border: "none",
-                borderRadius: 8, padding: "6px 12px", color: "#fff",
-                fontSize: 12, fontWeight: 700, cursor: "pointer",
+                background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)",
+                border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12,
+                padding: "8px 14px", color: "rgba(255,255,255,0.7)",
+                fontSize: 10, fontWeight: 800, cursor: "pointer",
               }}
             >
               ? Legende
             </button>
+            <button onClick={handleRefresh} style={{
+              background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12,
+              padding: "8px 14px", display: "flex", alignItems: "center", gap: 6,
+              color: "rgba(255,255,255,0.7)", fontSize: 10,
+              fontWeight: 800, cursor: "pointer", letterSpacing: "0.1em",
+            }}>
             <RefreshCw size={10} strokeWidth={3}
               style={{ animation: refreshing ? "spin 1s linear infinite" : "none" }} />
+            </button>
+          </div>
+            </button>
+          </div>
             {refreshing ? "LOADING..." : "REFRESH"}
           </button>
         </div>
