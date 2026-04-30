@@ -54,7 +54,7 @@ type Signal = {
 };
 
 const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
-const RPC = "https://mainnet.helius-rpc.com/?api-key=f88b1149-1fc7-4510-990f-29b312fe76d5";
+const RPC = "https://api.mainnet-beta.solana.com";
 
 // ── Disclaimer Modal ──────────────────────────────────────────
 function DisclaimerModal({ onAccept }: { onAccept: () => void }) {
