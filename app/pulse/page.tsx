@@ -104,19 +104,28 @@ function DisclaimerModal({ onAccept }: { onAccept: () => void }) {
 }
 
 // ── Token Gate ────────────────────────────────────────────────
+function formatTeft(n: number): string {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + "K";
+  return n.toFixed(0);
+}
+
 function TokenGate({ children }: { children: React.ReactNode }) {
   const { publicKey, connected } = useWallet();
   const [hasAccess, setHasAccess] = useState(false);
   const [checking, setChecking] = useState(false);
   const [checked, setChecked] = useState(false);
+  const [teftBalance, setTeftBalance] = useState(0);
+  const [showPulse, setShowPulse] = useState(false);
 
   useEffect(() => {
-    if (!connected || !publicKey) { setHasAccess(false); setChecked(false); return; }
+    if (!connected || !publicKey) { setHasAccess(false); setChecked(false); setShowPulse(false); return; }
     setChecking(true);
     const conn = new Connection(RPC);
     conn.getParsedTokenAccountsByOwner(publicKey, { mint: new PublicKey(TEFT_MINT) })
       .then(res => {
         const amount = res.value?.[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount ?? 0;
+        setTeftBalance(amount);
         setHasAccess(amount >= 1);
         setChecked(true);
       })
@@ -125,49 +134,45 @@ function TokenGate({ children }: { children: React.ReactNode }) {
   }, [connected, publicKey]);
 
   if (!connected) return (
-    <div style={{
-      minHeight: "100vh", background: "#0a0a0a", display: "flex",
-      flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20,
-    }}>
+    <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
       <div style={{ fontSize: 48 }}>🔒</div>
       <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800 }}>TEFT Pulse</h2>
-      <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>
-        Verbinde dein Wallet um zu prüfen ob du TEFT hältst.
-      </p>
+      <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>Connect your wallet to verify your TEFT holdings.</p>
       <WalletMultiButton />
     </div>
   );
 
   if (checking) return (
-    <div style={{
-      minHeight: "100vh", background: "#0a0a0a", display: "flex",
-      alignItems: "center", justifyContent: "center",
-    }}>
-      <p style={{ color: "#888" }}>Prüfe TEFT Balance...</p>
+    <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <p style={{ color: "#888" }}>Checking TEFT balance...</p>
     </div>
   );
 
   if (checked && !hasAccess) return (
-    <div style={{
-      minHeight: "100vh", background: "#0a0a0a", display: "flex",
-      flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20,
-    }}>
+    <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
       <div style={{ fontSize: 48 }}>🚫</div>
-      <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800 }}>Kein Zugang</h2>
+      <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800 }}>No Access</h2>
       <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>
-        Du benötigst mindestens <strong style={{color:"#fff"}}>1 TEFT</strong> um Pulse zu nutzen.
+        You need at least <strong style={{color:"#fff"}}>1 TEFT</strong> to access Pulse.
       </p>
-      <a
-        href={`https://jup.ag/swap/SOL-${TEFT_MINT}`}
-        target="_blank"
-        style={{
-          background: "#4ade80", color: "#000", borderRadius: 10,
-          padding: "12px 28px", fontWeight: 800, fontSize: 14,
-          textDecoration: "none",
-        }}
-      >
-        TEFT kaufen
+      <a href={`https://jup.ag/swap/SOL-${TEFT_MINT}`} target="_blank"
+        style={{ background: "#4ade80", color: "#000", borderRadius: 10, padding: "12px 28px", fontWeight: 800, fontSize: 14, textDecoration: "none" }}>
+        Buy TEFT
       </a>
+      <WalletMultiButton />
+    </div>
+  );
+
+  if (checked && hasAccess && !showPulse) return (
+    <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
+      <div style={{ fontSize: 56 }}>🎉</div>
+      <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, textAlign: "center" }}>Welcome to TEFT Pulse</h2>
+      <p style={{ color: "#4ade80", fontSize: 18, fontWeight: 700 }}>You hold {formatTeft(teftBalance)} TEFT</p>
+      <p style={{ color: "#888", fontSize: 13, textAlign: "center", maxWidth: 300 }}>Access granted. You are part of the TEFT Legion.</p>
+      <button onClick={() => setShowPulse(true)} style={{
+        background: "#4ade80", color: "#000", border: "none", borderRadius: 12,
+        padding: "14px 40px", fontSize: 16, fontWeight: 800, cursor: "pointer", marginTop: 8,
+      }}>Enter Pulse →</button>
       <WalletMultiButton />
     </div>
   );
