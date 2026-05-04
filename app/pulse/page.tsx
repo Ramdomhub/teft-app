@@ -152,7 +152,7 @@ function TokenGate({ children }: { children: React.ReactNode }) {
   if (!connected) return (
     <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
       <div style={{ fontSize: 48 }}>🔒</div>
-      <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800 }}>TEFT Pulse</h2>
+      <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800 }}>TEFT Pulse <span style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700, color: "#888", verticalAlign: "middle" }}>BETA</span></h2>
       <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>Connect your wallet to verify your TEFT holdings.</p>
       <WalletMultiButton />
     </div>
@@ -192,7 +192,7 @@ function TokenGate({ children }: { children: React.ReactNode }) {
   if (checked && hasAccess && !showPulse) return (
     <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
       <div style={{ fontSize: 56 }}>🎉</div>
-      <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, textAlign: "center" }}>Welcome to TEFT Pulse</h2>
+      <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, textAlign: "center" }}>Welcome to TEFT Pulse <span style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700, color: "#888", verticalAlign: "middle" }}>BETA</span></h2>
       <p style={{ color: "#4ade80", fontSize: 18, fontWeight: 700 }}>You hold {formatTeft(teftBalance)} TEFT</p>
       <p style={{ color: "#888", fontSize: 13, textAlign: "center", maxWidth: 300 }}>Access granted. You are part of the TEFT Legion.</p>
       <button onClick={() => setShowPulse(true)} style={{
@@ -734,8 +734,6 @@ export default function PulsePage() {
             {refreshing ? "LOADING..." : "REFRESH"}
             </button>
           </div>
-        </div>
-      </div>
 
       {/* CSS for spin */}
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
