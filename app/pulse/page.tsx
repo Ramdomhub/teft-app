@@ -713,20 +713,6 @@ export default function PulsePage() {
         </div>
 
         <div style={{
-          position: "absolute", top: "45%", left: "50%",
-          transform: "translate(-50%, -50%)",
-        }}>
-          <button style={{
-            background: "rgba(0,0,0,0.6)", backdropFilter: "blur(20px)",
-            border: "1px solid rgba(255,255,255,0.2)", borderRadius: 16,
-            padding: "14px 32px", color: "#fff", fontSize: 14, fontWeight: 800,
-            cursor: "pointer", letterSpacing: "0.05em",
-          }}>
-            Enter Gateway
-          </button>
-        </div>
-
-        <div style={{
           position: "absolute", bottom: 20, left: 20, right: 20,
           display: "flex", alignItems: "flex-end", justifyContent: "space-between",
         }}>
