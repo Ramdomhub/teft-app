@@ -887,7 +887,8 @@ export default function PulsePage() {
           );
         })()}
       </div>
-        </main>
+</div>
+    </main>
     </TokenGate>
   );
 }
