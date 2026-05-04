@@ -343,7 +343,7 @@ function buildTweetUrl(signal: Signal): string {
     ...(signal.volume_h24 ? { v24: formatUsd(signal.volume_h24) } : {}),
     ...(signal.buy_sell_ratio_1h ? { bs: String(signal.buy_sell_ratio_1h) } : {}),
   });
-  const signalUrl = `https://teftlegion.com/pulse/signal/${signal.token_address}?${tweetParams.toString()}`;
+  const signalUrl = "https://www.teftlegion.com/pulse";
   const text = `⚡ TEFT Pulse Signal\n\n${signal.token_name} (${signal.token_symbol}) ${multiplierStr} | ${signal.wallet_count}x Smart Wallets bought\nEntry MCap: ${formatUsd(signal.entry_market_cap)} → Now: ${formatUsd(signal.current_market_cap)}\n\nSee what others don't 👇\n\n#Solana #TEFTPulse`;
   return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(signalUrl)}`;
 }
