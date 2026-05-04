@@ -689,14 +689,12 @@ export default function PulsePage() {
             <ArrowLeft size={12} strokeWidth={3} />
             BACK
           </Link>
-          <div style={{
-            background: "rgba(255,255,255,0.1)", backdropFilter: "blur(10px)",
+          <WalletMultiButton style={{
+            background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)",
             border: "1px solid rgba(255,255,255,0.15)", borderRadius: 20,
-            padding: "5px 14px", fontSize: 9, fontWeight: 900,
-            letterSpacing: "0.2em", color: "rgba(255,255,255,0.8)",
-          }}>
-            PRECISION MODE
-          </div>
+            padding: "5px 14px", fontSize: 9, fontWeight: 900, height: "auto",
+            letterSpacing: "0.1em", color: "rgba(255,255,255,0.8)", lineHeight: 1.6,
+          }} />
         </div>
 
         <div style={{
@@ -726,12 +724,6 @@ export default function PulsePage() {
             </p>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <WalletMultiButton style={{
-              background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)",
-              border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12,
-              padding: "8px 14px", color: "rgba(255,255,255,0.7)",
-              fontSize: 10, fontWeight: 800, height: "auto", lineHeight: 1,
-            }} />
             <button
               onClick={() => setShowLegend(true)}
               style={{
