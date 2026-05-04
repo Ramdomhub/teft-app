@@ -800,7 +800,7 @@ export default function PulsePage() {
           borderRadius: 14, padding: "10px 14px", marginBottom: 16,
           fontSize: 10, color: "#444", fontWeight: 700, letterSpacing: "0.05em",
         }}>
-          Smart wallets ≥ 2 · liquidity ≥ $1,500 · freeze clear · signals expire after 2h
+          Smart wallets ≥ 2 · liquidity ≥ $4,500 · freeze clear · signals expire after 2h
         </div>
 
         <div style={{
