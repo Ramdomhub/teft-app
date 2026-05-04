@@ -154,6 +154,8 @@ function TokenGate({ children }: { children: React.ReactNode }) {
       <div style={{ fontSize: 48 }}>🔒</div>
       <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800 }}>TEFT Pulse</h2>
       <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>Connect your wallet to verify your TEFT holdings.</p>
+      <WalletMultiButton />
+    </div>
   );
 
   if (signing) return (
