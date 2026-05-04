@@ -711,20 +711,6 @@ export default function PulsePage() {
             letterSpacing: "0.1em", color: "rgba(255,255,255,0.8)", lineHeight: 1.6,
           }} />
         </div>
-
-        <div style={{
-          position: "absolute", bottom: 20, left: 20, right: 20,
-          display: "flex", alignItems: "flex-end", justifyContent: "space-between",
-        }}>
-          <div>
-            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 900, letterSpacing: "-0.02em" }}>
-              TEFT Pulse
-            </h1>
-            <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: 600 }}>
-              See what others don't.
-            </p>
-          </div>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <button
               onClick={() => setShowLegend(true)}
               style={{
