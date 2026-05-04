@@ -77,16 +77,16 @@ function DisclaimerModal({ onAccept }: { onAccept: () => void }) {
           Risk Disclaimer
         </h2>
         <p style={{ color: "#aaa", fontSize: 14, lineHeight: 1.7, marginBottom: 12 }}>
-          TEFT Pulse zeigt Aktivitäten von Smart Wallets — <strong style={{color:"#fff"}}>kein Finanzrat</strong>. 
-          Trading mit Meme Coins ist hochriskant und kann zum Totalverlust führen.
+          TEFT Pulse displays Smart Wallet activity — <strong style={{color:"#fff"}}>not financial advice</strong>. 
+          Trading meme coins is highly risky and may result in total loss of funds.
         </p>
         <p style={{ color: "#aaa", fontSize: 14, lineHeight: 1.7, marginBottom: 12 }}>
-          Signale sind <strong style={{color:"#fff"}}>keine Kaufempfehlungen</strong>. 
-          DYOR. Investiere nur was du bereit bist zu verlieren.
+          Signals are <strong style={{color:"#fff"}}>not buy recommendations</strong>. 
+          DYOR. Only invest what you can afford to lose.
         </p>
         <p style={{ color: "#666", fontSize: 12, lineHeight: 1.6, marginBottom: 24 }}>
-          Tokens auf Jupiter können mit "2 Warnings" markiert sein — das bedeutet der Token 
-          ist nicht verifiziert. Prüfe immer die Contract Address bevor du kaufst.
+          Tokens on Jupiter may show "2 Warnings" — this means the token is unverified. 
+          Always check the contract address before buying.
         </p>
         <button
           onClick={onAccept}
@@ -96,7 +96,7 @@ function DisclaimerModal({ onAccept }: { onAccept: () => void }) {
             fontSize: 15, fontWeight: 800, cursor: "pointer",
           }}
         >
-          Verstanden — Pulse öffnen
+          I understand — Enter Pulse
         </button>
       </div>
     </div>
