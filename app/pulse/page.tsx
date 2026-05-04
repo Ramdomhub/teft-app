@@ -111,27 +111,43 @@ function formatTeft(n: number): string {
 }
 
 function TokenGate({ children }: { children: React.ReactNode }) {
-  const { publicKey, connected } = useWallet();
+  const { publicKey, connected, signMessage } = useWallet();
   const [hasAccess, setHasAccess] = useState(false);
   const [checking, setChecking] = useState(false);
   const [checked, setChecked] = useState(false);
   const [teftBalance, setTeftBalance] = useState(0);
   const [showPulse, setShowPulse] = useState(false);
+  const [signed, setSigned] = useState(false);
+  const [signing, setSigning] = useState(false);
 
   useEffect(() => {
-    if (!connected || !publicKey) { setHasAccess(false); setChecked(false); setShowPulse(false); return; }
-    setChecking(true);
-    const conn = new Connection(RPC);
-    conn.getParsedTokenAccountsByOwner(publicKey, { mint: new PublicKey(TEFT_MINT) })
-      .then(res => {
-        const amount = res.value?.[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount ?? 0;
-        setTeftBalance(amount);
-        setHasAccess(amount >= 1);
-        setChecked(true);
-      })
-      .catch(() => { setHasAccess(false); setChecked(true); })
-      .finally(() => setChecking(false));
-  }, [connected, publicKey]);
+    if (!connected || !publicKey) { 
+      setHasAccess(false); setChecked(false); setShowPulse(false); setSigned(false); return; 
+    }
+    // Auto-sign on connect
+    if (!signed && signMessage) {
+      setSigning(true);
+      const msg = new TextEncoder().encode("Welcome to TEFT Pulse. Sign to verify wallet ownership.");
+      signMessage(msg)
+        .then(() => {
+          setSigned(true);
+          setSigning(false);
+          // Now check TEFT balance
+          setChecking(true);
+          const conn = new Connection(RPC);
+          return conn.getParsedTokenAccountsByOwner(publicKey, { mint: new PublicKey(TEFT_MINT) });
+        })
+        .then(res => {
+          if (!res) return;
+          const amount = res.value?.[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount ?? 0;
+          setTeftBalance(amount);
+          setHasAccess(amount >= 1);
+          setChecked(true);
+        })
+        .catch(() => { setSigning(false); setHasAccess(false); setChecked(false); })
+        .finally(() => setChecking(false));
+    }
+  }, [connected, publicKey, signed, signMessage]);
 
   if (!connected) return (
     <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
@@ -150,6 +166,16 @@ function TokenGate({ children }: { children: React.ReactNode }) {
           Open in Solflare Browser
         </a>
       </div>
+    </div>
+  );
+
+  if (signing) return (
+    <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
+      <div style={{ fontSize: 48 }}>✍️</div>
+      <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 800 }}>Sign to verify</h2>
+      <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>
+        Please sign the message in your wallet to verify ownership. No transaction — free of charge.
+      </p>
     </div>
   );
 
