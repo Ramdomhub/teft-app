@@ -887,7 +887,6 @@ export default function PulsePage() {
           );
         })()}
       </div>
-    {/* Jupiter Terminal Mount Point */}
         </main>
     </TokenGate>
   );
