@@ -140,12 +140,12 @@ function TokenGate({ children }: { children: React.ReactNode }) {
       <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>Connect your wallet to verify your TEFT holdings.</p>
       <WalletMultiButton />
       <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
-        <a href="https://phantom.app/ul/browse/https%3A%2F%2Fwww.teftlegion.com%2Fpulse?ref=https%3A%2F%2Fwww.teftlegion.com"
-          style={{ background: "#ab9ff2", color: "#000", borderRadius: 10, padding: "10px 20px", fontWeight: 800, fontSize: 13, textDecoration: "none" }}>
+        <a href="phantom://browse?url=https%3A%2F%2Fwww.teftlegion.com%2Fpulse"
+          style={{ background: "#fff", color: "#000", borderRadius: 10, padding: "10px 20px", fontWeight: 800, fontSize: 13, textDecoration: "none" }}>
           Open in Phantom
         </a>
-        <a href="https://solflare.com/ul/v1/browse/https%3A%2F%2Fwww.teftlegion.com%2Fpulse?ref=https%3A%2F%2Fwww.teftlegion.com"
-          style={{ background: "#fc8b00", color: "#000", borderRadius: 10, padding: "10px 20px", fontWeight: 800, fontSize: 13, textDecoration: "none" }}>
+        <a href="https://solflare.com/ul/v1/browse/https%3A%2F%2Fwww.teftlegion.com%2Fpulse"
+          style={{ background: "#4ade80", color: "#000", borderRadius: 10, padding: "10px 20px", fontWeight: 800, fontSize: 13, textDecoration: "none" }}>
           Open in Solflare
         </a>
       </div>
@@ -203,20 +203,20 @@ function LegendModal({ onClose }: { onClose: () => void }) {
         padding: 28, maxWidth: 480, width: "100%",
       }} onClick={e => e.stopPropagation()}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-          <h2 style={{ color: "#fff", fontSize: 18, fontWeight: 800 }}>Legende & Erklärung</h2>
+          <h2 style={{ color: "#fff", fontSize: 18, fontWeight: 800 }}>Legend & Glossary</h2>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "#888", fontSize: 20, cursor: "pointer" }}>✕</button>
         </div>
 
         {[
-          { label: "🟢 Strong", desc: "≥3 Smart Wallets haben diesen Token gekauft" },
-          { label: "🟡 Watch", desc: "2 Smart Wallets haben gekauft — beobachten" },
-          { label: "⚫ Weak", desc: "1 Smart Wallet — schwaches Signal" },
-          { label: "💀 Rugged", desc: "Liquidität unter $1.500 — Token vermutlich gerugged" },
-          { label: "B/S Ratio", desc: "Käufe ÷ Verkäufe. >2x = starke Kaufaktivität" },
-          { label: "MCap", desc: "Aktuelle Market Capitalization des Tokens" },
-          { label: "Vol", desc: "Handelsvolumen in den letzten 5min / 1h" },
-          { label: "Multiplier", desc: "Preisentwicklung seit Signal-Erkennung" },
-          { label: "Smart Wallet", desc: "Wallet mit nachgewiesener Trading-Performance" },
+          { label: "🟢 Strong", desc: "≥3 Smart Wallets bought this token" },
+          { label: "🟡 Watch", desc: "2 Smart Wallets bought — keep an eye on it" },
+          { label: "⚫ Weak", desc: "1 Smart Wallet — weak signal" },
+          { label: "💀 Rugged", desc: "Liquidity below $1,500 — token likely rugged" },
+          { label: "B/S Ratio", desc: "Buys ÷ Sells. >2x = strong buying activity" },
+          { label: "MCap", desc: "Current Market Capitalization of the token" },
+          { label: "Vol", desc: "Trading volume in the last 5min / 1h" },
+          { label: "Multiplier", desc: "Price change since signal was detected" },
+          { label: "Smart Wallet", desc: "Wallet with proven trading performance" },
         ].map(({ label, desc }) => (
           <div key={label} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: "1px solid #222" }}>
             <div style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>{label}</div>
@@ -225,7 +225,7 @@ function LegendModal({ onClose }: { onClose: () => void }) {
         ))}
 
         <p style={{ color: "#555", fontSize: 11, marginTop: 8 }}>
-          ⚠️ Kein Finanzrat. DYOR. Nur für Infozwecke.
+          ⚠️ Not financial advice. DYOR. For informational purposes only.
         </p>
       </div>
     </div>
@@ -725,6 +725,12 @@ export default function PulsePage() {
             </p>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <WalletMultiButton style={{
+              background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12,
+              padding: "8px 14px", color: "rgba(255,255,255,0.7)",
+              fontSize: 10, fontWeight: 800, height: "auto", lineHeight: 1,
+            }} />
             <button
               onClick={() => setShowLegend(true)}
               style={{
@@ -734,7 +740,7 @@ export default function PulsePage() {
                 fontSize: 10, fontWeight: 800, cursor: "pointer",
               }}
             >
-              ? Legende
+              ? Legend
             </button>
             <button onClick={handleRefresh} style={{
               background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)",
