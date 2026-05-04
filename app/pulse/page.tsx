@@ -227,7 +227,7 @@ function LegendModal({ onClose }: { onClose: () => void }) {
           { label: "🟢 Strong", desc: "≥3 Smart Wallets bought this token" },
           { label: "🟡 Watch", desc: "2 Smart Wallets bought — keep an eye on it" },
           { label: "⚫ Weak", desc: "1 Smart Wallet — weak signal" },
-          { label: "💀 Rugged", desc: "Liquidity below $1,500 — token likely rugged" },
+          { label: "💀 Rugged", desc: "Liquidity below $4,500 — token likely rugged" },
           { label: "B/S Ratio", desc: "Buys ÷ Sells. >2x = strong buying activity" },
           { label: "MCap", desc: "Current Market Capitalization of the token" },
           { label: "Vol", desc: "Trading volume in the last 5min / 1h" },
@@ -784,7 +784,7 @@ export default function PulsePage() {
               {loading ? "SCANNING..." : `LIVE · ${signals.filter(s => s.wallet_count >= 3 && !(
     (s.multiplier !== null && s.multiplier !== undefined && s.multiplier < 0.4) ||
     (s.current_market_cap !== null && s.current_market_cap !== undefined && s.current_market_cap < 5000) ||
-    (s.current_liquidity !== null && s.current_liquidity !== undefined && s.current_liquidity < 500)
+    (s.current_liquidity !== null && s.current_liquidity !== undefined && s.current_liquidity < 4500)
   )).length} SIGNALS`}
             </span>
           </div>
@@ -831,7 +831,7 @@ export default function PulsePage() {
           const rugged = signals.filter(s => 
     (s.multiplier !== null && s.multiplier !== undefined && s.multiplier < 0.4) ||
     (s.current_market_cap !== null && s.current_market_cap !== undefined && s.current_market_cap < 5000) ||
-    (s.current_liquidity !== null && s.current_liquidity !== undefined && s.current_liquidity < 500)
+    (s.current_liquidity !== null && s.current_liquidity !== undefined && s.current_liquidity < 4500)
   );
           const ruggedAddresses = new Set(rugged.map(s => s.token_address));
           const active = signals.filter(s => !ruggedAddresses.has(s.token_address));
