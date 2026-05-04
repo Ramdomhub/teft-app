@@ -139,6 +139,16 @@ function TokenGate({ children }: { children: React.ReactNode }) {
       <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800 }}>TEFT Pulse</h2>
       <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>Connect your wallet to verify your TEFT holdings.</p>
       <WalletMultiButton />
+      <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+        <a href="https://phantom.app/ul/browse/https%3A%2F%2Fwww.teftlegion.com%2Fpulse?ref=https%3A%2F%2Fwww.teftlegion.com"
+          style={{ background: "#ab9ff2", color: "#000", borderRadius: 10, padding: "10px 20px", fontWeight: 800, fontSize: 13, textDecoration: "none" }}>
+          Open in Phantom
+        </a>
+        <a href="https://solflare.com/ul/v1/browse/https%3A%2F%2Fwww.teftlegion.com%2Fpulse?ref=https%3A%2F%2Fwww.teftlegion.com"
+          style={{ background: "#fc8b00", color: "#000", borderRadius: 10, padding: "10px 20px", fontWeight: 800, fontSize: 13, textDecoration: "none" }}>
+          Open in Solflare
+        </a>
+      </div>
     </div>
   );
 
