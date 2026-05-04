@@ -181,7 +181,7 @@ function TokenGate({ children }: { children: React.ReactNode }) {
       <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>
         You need at least <strong style={{color:"#fff"}}>1 TEFT</strong> to access Pulse.
       </p>
-      <a href={`https://jup.ag/swap/SOL-${TEFT_MINT}`} target="_blank"
+      <a href={`https://jup.ag/swap/SOL-${TEFT_MINT}?referral=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&feeBps=50`} target="_blank"
         style={{ background: "#4ade80", color: "#000", borderRadius: 10, padding: "12px 28px", fontWeight: 800, fontSize: 14, textDecoration: "none" }}>
         Buy TEFT
       </a>
@@ -879,7 +879,6 @@ export default function PulsePage() {
         })()}
       </div>
     {/* Jupiter Terminal Mount Point */}
-      <div id="jupiter-terminal" />
         </main>
     </TokenGate>
   );
