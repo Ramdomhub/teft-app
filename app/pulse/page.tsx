@@ -598,26 +598,19 @@ function SignalCard({ signal }: { signal: Signal }) {
         </ShareLink>
       </div>
 
-      {/* Buy Buttons */}
-      <div style={{ padding: "0 16px 16px", display: "flex", gap: 8 }}>
-        {["0.01", "0.05", "0.1"].map((amount) => (
-          <button
-            key={amount}
-            onClick={() => openJupiter(signal.token_address, amount)}
-            style={{
-              flex: 1,
-              background: amount === "0.1" ? "#fff" : "#1a1a1a",
-              color: amount === "0.1" ? "#000" : "#fff",
-              border: amount === "0.1" ? "none" : "1px solid #333",
-              borderRadius: 12, padding: "12px 4px",
-              fontWeight: 900, fontSize: 11,
-              letterSpacing: "0.05em", cursor: "pointer",
-              textTransform: "uppercase",
-            }}
-          >
-            {amount} SOL
-          </button>
-        ))}
+      {/* Buy Button */}
+      <div style={{ padding: "0 16px 16px" }}>
+        <button
+          onClick={() => openJupiter(signal.token_address, 0)}
+          style={{
+            width: "100%", background: "#fff", color: "#000",
+            border: "none", borderRadius: 12, padding: "13px 0",
+            fontWeight: 900, fontSize: 12, letterSpacing: "0.05em",
+            cursor: "pointer", textTransform: "uppercase",
+          }}
+        >
+          Buy on Jupiter ↗
+        </button>
       </div>
     </div>
   );
@@ -711,6 +704,21 @@ export default function PulsePage() {
             letterSpacing: "0.1em", color: "rgba(255,255,255,0.8)", lineHeight: 1.6,
           }} />
         </div>
+
+        {/* Bottom Hero: Title + Legend + Refresh */}
+        <div style={{
+          position: "absolute", bottom: 20, left: 20, right: 20,
+          display: "flex", alignItems: "flex-end", justifyContent: "space-between",
+        }}>
+          <div>
+            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 900, letterSpacing: "-0.02em" }}>
+              TEFT Pulse <span style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700, color: "#888", verticalAlign: "middle" }}>BETA</span>
+            </h1>
+            <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: 600 }}>
+              See what others don't.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <button
               onClick={() => setShowLegend(true)}
               style={{
@@ -729,11 +737,12 @@ export default function PulsePage() {
               color: "rgba(255,255,255,0.7)", fontSize: 10,
               fontWeight: 800, cursor: "pointer", letterSpacing: "0.1em",
             }}>
-            <RefreshCw size={10} strokeWidth={3}
-              style={{ animation: refreshing ? "spin 1s linear infinite" : "none" }} />
-            {refreshing ? "LOADING..." : "REFRESH"}
+              <RefreshCw size={10} strokeWidth={3}
+                style={{ animation: refreshing ? "spin 1s linear infinite" : "none" }} />
+              {refreshing ? "LOADING..." : "REFRESH"}
             </button>
           </div>
+        </div>
 
       {/* CSS for spin */}
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
