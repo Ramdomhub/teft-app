@@ -242,6 +242,7 @@ export default function IdentityPage() {
   const { publicKey } = useWallet();
   const [cardData, setCardData] = useState<CardData|null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string|null>(null);
   const [refLink, setRefLink] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -274,7 +275,7 @@ export default function IdentityPage() {
         xVerified: !!stats?.x_verified_at,
       });
       setRefLink(`${window.location.origin}/identity?ref=${wallet}`);
-    } catch(e) { console.error(e); }
+    } catch(e) { console.error(e); setError("Failed to load identity. Check your connection and try again."); }
     finally { setLoading(false); }
   }, [publicKey, refParam]);
 
@@ -306,13 +307,22 @@ export default function IdentityPage() {
             <h1 style={{ fontSize:24, fontWeight:900, color:"#fff", margin:"6px 0 4px", letterSpacing:-1 }}>Your Identity</h1>
             <p style={{ fontSize:11, color:"#333", margin:0 }}>On-chain profile for TEFT Holders</p>
           </div>
-          {loading && (
+          {error && (
+            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, paddingTop:60, textAlign:"center" }}>
+              <div style={{ fontSize:36 }}>⚠️</div>
+              <div style={{ color:"#F87171", fontSize:13 }}>{error}</div>
+              <button onClick={() => { setError(null); loadIdentity(); }} style={{ background:"#111", color:"#fff", border:"1px solid #333", borderRadius:8, padding:"10px 20px", cursor:"pointer", fontSize:12 }}>
+                Try Again
+              </button>
+            </div>
+          )}
+          {!error && loading && (
             <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:12, paddingTop:60 }}>
               <div style={{ width:36, height:36, border:"2px solid #C084FC", borderTopColor:"transparent", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/>
               <div style={{ color:"#444", fontSize:12 }}>Building your identity…</div>
             </div>
           )}
-          {!loading && cardData && (
+          {!error && !loading && cardData && (
             <>
               <IdentityCard data={cardData}/>
               <div style={{ marginTop:20, background:"#0d0d0d", border:"1px solid #1a1a1a", borderRadius:14, padding:18 }}>
