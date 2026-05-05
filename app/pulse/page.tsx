@@ -623,7 +623,7 @@ export default function PulsePage() {
   }, []);
   const [showLegend, setShowLegend] = useState(false);
   const [signals, setSignals] = useState<Signal[]>([]);
-  const [showWeak, setShowWeak] = useState(false);
+  const [showWeak, setShowWeak] = useState(true);
   const [showWatch, setShowWatch] = useState(false);
   const [showRugged, setShowRugged] = useState(false);
   const [loading, setLoading] = useState(true);
