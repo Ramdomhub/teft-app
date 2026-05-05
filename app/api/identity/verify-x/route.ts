@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -9,19 +8,19 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   try {
-    const { wallet } = await req.json();
-    if (!wallet) return NextResponse.json({ error: "Missing wallet" }, { status: 400 });
-
-    const session = await getServerSession() as any;
-    if (!session?.xHandle) return NextResponse.json({ error: "Not authenticated with X" }, { status: 401 });
+    const { wallet, xHandle } = await req.json();
+    if (!wallet || !xHandle) {
+      return NextResponse.json({ error: "Missing wallet or xHandle" }, { status: 400 });
+    }
 
     await supabase.from("legion_members").update({
-      x_handle: session.xHandle,
+      x_handle: xHandle,
       x_verified_at: new Date().toISOString(),
     }).eq("wallet_address", wallet);
 
-    return NextResponse.json({ success: true, xHandle: session.xHandle });
+    return NextResponse.json({ success: true, xHandle });
   } catch (e) {
+    console.error(e);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
