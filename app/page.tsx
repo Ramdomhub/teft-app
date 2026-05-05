@@ -34,7 +34,7 @@ export default function Home() {
           
           <a 
             href="/nft-marketplace" 
-            className="bg-[#e9e9e9] text-black py-4 rounded-2xl text-center text-xs font-bold hover:bg-[#dfdfdf] transition-all active:scale-95"
+            className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95"
           >
             Get NFTs
           </a>
@@ -42,7 +42,7 @@ export default function Home() {
           <a 
             href="https://www.solsuite.io/teftsupreme" 
             target="_blank" 
-            className="bg-[#e9e9e9] text-black py-4 rounded-2xl text-center text-xs font-bold hover:bg-[#dfdfdf] transition-all active:scale-95"
+            className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95"
           >
             NFT Staking
           </a>
