@@ -53,6 +53,12 @@ export default function Home() {
           >
             TEFT Pulse <span style={{background:"#e9e9e9",borderRadius:4,padding:"1px 5px",fontSize:9,fontWeight:700,color:"#999"}}>BETA</span>
           </a>
+          
+            href="/identity"
+            className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95 flex items-center justify-center gap-1"
+          >
+            TEFT Identity <span style={{background:"#C084FC22",borderRadius:4,padding:"1px 5px",fontSize:9,fontWeight:700,color:"#C084FC"}}>NEW</span>
+          </a>
         </div>
 
         {/* Footer Links - Mit korrigiertem X Link */}
