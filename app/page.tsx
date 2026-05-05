@@ -3,7 +3,7 @@ import React from "react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#f2f2f2] text-black font-sans antialiased flex flex-col items-center justify-center p-4 selection:bg-black selection:text-white">
+    <div className="min-h-screen bg-black text-black font-sans antialiased flex flex-col items-center justify-center p-4 selection:bg-black selection:text-white">
       
       <div className="bg-white rounded-[2.5rem] max-w-[380px] w-full p-4 shadow-xl shadow-black/5 overflow-hidden border border-black/[0.01]">
         
