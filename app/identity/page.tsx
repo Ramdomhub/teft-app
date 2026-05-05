@@ -7,7 +7,7 @@ import { PublicKey, Connection } from "@solana/web3.js";
 import { createClient } from "@supabase/supabase-js";
 
 const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
-const RPC = "/api/rpc";
+const RPC = typeof window !== "undefined" ? window.location.origin + "/api/rpc" : "https://teftlegion.com/api/rpc";
 const JUPITER_REF = "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
