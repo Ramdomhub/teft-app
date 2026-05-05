@@ -5,6 +5,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { createClient } from "@supabase/supabase-js";
+import { signIn, useSession } from "next-auth/react";
 import NavHeader from "../components/NavHeader";
 
 const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
@@ -245,6 +246,7 @@ export default function IdentityPage() {
   const [error, setError] = useState<string|null>(null);
   const [refLink, setRefLink] = useState("");
   const [copied, setCopied] = useState(false);
+  const { data: session } = useSession() as any;
 
   const refParam = typeof window !== "undefined"
     ? new URLSearchParams(window.location.search).get("ref")
@@ -280,6 +282,22 @@ export default function IdentityPage() {
   }, [publicKey, refParam]);
 
   useEffect(() => { loadIdentity(); }, [loadIdentity]);
+
+  const connectX = async () => {
+    if (!publicKey) return;
+    if (!(session as any)?.xHandle) {
+      signIn("twitter", { callbackUrl: window.location.href });
+      return;
+    }
+    try {
+      const res = await fetch("/api/identity/verify-x", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet: publicKey.toBase58() }),
+      });
+      if (res.ok) loadIdentity();
+    } catch(e) { console.error(e); }
+  };
 
   const shareToX = () => {
     if (!cardData) return;
@@ -342,10 +360,18 @@ export default function IdentityPage() {
               </div>
               <div style={{ marginTop:12, background:"#0d0d0d", border:"1px solid #1a1a1a", borderRadius:14, padding:18, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                 <div>
-                  <div style={{ fontSize:12, fontWeight:700, color:"#555" }}>Connect X Account</div>
-                  <div style={{ fontSize:10, color:"#333", marginTop:3 }}>Unlock Verified badge + handle on card</div>
+                  <div style={{ fontSize:12, fontWeight:700, color: cardData.xVerified ? "#4ADE80" : "#666" }}>
+                    {cardData.xVerified ? `✓ @${cardData.xHandle}` : "Connect X Account"}
+                  </div>
+                  <div style={{ fontSize:10, color:"#333", marginTop:3 }}>
+                    {cardData.xVerified ? "X account linked to your identity" : "Unlock Verified badge + handle on card"}
+                  </div>
                 </div>
-                <div style={{ fontSize:9, color:"#444", border:"1px solid #222", borderRadius:4, padding:"4px 8px", letterSpacing:1 }}>SOON</div>
+                {!cardData.xVerified && (
+                  <button onClick={connectX} style={{ fontSize:10, color:"#fff", background:"#111", border:"1px solid #333", borderRadius:6, padding:"6px 14px", cursor:"pointer", letterSpacing:1, fontFamily:"inherit" }}>
+                    Connect 𝕏
+                  </button>
+                )}
               </div>
               <div style={{ display:"flex", gap:10, marginTop:16 }}>
                 <button onClick={shareToX} style={{ flex:1, background:"#0a0a0a", color:"#fff", border:"1px solid #222", borderRadius:12, padding:"14px 0", fontSize:12, fontWeight:700, cursor:"pointer", letterSpacing:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
