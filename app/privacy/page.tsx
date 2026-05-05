@@ -1,14 +1,25 @@
-export default function Privacy() {
+export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[#f5f5f7] pt-40 px-6 font-sans">
-      <div className="max-w-2xl mx-auto text-[#1d1d1f]">
-        <h1 className="text-4xl font-black uppercase tracking-tighter mb-8">Privacy Policy</h1>
-        <p className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest mb-12">Last Updated: April 2026</p>
-        <div className="font-medium space-y-6">
-          <p>The Legion respects your privacy. We only use your TikTok or X data to verify your identity as a creator.</p>
-          <p>No private keys are ever stored on our servers. All transactions happen directly on the Solana blockchain.</p>
+    <div style={{ minHeight:"100vh", background:"#000", color:"#fff", fontFamily:"'DM Mono',monospace", padding:"60px 24px", maxWidth:640, margin:"0 auto" }}>
+      <a href="/" style={{ color:"#444", textDecoration:"none", fontSize:11, letterSpacing:2 }}>← TEFTLEGION</a>
+      <h1 style={{ fontSize:28, fontWeight:900, margin:"24px 0 8px", letterSpacing:-1 }}>Privacy Policy</h1>
+      <p style={{ color:"#444", fontSize:11, marginBottom:40 }}>Last updated: May 2026</p>
+
+      {[
+        ["1. Data We Collect", "We collect wallet addresses, TEFT token balances, and optionally X handles when you connect your X account. We also store referral relationships between wallets."],
+        ["2. How We Use Data", "Wallet addresses and balances are used to display your TEFT Identity card and calculate your rank. X handles are displayed on your identity card if you choose to connect."],
+        ["3. Data Storage", "Data is stored in Supabase (PostgreSQL). We do not sell or share your data with third parties."],
+        ["4. X Authentication", "When connecting X, we receive your public X username only. We do not access your DMs, followers, or post on your behalf."],
+        ["5. Cookies", "We use minimal session cookies required for X authentication via NextAuth. No tracking or advertising cookies are used."],
+        ["6. Blockchain Data", "Wallet addresses and on-chain transactions are public by nature of the Solana blockchain. We only read this data, we do not modify it."],
+        ["7. Data Deletion", "To delete your data, contact us on X @TEFTofficial. We will remove your record from our database within 7 days."],
+        ["8. Contact", "For privacy questions, reach us on X @TEFTofficial or Telegram t.me/teftlegionofficial"],
+      ].map(([title, text]) => (
+        <div key={title as string} style={{ marginBottom:28 }}>
+          <h2 style={{ fontSize:13, fontWeight:700, color:"#fff", marginBottom:8, letterSpacing:1 }}>{title}</h2>
+          <p style={{ fontSize:12, color:"#555", lineHeight:1.8 }}>{text}</p>
         </div>
-      </div>
+      ))}
     </div>
   );
 }
