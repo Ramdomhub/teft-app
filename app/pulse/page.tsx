@@ -10,6 +10,7 @@ const WalletMultiButton = dynamic(
 );
 import Link from "next/link";
 import { ArrowLeft, RefreshCw } from "lucide-react";
+import NavHeader from "../components/NavHeader";
 
 type Signal = {
   id: string;
@@ -698,20 +699,7 @@ export default function PulsePage() {
           padding: "16px 20px",
           display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
-          <Link href="/" style={{
-            display: "flex", alignItems: "center", gap: 6,
-            color: "rgba(255,255,255,0.7)", textDecoration: "none",
-            fontSize: 11, fontWeight: 800, letterSpacing: "0.15em",
-          }}>
-            <ArrowLeft size={12} strokeWidth={3} />
-            BACK
-          </Link>
-          <WalletMultiButton style={{
-            background: "rgba(0,0,0,0.5)", backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255,255,255,0.15)", borderRadius: 20,
-            padding: "5px 14px", fontSize: 9, fontWeight: 900, height: "auto",
-            letterSpacing: "0.1em", color: "rgba(255,255,255,0.8)", lineHeight: 1.6,
-          }} />
+          <NavHeader maxWidth={480} />
         </div>
 
         {/* Bottom Hero: Title + Legend + Refresh */}

@@ -5,6 +5,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { PublicKey, Connection } from "@solana/web3.js";
 import { createClient } from "@supabase/supabase-js";
+import NavHeader from "../components/NavHeader";
 
 const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
 const RPC = typeof window !== "undefined" ? window.location.origin + "/api/rpc" : "https://teftlegion.com/api/rpc";
@@ -298,10 +299,7 @@ export default function IdentityPage() {
     <TokenGate>
       <div style={{ minHeight:"100vh", background:"#080808", fontFamily:"'DM Mono',monospace", padding:"20px 16px 80px" }}>
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-        <div style={{ maxWidth:440, margin:"0 auto 24px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-          <a href="/" style={{ color:"#333", textDecoration:"none", fontSize:11, letterSpacing:1 }}>← TEFTLEGION</a>
-          <WalletMultiButton style={{ fontSize:11, height:34, borderRadius:8 }}/>
-        </div>
+        <NavHeader maxWidth={440} />
         <div style={{ maxWidth:440, margin:"0 auto" }}>
           <div style={{ marginBottom:24 }}>
             <div style={{ fontSize:9, color:"#333", letterSpacing:4 }}>TEFT · IDENTITY</div>
