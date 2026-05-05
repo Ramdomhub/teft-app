@@ -286,7 +286,15 @@ export default function IdentityPage() {
   const connectX = async () => {
     if (!publicKey) return;
     if (!(session as any)?.xHandle) {
-      signIn("twitter", { callbackUrl: window.location.href });
+      signIn("twitter", { callbackUrl: window.location.href, redirect: false });
+      const width = 600, height = 700;
+      const left = window.innerWidth/2 - width/2;
+      const top = window.innerHeight/2 - height/2;
+      window.open(
+        `/api/auth/signin/twitter?callbackUrl=${encodeURIComponent(window.location.href)}`,
+        "X Auth",
+        `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
+      );
       return;
     }
     try {
