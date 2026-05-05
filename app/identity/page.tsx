@@ -345,9 +345,7 @@ export default function IdentityPage() {
                 </button>
                 <button onClick={loadIdentity} style={{ background:"#0a0a0a", color:"#444", border:"1px solid #1a1a1a", borderRadius:12, padding:"14px 18px", fontSize:14, cursor:"pointer" }}>↻</button>
               </div>
-              <div style={{ textAlign:"center", marginTop:20 }}>
-                <a href="/pulse" style={{ color:"#282828", fontSize:10, textDecoration:"none", letterSpacing:2 }}>→ TEFT PULSE BETA</a>
-              </div>
+
             </>
           )}
         </div>
