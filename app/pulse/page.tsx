@@ -150,7 +150,7 @@ function TokenGate({ children }: { children: React.ReactNode }) {
   }, [connected, publicKey, signed, signMessage]);
 
   if (!connected) return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
+    <div style={{ minHeight: "100vh", background: "#000", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
       <div style={{ fontSize: 48 }}>🔒</div>
       <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800 }}>TEFT Pulse <span style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700, color: "#888", verticalAlign: "middle" }}>BETA</span></h2>
       <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>Connect your wallet to verify your TEFT holdings.</p>
@@ -159,7 +159,7 @@ function TokenGate({ children }: { children: React.ReactNode }) {
   );
 
   if (signing) return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
+    <div style={{ minHeight: "100vh", background: "#000", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
       <div style={{ fontSize: 48 }}>✍️</div>
       <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 800 }}>Sign to verify</h2>
       <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>
@@ -169,13 +169,13 @@ function TokenGate({ children }: { children: React.ReactNode }) {
   );
 
   if (checking) return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div style={{ minHeight: "100vh", background: "#000", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <p style={{ color: "#888" }}>Checking TEFT balance...</p>
     </div>
   );
 
   if (checked && !hasAccess) return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
+    <div style={{ minHeight: "100vh", background: "#000", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
       <div style={{ fontSize: 48 }}>🚫</div>
       <h2 style={{ color: "#fff", fontSize: 22, fontWeight: 800 }}>No Access</h2>
       <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>
@@ -190,7 +190,7 @@ function TokenGate({ children }: { children: React.ReactNode }) {
   );
 
   if (checked && hasAccess && !showPulse) return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
+    <div style={{ minHeight: "100vh", background: "#000", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
       <div style={{ fontSize: 56 }}>🎉</div>
       <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, textAlign: "center" }}>Welcome to TEFT Pulse <span style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700, color: "#888", verticalAlign: "middle" }}>BETA</span></h2>
       <p style={{ color: "#4ade80", fontSize: 18, fontWeight: 700 }}>You hold {formatTeft(teftBalance)} TEFT</p>
