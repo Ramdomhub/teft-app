@@ -25,7 +25,7 @@ export default function Home() {
         {/* Button Grid */}
         <div className="grid grid-cols-2 gap-3 px-2">
           <a 
-            href="https://jup.ag/swap?sell=So11111111111111111111111111111111111111112&buy=8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump&referral=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&feeBps=50" 
+            href="https://jup.ag/swap/SOL-8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump" 
             target="_blank" 
             className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95"
           >
