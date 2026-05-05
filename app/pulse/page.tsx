@@ -630,6 +630,8 @@ export default function PulsePage() {
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const [countdown, setCountdown] = useState(30);
 
   const fetchSignals = useCallback(async (showRefreshing = false) => {
     if (showRefreshing) setRefreshing(true);
@@ -649,14 +651,21 @@ export default function PulsePage() {
 
   useEffect(() => {
     fetchSignals();
-    intervalRef.current = setInterval(() => fetchSignals(), 30_000);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    intervalRef.current = setInterval(() => { fetchSignals(); setCountdown(30); }, 30_000);
+    setCountdown(30);
+    countdownRef.current = setInterval(() => setCountdown(c => c > 0 ? c - 1 : 0), 1_000);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); if (countdownRef.current) clearInterval(countdownRef.current); };
   }, [fetchSignals]);
 
   const handleRefresh = () => {
+    if (countdownRef.current) clearInterval(countdownRef.current);
+    setCountdown(30);
+    countdownRef.current = setInterval(() => setCountdown(c => c > 0 ? c - 1 : 0), 1_000);
     if (intervalRef.current) clearInterval(intervalRef.current);
     fetchSignals(true);
-    intervalRef.current = setInterval(() => fetchSignals(), 30_000);
+    intervalRef.current = setInterval(() => { fetchSignals(); setCountdown(30); }, 30_000);
+    setCountdown(30);
+    countdownRef.current = setInterval(() => setCountdown(c => c > 0 ? c - 1 : 0), 1_000);
   };
 
   return (
@@ -770,7 +779,7 @@ export default function PulsePage() {
           </div>
           {lastUpdate && (
             <span style={{ color: "#333", fontSize: 10 }}>
-              Auto-refresh 30s
+              {`Auto-refresh ${countdown}s`}
             </span>
           )}
         </div>
