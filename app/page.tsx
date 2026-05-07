@@ -27,14 +27,14 @@ export default function Home() {
           <a 
             href="https://jup.ag/swap/SOL-8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump" 
             target="_blank" 
-            className="bg-white text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95"
+            className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95"
           >
             Buy TEFT
           </a>
           
           <a 
             href="/nft-marketplace" 
-            className="bg-white text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95"
+            className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95"
           >
             Get NFTs
           </a>
@@ -42,20 +42,20 @@ export default function Home() {
           <a 
             href="https://www.solsuite.io/teftsupreme" 
             target="_blank" 
-            className="bg-white text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95"
+            className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95"
           >
             NFT Staking
           </a>
           
           
           <a
-            href="/pulse" className="bg-white text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95 flex items-center justify-center gap-1"
+            href="/pulse" className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95 flex items-center justify-center gap-1"
           >
             TEFT Pulse <span style={{background:"#e9e9e9",borderRadius:4,padding:"1px 5px",fontSize:9,fontWeight:700,color:"#999"}}>BETA</span>
           </a>
           <a
             href="/identity"
-            className="bg-white text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95 flex items-center justify-center gap-1"
+            className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95 flex items-center justify-center gap-1"
           >
             TEFT Identity <span style={{background:"#C084FC22",borderRadius:4,padding:"1px 5px",fontSize:9,fontWeight:700,color:"#C084FC"}}>NEW</span>
           </a>
