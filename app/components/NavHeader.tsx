@@ -8,6 +8,7 @@ export default function NavHeader({ backHref = "/", maxWidth = 440 }: { backHref
     <div style={{
       maxWidth, margin: "0 auto 24px",
       display: "flex", justifyContent: "space-between", alignItems: "center",
+      width: "100%",
     }}>
       <Link href={backHref} style={{
         display: "flex", alignItems: "center", gap: 6,
