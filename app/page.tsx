@@ -20,7 +20,7 @@ export default function Home() {
         {/* Buy TEFT — full width, primary */}
         <div className="px-2 mb-3">
           
-            href="https://jup.ag/swap?sell=So11111111111111111111111111111111111111112&buy=8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump&referral=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&feeBps=50"
+            href={"https://jup.ag/swap?sell=So11111111111111111111111111111111111111112&buy=8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump&referral=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&feeBps=50"}
             target="_blank"
             className="bg-black text-white py-4 rounded-2xl text-center text-xs font-bold hover:opacity-80 transition-all active:scale-95 block w-full"
           >
