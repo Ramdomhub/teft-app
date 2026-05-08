@@ -283,18 +283,36 @@ export default function IdentityPage() {
 
   useEffect(() => { loadIdentity(); }, [loadIdentity]);
 
+  // Auto-save X handle to Supabase when session + wallet available
+  useEffect(() => {
+    const xHandle = (session as any)?.xHandle;
+    if (!xHandle || !publicKey || !cardData || cardData.xVerified) return;
+    fetch("/api/identity/verify-x", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wallet: publicKey.toBase58(), xHandle }),
+    }).then(r => { if (r.ok) loadIdentity(); });
+  }, [session, publicKey, cardData]);
+
   const connectX = async () => {
     if (!publicKey) return;
     if (!(session as any)?.xHandle) {
-      signIn("twitter", { callbackUrl: window.location.href, redirect: false });
       const width = 600, height = 700;
       const left = window.innerWidth/2 - width/2;
       const top = window.innerHeight/2 - height/2;
-      window.open(
-        `/api/auth/signin/twitter?callbackUrl=${encodeURIComponent(window.location.href)}`,
+      const popup = window.open(
+        `/api/auth/signin/twitter?callbackUrl=${encodeURIComponent(window.location.origin + "/identity?xauth=1")}`,
         "X Auth",
         `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
       );
+      // Poll until popup closes
+      const timer = setInterval(async () => {
+        if (popup?.closed) {
+          clearInterval(timer);
+          // Reload session + identity
+          window.location.reload();
+        }
+      }, 500);
       return;
     }
     try {
