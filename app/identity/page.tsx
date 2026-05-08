@@ -297,22 +297,7 @@ export default function IdentityPage() {
   const connectX = async () => {
     if (!publicKey) return;
     if (!(session as any)?.xHandle) {
-      const width = 600, height = 700;
-      const left = window.innerWidth/2 - width/2;
-      const top = window.innerHeight/2 - height/2;
-      const popup = window.open(
-        `/api/auth/signin/twitter?callbackUrl=${encodeURIComponent(window.location.origin + "/identity?xauth=1")}`,
-        "X Auth",
-        `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
-      );
-      // Poll until popup closes
-      const timer = setInterval(async () => {
-        if (popup?.closed) {
-          clearInterval(timer);
-          // Reload session + identity
-          window.location.reload();
-        }
-      }, 500);
+      signIn("twitter", { callbackUrl: window.location.href });
       return;
     }
     try {
