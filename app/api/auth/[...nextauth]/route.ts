@@ -7,6 +7,12 @@ const authOptions = {
       clientId: process.env.TWITTER_CLIENT_ID!,
       clientSecret: process.env.TWITTER_CLIENT_SECRET!,
       version: "2.0",
+      authorization: {
+        url: "https://x.com/i/oauth2/authorize",
+        params: {
+          scope: "users.read tweet.read offline.access",
+        },
+      },
     }),
   ],
   callbacks: {
@@ -21,28 +27,7 @@ const authOptions = {
       return session;
     },
   },
-  cookies: {
-    pkceCodeVerifier: {
-      name: "next-auth.pkce.code_verifier",
-      options: {
-        httpOnly: true,
-        sameSite: "none",
-        path: "/",
-        secure: true,
-      },
-    },
-    state: {
-      name: "next-auth.state",
-      options: {
-        httpOnly: true,
-        sameSite: "none",
-        path: "/",
-        secure: true,
-      },
-    },
-  },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true,
 };
 
 const handler = NextAuth(authOptions);
