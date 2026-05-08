@@ -7,6 +7,14 @@ const authOptions = {
       clientId: process.env.TWITTER_CLIENT_ID!,
       clientSecret: process.env.TWITTER_CLIENT_SECRET!,
       version: "2.0",
+      authorization: {
+        url: "https://x.com/i/oauth2/authorize",
+        params: {
+          scope: "users.read tweet.read offline.access",
+        },
+      },
+      token: "https://api.x.com/2/oauth2/token",
+      userinfo: "https://api.x.com/2/users/me?user.fields=profile_image_url",
     }),
   ],
   callbacks: {
