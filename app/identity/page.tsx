@@ -2,7 +2,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
 
@@ -11,7 +14,7 @@ export default function IdentityPage() {
   const [loading, setLoading] = useState(true);
   const [cardData, setCardData] = useState<any>(null);
   const [xHandle, setXHandle] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
   const loadIdentity = useCallback(async () => {
     if (!publicKey) return;
