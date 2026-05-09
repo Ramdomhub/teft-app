@@ -6,6 +6,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
 
@@ -14,7 +15,7 @@ export default function IdentityPage() {
   const [loading, setLoading] = useState(true);
   const [cardData, setCardData] = useState<any>(null);
   const [xHandle, setXHandle] = useState<string | null>(null);
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
 
   const loadIdentity = useCallback(async () => {
     if (!publicKey) return;
