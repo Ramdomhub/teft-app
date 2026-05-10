@@ -11,12 +11,12 @@ const TIER_COLORS: Record<string, { color: string; border: string; glow: string;
 };
 
 const RANKS = [
-  { name: "SHADOWCORE", min: 1,          tier: "white",  tagline: "Not visible. Still present.",          badge: "⚪" },
-  { name: "IRONVEIL",   min: 5_000_000,  tier: "white",  tagline: "Steel without noise.",                 badge: "⚪" },
-  { name: "TITANCORE",  min: 10_000_000, tier: "white",  tagline: "Weight becomes power.",                badge: "⚪" },
-  { name: "VOIDWALKER", min: 20_000_000, tier: "bronze", tagline: "They walk where signals disappear.",   badge: "🥉" },
-  { name: "ASCENDANT",  min: 30_000_000, tier: "silver", tagline: "No longer followers. No longer human.", badge: "🥈" },
-  { name: "NULLCORE",   min: 40_000_000, tier: "gold",   tagline: "The center of inevitability.",         badge: "🥇" },
+  { name: "SHADOWCORE", min: 1,          tier: "white",  tagline: "Not visible. Still present.",          badge: "○" },
+  { name: "IRONVEIL",   min: 5_000_000,  tier: "white",  tagline: "Steel without noise.",                 badge: "○" },
+  { name: "TITANCORE",  min: 10_000_000, tier: "white",  tagline: "Weight becomes power.",                badge: "○" },
+  { name: "VOIDWALKER", min: 20_000_000, tier: "bronze", tagline: "They walk where signals disappear.",   badge: "◈" },
+  { name: "ASCENDANT",  min: 30_000_000, tier: "silver", tagline: "No longer followers. No longer human.", badge: "◈" },
+  { name: "NULLCORE",   min: 40_000_000, tier: "gold",   tagline: "The center of inevitability.",         badge: "◆" },
 ];
 
 function getRank(balance: number) {
@@ -132,7 +132,7 @@ export async function GET(req: NextRequest) {
           {/* Bottom: wallet + handle */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {xHandle && (
-              <div style={{ fontSize: "18px", color: "#4ade80", fontWeight: 700, display: "flex" }}>@{xHandle} ✓</div>
+              <div style={{ fontSize: "18px", color: "#4ade80", fontWeight: 700, display: "flex" }}>@{xHandle} — verified</div>
             )}
             {shortWallet && (
               <div style={{ fontSize: "14px", color: "#333", fontFamily: "monospace", display: "flex" }}>{shortWallet}</div>
@@ -162,7 +162,7 @@ export async function GET(req: NextRequest) {
             gap: "12px",
             boxShadow: `0 0 60px ${tc.glow}`,
           }}>
-            <div style={{ fontSize: "80px", display: "flex" }}>{rank.badge}</div>
+            <div style={{ fontSize: "64px", fontWeight: 900, color: tc.color, display: "flex" }}>{rank.name.slice(0, 1)}</div>
             <div style={{
               fontSize: "14px",
               fontWeight: 900,
