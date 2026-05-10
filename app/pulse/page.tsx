@@ -699,7 +699,7 @@ export default function PulsePage() {
           background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.95) 100%)",
         }} />
 
-        <div style={{position:"relative",zIndex:10}}><NavHeader maxWidth={880} /></div>
+        <div style={{position:"absolute",top:20,left:20,right:20,zIndex:10,display:"flex",justifyContent:"space-between",alignItems:"center"}}><a href="/" style={{color:"rgba(255,255,255,0.7)",textDecoration:"none",fontSize:11,fontWeight:800,letterSpacing:"0.1em"}}>← Back</a><WalletMultiButton style={{background:"rgba(0,0,0,0.5)",backdropFilter:"blur(10px)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:20,padding:"5px 14px",fontSize:9,fontWeight:900,height:"auto",letterSpacing:"0.1em",color:"rgba(255,255,255,0.7)",lineHeight:"1.6"}}/></div>
 
         {/* Bottom Hero: Title + Legend + Refresh */}
         <div style={{
