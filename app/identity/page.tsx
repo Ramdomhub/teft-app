@@ -16,7 +16,6 @@ export default function IdentityPage() {
   const [cardData, setCardData] = useState<any>(null);
   const [xHandle, setXHandle] = useState<string | null>(null);
 
-
   const loadIdentity = useCallback(async () => {
     if (!publicKey) return;
     setLoading(true);
@@ -47,15 +46,22 @@ export default function IdentityPage() {
     } finally {
       setLoading(false);
     }
-  }, [publicKey, supabase]);
+  }, [publicKey]);
 
   useEffect(() => {
     loadIdentity();
   }, [loadIdentity]);
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user?.user_metadata?.provider_token) {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.user_metadata?.user_name) {
+        const handle = session.user.user_metadata.user_name;
+        setXHandle(handle);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user?.user_metadata?.user_name) {
         const handle = session.user.user_metadata.user_name;
         setXHandle(handle);
         if (publicKey && handle) {
@@ -70,14 +76,16 @@ export default function IdentityPage() {
         }
       }
     });
-  }, [publicKey, supabase, loadIdentity]);
+
+    return () => subscription.unsubscribe();
+  }, [publicKey, loadIdentity]);
 
   const connectX = async () => {
     if (!publicKey) return;
     await supabase.auth.signInWithOAuth({
-      provider: "x" as Provider as any,
+      provider: "x" as any,
       options: {
-        redirectTo: window.location.origin + "/identity",
+        redirectTo: window.location.origin + "/auth/callback",
       },
     });
   };
@@ -119,8 +127,7 @@ export default function IdentityPage() {
     <div style={{ minHeight: "100vh", background: "#000", color: "#fff", padding: "40px 20px" }}>
       <div style={{ maxWidth: 440, margin: "0 auto" }}>
         <h1 style={{ fontSize: 32, fontWeight: 900, marginBottom: 32, textAlign: "center" }}>Your Identity</h1>
-        
-        {/* Identity Card */}
+
         <div style={{ background: "#0a0a0a", border: "1px solid #222", borderRadius: 16, padding: 24, marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
             <div style={{ width: 64, height: 64, background: "#222", borderRadius: 12 }} />
@@ -135,10 +142,10 @@ export default function IdentityPage() {
             <div style={{ fontSize: 12, fontFamily: "monospace", color: "#fff" }}>{cardData?.wallet.slice(0, 8)}...{cardData?.wallet.slice(-8)}</div>
           </div>
 
-          {cardData?.xHandle && (
+          {(cardData?.xHandle || xHandle) && (
             <div style={{ borderTop: "1px solid #222", paddingTop: 16, marginTop: 16 }}>
               <div style={{ fontSize: 11, color: "#666", marginBottom: 4 }}>X Handle</div>
-              <div style={{ fontSize: 14, color: "#fff" }}>@{cardData.xHandle} {cardData.xVerified && "✓"}</div>
+              <div style={{ fontSize: 14, color: "#fff" }}>@{cardData?.xHandle || xHandle} {cardData?.xVerified && "✓"}</div>
             </div>
           )}
 
@@ -148,8 +155,7 @@ export default function IdentityPage() {
           </div>
         </div>
 
-        {/* Connect X */}
-        {!cardData?.xHandle && (
+        {!cardData?.xHandle && !xHandle && (
           <button
             onClick={connectX}
             style={{
