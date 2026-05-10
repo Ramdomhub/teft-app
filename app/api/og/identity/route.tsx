@@ -48,8 +48,8 @@ export async function GET(req: NextRequest) {
         `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/legion_stats?wallet_address=eq.${wallet}&select=teft_balance,score,x_handle,x_verified_at`,
         {
           headers: {
-            apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
+            apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+            Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`,
           },
         }
       );
