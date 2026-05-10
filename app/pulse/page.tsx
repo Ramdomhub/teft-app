@@ -643,9 +643,11 @@ export default function PulsePage() {
   const walletAddress = publicKey?.toBase58() ?? "";
 
   const fetchSignals = useCallback(async (showRefreshing = false) => {
+    const addr = publicKey?.toBase58() ?? "";
+    if (!addr) return;
     if (showRefreshing) setRefreshing(true);
     try {
-      const res = await fetch("/api/signals", { cache: "no-store", headers: { "x-wallet-address": walletAddress } });
+      const res = await fetch("/api/signals", { cache: "no-store", headers: { "x-wallet-address": addr } });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setSignals(data.signals || []);
@@ -656,9 +658,10 @@ export default function PulsePage() {
       setLoading(false);
       if (showRefreshing) setRefreshing(false);
     }
-  }, []);
+  }, [publicKey]);
 
   useEffect(() => {
+    if (!walletAddress) return;
     fetchSignals();
     intervalRef.current = setInterval(() => { fetchSignals(); setCountdown(30); }, 30_000);
     setCountdown(30);
