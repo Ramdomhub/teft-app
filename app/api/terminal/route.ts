@@ -1,0 +1,48 @@
+import { NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
+
+const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
+
+export async function GET() {
+  try {
+    const [teftRes, cgRes, fgRes, newsRes] = await Promise.allSettled([
+      fetch(`https://api.dexscreener.com/tokens/v1/solana/${TEFT_MINT}`, { next: { revalidate: 60 } }),
+      fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana,bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true"),
+      fetch("https://api.alternative.me/fng/?limit=1"),
+      fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.coindesk.com/arc/outboundfeeds/rss/&count=8"),
+    ]);
+
+    // TEFT
+    let teft = null;
+    if (teftRes.status === "fulfilled" && teftRes.value.ok) {
+      const data = await teftRes.value.json();
+      const pairs = Array.isArray(data) ? data : data?.pairs ?? [];
+      teft = pairs.sort((a: any, b: any) => (b.marketCap || 0) - (a.marketCap || 0))[0] || null;
+    }
+
+    // CoinGecko
+    let cg = null;
+    if (cgRes.status === "fulfilled" && cgRes.value.ok) {
+      cg = await cgRes.value.json();
+    }
+
+    // Fear & Greed
+    let fg = null;
+    if (fgRes.status === "fulfilled" && fgRes.value.ok) {
+      const fgData = await fgRes.value.json();
+      fg = fgData.data?.[0] || null;
+    }
+
+    // News
+    let news: any[] = [];
+    if (newsRes.status === "fulfilled" && newsRes.value.ok) {
+      const newsData = await newsRes.value.json();
+      news = newsData.items?.slice(0, 8) || [];
+    }
+
+    return NextResponse.json({ teft, cg, fg, news });
+  } catch (e) {
+    return NextResponse.json({ teft: null, cg: null, fg: null, news: [] });
+  }
+}

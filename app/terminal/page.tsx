@@ -29,31 +29,13 @@ export default function TerminalPage() {
   useEffect(() => {
     async function load() {
       try {
-        // TEFT via DexScreener
-        const teftRes = await fetch(`https://api.dexscreener.com/tokens/v1/solana/${TEFT_MINT}`);
-        const teftData = await teftRes.json();
-        const pairs = Array.isArray(teftData) ? teftData : teftData?.pairs ?? [];
-        const best = pairs.sort((a: any, b: any) => (b.marketCap || 0) - (a.marketCap || 0))[0] || pairs[0];
-        setTeft(best);
-
-        // SOL + BTC via CoinGecko
-        const cgRes = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana,bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true");
-        const cgData = await cgRes.json();
-        setSol(cgData.solana);
-        setBtc(cgData.bitcoin);
-
-        // Fear & Greed
-        const fgRes = await fetch("https://api.alternative.me/fng/?limit=1");
-        const fgData = await fgRes.json();
-        setFg(fgData.data?.[0]);
-
-        // Crypto News via Coindesk RSS
-        try {
-          const newsRes = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.coindesk.com/arc/outboundfeeds/rss/&count=8");
-          const newsData = await newsRes.json();
-          setNews(newsData.items?.slice(0, 8) || []);
-        } catch { setNews([]); }
-
+        const res = await fetch("/api/terminal");
+        const data = await res.json();
+        setTeft(data.teft);
+        setSol(data.cg?.solana || null);
+        setBtc(data.cg?.bitcoin || null);
+        setFg(data.fg);
+        setNews(data.news || []);
       } catch (e) { console.error(e); }
       finally {
         setLoading(false);
