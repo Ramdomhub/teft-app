@@ -11,28 +11,25 @@ const supabase = createClient(
 export async function GET() {
   try {
     const { data, error } = await supabase
-      .from("legion_members")
-      .select("wallet_address, x_handle, teft_balance, referral_count, created_at")
-      .not("teft_balance", "is", null)
+      .from("legion_stats")
+      .select("wallet_address, x_handle, teft_balance, referral_count_live, referral_code, score")
       .gt("teft_balance", 0)
-      .order("teft_balance", { ascending: false })
+      .order("score", { ascending: false })
       .limit(100);
 
     if (error) throw error;
 
-    const scored = (data || [])
-      .map((m: any) => ({
-        wallet: m.wallet_address,
-        xHandle: m.x_handle,
-        balance: m.teft_balance || 0,
-        referrals: m.referral_count || 0,
-        joinDate: m.created_at,
-        score: Math.round((m.teft_balance || 0) * (1 + (m.referral_count || 0) * 0.25)),
-      }))
-      .sort((a: any, b: any) => b.score - a.score)
-      .map((m: any, i: number) => ({ ...m, position: i + 1 }));
+    const leaderboard = (data || []).map((m: any, i: number) => ({
+      position: i + 1,
+      wallet: m.wallet_address,
+      xHandle: m.x_handle,
+      balance: m.teft_balance || 0,
+      referrals: m.referral_count_live || 0,
+      referralCode: m.referral_code,
+      score: m.score || 0,
+    }));
 
-    return NextResponse.json({ leaderboard: scored });
+    return NextResponse.json({ leaderboard });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ leaderboard: [] });
