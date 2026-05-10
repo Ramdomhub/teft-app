@@ -642,7 +642,7 @@ export default function PulsePage() {
   const fetchSignals = useCallback(async (showRefreshing = false) => {
     if (showRefreshing) setRefreshing(true);
     try {
-      const res = await fetch("/api/signals", { cache: "no-store" });
+      const res = await fetch("/api/signals", { cache: "no-store", headers: { "x-wallet-address": publicKey?.toBase58() || "" } });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setSignals(data.signals || []);

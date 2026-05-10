@@ -109,8 +109,22 @@ async function getLiveTokenData(tokenAddress: string) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    // Auth check: wallet must be in legion_members with balance > 0
+    const wallet = req.headers.get("x-wallet-address");
+    if (!wallet || wallet.length < 40) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { data: member } = await supabase
+      .from("legion_members")
+      .select("teft_balance")
+      .eq("wallet_address", wallet)
+      .single();
+    if (!member || !member.teft_balance || member.teft_balance < 1) {
+      return NextResponse.json({ error: "Insufficient TEFT balance" }, { status: 403 });
+    }
+
     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
 
     const { data, error } = await supabase
