@@ -8,17 +8,14 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   try {
-    const { wallet, balance, referredBy } = await req.json();
+    const { wallet, balance, referredBy, xHandle, xVerifiedAt } = await req.json();
     if (!wallet || wallet.length < 40) return NextResponse.json({ error: "Invalid wallet" }, { status: 400 });
 
-    // Resolve referral code to wallet address
     let referredByWallet = null;
     if (referredBy) {
-      // Check if it's already a full wallet address
-      if (referredBy.length > 20) {
+      if (referredBy.length >= 40) {
         referredByWallet = referredBy;
       } else {
-        // Look up wallet by referral_code
         const { data } = await supabase
           .from("legion_members")
           .select("wallet_address")
@@ -28,7 +25,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Don't override existing referred_by
     const { data: existing } = await supabase
       .from("legion_members")
       .select("referred_by")
@@ -41,6 +37,7 @@ export async function POST(req: NextRequest) {
       joined_at: new Date().toISOString(),
       referral_code: wallet.slice(0, 8),
       ...(referredByWallet && !existing?.referred_by ? { referred_by: referredByWallet } : {}),
+      ...(xHandle ? { x_handle: xHandle, x_verified_at: xVerifiedAt || new Date().toISOString() } : {}),
     }, { onConflict: "wallet_address", ignoreDuplicates: false });
 
     return NextResponse.json({ success: true });

@@ -138,9 +138,8 @@ export default function IdentityPage() {
       if (session?.user?.user_metadata?.user_name) {
         const handle = session.user.user_metadata.user_name;
         setXSession({ handle, avatar: session.user.user_metadata.avatar_url });
-        if (publicKey) {
-          if (publicKey.toBase58().length >= 40) { supabase.from("legion_members").upsert({ wallet_address: publicKey.toBase58(), x_handle: handle, x_verified_at: new Date().toISOString() }, { onConflict: "wallet_address", ignoreDuplicates: false }).then(() => loadIdentity()); }
-        }
+        // X handle is synced via /api/identity/sync when wallet loads
+        // No direct DB write here to prevent wrong wallet entries
       }
       if (event === "SIGNED_OUT") setXSession(null);
     });
