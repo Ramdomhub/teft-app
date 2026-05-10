@@ -9,7 +9,7 @@ const supabase = createClient(
 export async function POST(req: NextRequest) {
   try {
     const { wallet, balance, referredBy } = await req.json();
-    if (!wallet) return NextResponse.json({ error: "Missing wallet" }, { status: 400 });
+    if (!wallet || wallet.length < 32) return NextResponse.json({ error: "Invalid wallet" }, { status: 400 });
 
     // Resolve referral code to wallet address
     let referredByWallet = null;
