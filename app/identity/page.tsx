@@ -75,7 +75,7 @@ export default function IdentityPage() {
   const connectX = async () => {
     if (!publicKey) return;
     await supabase.auth.signInWithOAuth({
-      provider: "twitter",
+      provider: "twitter" as Provider as any,
       options: {
         redirectTo: window.location.origin + "/identity",
       },
