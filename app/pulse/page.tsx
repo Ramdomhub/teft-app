@@ -623,6 +623,7 @@ function SignalCard({ signal }: { signal: Signal }) {
 }
 
 export default function PulsePage() {
+  const { publicKey } = useWallet();
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   useEffect(() => {
     setShowDisclaimer(!localStorage.getItem('teft_disclaimer_accepted'));
