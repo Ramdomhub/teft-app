@@ -177,7 +177,7 @@ export default function TerminalPage() {
               {news.map((item, i) => (
                 <a key={i} href={item.link} target="_blank" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "12px 0", borderBottom: i < news.length - 1 ? "1px solid #111" : "none", textDecoration: "none", gap: 12 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", lineHeight: 1.4 }}>{item.title}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", lineHeight: 1.5 }}>{item.title}</div>
                     <div style={{ fontSize: 9, color: "#444", marginTop: 4 }}>{item.source} · {new Date(item.pubDate).toLocaleTimeString()}</div>
                   </div>
                   <span style={{ color: "#333", fontSize: 11, flexShrink: 0, marginTop: 2 }}>↗</span>
