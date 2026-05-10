@@ -640,7 +640,7 @@ export default function PulsePage() {
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const [countdown, setCountdown] = useState(30);
 
-  const walletAddress = typeof window !== "undefined" && publicKey ? publicKey.toBase58() : "";
+  const walletAddress = publicKey?.toBase58() ?? "";
 
   const fetchSignals = useCallback(async (showRefreshing = false) => {
     if (showRefreshing) setRefreshing(true);
