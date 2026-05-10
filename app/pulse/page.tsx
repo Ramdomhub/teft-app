@@ -681,7 +681,7 @@ export default function PulsePage() {
     <main style={{
       minHeight: "100vh", background: "#000", color: "#fff",
       fontFamily: "'Inter', -apple-system, sans-serif",
-      maxWidth: 480, margin: "0 auto",
+      
     }}>
       {/* Hero */}
       <div style={{ position: "relative", height: 320, overflow: "hidden" }}>
