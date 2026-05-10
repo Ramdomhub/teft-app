@@ -10,7 +10,11 @@ export async function GET() {
       fetch(`https://api.dexscreener.com/tokens/v1/solana/${TEFT_MINT}`, { next: { revalidate: 60 } }),
       fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana,bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true"),
       fetch("https://api.alternative.me/fng/?limit=1"),
-      fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fcointelegraph.com%2Frss"),
+      Promise.allSettled([
+        fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fcointelegraph.com%2Frss"),
+        fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fnews.bitcoin.com%2Ffeed%2F"),
+        fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.coindesk.com%2Farc%2Foutboundfeeds%2Frss%2F"),
+      ]),
     ]);
 
     // TEFT
@@ -39,11 +43,27 @@ export async function GET() {
       fg = fgData.data?.[0] || null;
     }
 
-    // News
+    // News — merge from multiple sources
     let news: any[] = [];
-    if (newsRes.status === "fulfilled" && newsRes.value.ok) {
-      const newsData = await newsRes.value.json();
-      news = newsData.items?.slice(0, 8) || [];
+    if (newsRes.status === "fulfilled") {
+      const results = newsRes.value as PromiseSettledResult<Response>[];
+      const allItems: any[] = [];
+      for (const r of results) {
+        if (r.status === "fulfilled" && r.value.ok) {
+          try {
+            const d = await r.value.json();
+            allItems.push(...(d.items || []).map((item: any) => ({
+              ...item,
+              source: d.feed?.title || "News",
+            })));
+          } catch {}
+        }
+      }
+      // Sort by date, deduplicate, take top 12
+      news = allItems
+        .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+        .filter((item, i, arr) => arr.findIndex(x => x.title === item.title) === i)
+        .slice(0, 12);
     }
 
     return NextResponse.json({ teft, cg, fg, news });
