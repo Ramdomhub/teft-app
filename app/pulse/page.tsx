@@ -694,7 +694,7 @@ export default function PulsePage() {
           background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.95) 100%)",
         }} />
 
-        <NavHeader maxWidth={880} />
+        <div style={{position:"relative",zIndex:10}}><NavHeader maxWidth={880} /></div>
 
         {/* Bottom Hero: Title + Legend + Refresh */}
         <div style={{
