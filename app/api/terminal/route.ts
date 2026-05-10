@@ -6,15 +6,13 @@ const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
 
 export async function GET() {
   try {
-    const [teftRes, cgRes, fgRes, newsRes] = await Promise.allSettled([
-      fetch(`https://api.dexscreener.com/tokens/v1/solana/${TEFT_MINT}`, { next: { revalidate: 60 } }),
+    const [teftRes, cgRes, fgRes, news1Res, news2Res, news3Res] = await Promise.allSettled([
+      fetch(`https://api.dexscreener.com/tokens/v1/solana/${TEFT_MINT}`),
       fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana,bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true"),
       fetch("https://api.alternative.me/fng/?limit=1"),
-      Promise.allSettled([
-        fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fcointelegraph.com%2Frss"),
-        fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fnews.bitcoin.com%2Ffeed%2F"),
-        fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.coindesk.com%2Farc%2Foutboundfeeds%2Frss%2F"),
-      ]),
+      fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fcointelegraph.com%2Frss"),
+      fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fnews.bitcoin.com%2Ffeed%2F"),
+      fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.coindesk.com%2Farc%2Foutboundfeeds%2Frss%2F"),
     ]);
 
     // TEFT
@@ -22,7 +20,6 @@ export async function GET() {
     if (teftRes.status === "fulfilled" && teftRes.value.ok) {
       const data = await teftRes.value.json();
       const pairs = Array.isArray(data) ? data : data?.pairs ?? [];
-      // Pick pair with highest volume or liquidity
       teft = pairs.sort((a: any, b: any) => {
         const aScore = (a.volume?.h24 || 0) + (a.liquidity?.usd || 0);
         const bScore = (b.volume?.h24 || 0) + (b.liquidity?.usd || 0);
@@ -43,28 +40,27 @@ export async function GET() {
       fg = fgData.data?.[0] || null;
     }
 
-    // News — merge from multiple sources
-    let news: any[] = [];
-    if (newsRes.status === "fulfilled") {
-      const results = newsRes.value as PromiseSettledResult<Response>[];
-      const allItems: any[] = [];
-      for (const r of results) {
-        if (r.status === "fulfilled" && r.value.ok) {
-          try {
-            const d = await r.value.json();
-            allItems.push(...(d.items || []).map((item: any) => ({
-              ...item,
-              source: d.feed?.title || "News",
-            })));
-          } catch {}
-        }
+    // News — alle 3 sources
+    const allItems: any[] = [];
+    for (const res of [news1Res, news2Res, news3Res]) {
+      if (res.status === "fulfilled" && res.value.ok) {
+        try {
+          const d = await res.value.json();
+          const source = d.feed?.title || "News";
+          allItems.push(...(d.items || []).slice(0, 8).map((item: any) => ({
+            title: item.title,
+            link: item.link,
+            pubDate: item.pubDate,
+            source,
+          })));
+        } catch {}
       }
-      // Sort by date, deduplicate, take top 12
-      news = allItems
-        .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
-        .filter((item, i, arr) => arr.findIndex(x => x.title === item.title) === i)
-        .slice(0, 12);
     }
+
+    const news = allItems
+      .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+      .filter((item, i, arr) => arr.findIndex(x => x.title === item.title) === i)
+      .slice(0, 15);
 
     return NextResponse.json({ teft, cg, fg, news });
   } catch (e) {
