@@ -139,7 +139,7 @@ export default function IdentityPage() {
         const handle = session.user.user_metadata.user_name;
         setXSession({ handle, avatar: session.user.user_metadata.avatar_url });
         if (publicKey) {
-          supabase.from("legion_members").upsert({ wallet_address: publicKey.toBase58(), x_handle: handle, x_verified_at: new Date().toISOString() }).then(() => loadIdentity());
+          if (publicKey.toBase58().length >= 32) { supabase.from("legion_members").upsert({ wallet_address: publicKey.toBase58(), x_handle: handle, x_verified_at: new Date().toISOString() }, { onConflict: "wallet_address", ignoreDuplicates: false }).then(() => loadIdentity()); }
         }
       }
       if (event === "SIGNED_OUT") setXSession(null);
