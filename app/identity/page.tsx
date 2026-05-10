@@ -1,8 +1,17 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { createClient } from "@supabase/supabase-js";
+import dynamic from "next/dynamic";
+
+const WalletButton = dynamic(() => Promise.resolve(({ style }: { style?: React.CSSProperties }) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
+  return <WalletMultiButton style={style} />;
+}), { ssr: false });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -85,26 +94,16 @@ export default function IdentityPage() {
       const conn = new Connection(window.location.origin + "/api/rpc");
       const accounts = await conn.getParsedTokenAccountsByOwner(publicKey, { mint: new PublicKey(TEFT_MINT) });
       const balance = accounts.value[0]?.account.data.parsed.info.tokenAmount.uiAmount || 0;
-
-      // Get ref from URL
       const urlParams = new URLSearchParams(window.location.search);
       const referredBy = urlParams.get("ref");
-
-      // Sync balance + referral to DB
       await fetch("/api/identity/sync", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          wallet: publicKey.toBase58(),
-          balance,
-          ...(referredBy ? { referredBy } : {}),
-        }),
+        body: JSON.stringify({ wallet: publicKey.toBase58(), balance, ...(referredBy ? { referredBy } : {}) }),
       });
-
       const { data } = await supabase.from("legion_stats").select("*").eq("wallet_address", publicKey.toBase58()).single();
       setCardData({
-        wallet: publicKey.toBase58(),
-        balance,
+        wallet: publicKey.toBase58(), balance,
         legionSize: data?.referral_count_live || 0,
         xHandle: data?.x_handle || null,
         referralCode: data?.referral_code || publicKey.toBase58().slice(0, 8),
@@ -124,7 +123,10 @@ export default function IdentityPage() {
     finally { setLbLoading(false); }
   }, []);
 
-  useEffect(() => { loadIdentity(); loadLeaderboard(); }, [loadIdentity, loadLeaderboard]);
+  useEffect(() => {
+    if (publicKey) { loadIdentity(); loadLeaderboard(); }
+    else { setLoading(false); loadLeaderboard(); }
+  }, [publicKey, loadIdentity, loadLeaderboard]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -170,12 +172,64 @@ export default function IdentityPage() {
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
   };
 
+  // NO WALLET CONNECTED
   if (!publicKey) return (
-    <div style={{ minHeight: "100vh", background: "#000", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
-        <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8 }}>TEFT Identity</h1>
-        <p style={{ color: "#444", fontSize: 13 }}>Connect your wallet to access your on-chain identity.</p>
+    <div style={{ minHeight: "100vh", background: "#000", color: "#fff", fontFamily: "'Inter', -apple-system, sans-serif" }}>
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} .wallet-adapter-button{background:#fff!important;color:#000!important;border-radius:12px!important;font-weight:900!important;font-size:13px!important;height:48px!important;padding:0 28px!important;}`}</style>
+      <div style={{ position: "relative", height: 220, overflow: "hidden" }}>
+        <img src="/teft.png" alt="TEFT" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", opacity: 0.5 }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,1) 100%)" }} />
+        <div style={{ position: "absolute", top: 20, left: 20, right: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <a href="/" style={{ color: "#888", fontSize: 11, fontWeight: 800, textDecoration: "none", letterSpacing: "0.1em" }}>← TEFT</a>
+          <span style={{ background: "#C084FC22", border: "1px solid #c084fc44", borderRadius: 6, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: "#C084FC", letterSpacing: "0.1em" }}>IDENTITY</span>
+        </div>
+        <div style={{ position: "absolute", bottom: 24, left: 20 }}>
+          <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, letterSpacing: "-0.02em" }}>Your Identity</h1>
+          <p style={{ margin: "2px 0 0", color: "#444", fontSize: 11, fontWeight: 700, letterSpacing: "0.05em" }}>ON-CHAIN PROFILE</p>
+        </div>
+      </div>
+      <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 80px" }}>
+        <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 32, marginBottom: 12, textAlign: "center" }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
+          <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 8, margin: "0 0 8px" }}>Connect Wallet</h2>
+          <p style={{ color: "#444", fontSize: 13, marginBottom: 24 }}>Connect your Phantom or Solflare wallet to access your TEFT Identity.</p>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <WalletButton />
+          </div>
+        </div>
+
+        {/* Show leaderboard even without wallet */}
+        <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20 }}>
+          <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>LEGION LEADERBOARD</div>
+          {lbLoading ? (
+            <div style={{ textAlign: "center", padding: "20px 0", color: "#333", fontSize: 11 }}>Loading...</div>
+          ) : leaderboard.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "20px 0", color: "#333", fontSize: 11 }}>No members yet</div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {leaderboard.slice(0, 10).map((member: any) => {
+                const memberRank = getRank(member.balance);
+                const mts = memberRank ? TIER_STYLES[memberRank.tier] : null;
+                return (
+                  <div key={member.wallet} style={{ display: "flex", alignItems: "center", gap: 10, background: "#0a0a0a", border: "1px solid #111", borderRadius: 10, padding: "10px 12px" }}>
+                    <div style={{ width: 28, display: "flex", justifyContent: "center", flexShrink: 0 }}><PositionBadge position={member.position} /></div>
+                    <div style={{ width: 28, height: 28, background: memberRank?.bg || "#111", border: `1px solid ${mts?.border || "#222"}`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{mts?.badge || "•"}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {member.xHandle ? `@${member.xHandle}` : `${member.wallet.slice(0, 4)}...${member.wallet.slice(-4)}`}
+                      </div>
+                      <div style={{ fontSize: 9, color: "#444", marginTop: 1 }}>{formatBalance(member.balance)} TEFT · {member.referrals} referrals</div>
+                    </div>
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 900, color: memberRank?.color || "#fff" }}>{formatBalance(member.score)}</div>
+                      <div style={{ fontSize: 9, color: "#444" }}>score</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -192,11 +246,16 @@ export default function IdentityPage() {
 
   if (!cardData || cardData.balance < 1) return (
     <div style={{ minHeight: "100vh", background: "#000", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <style>{`.wallet-adapter-button{background:#fff!important;color:#000!important;border-radius:12px!important;font-weight:900!important;}`}</style>
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>🚫</div>
         <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8 }}>No Access</h1>
         <p style={{ color: "#444", fontSize: 13, marginBottom: 24 }}>You need at least 1 TEFT to access Identity.</p>
-        <a href={`https://jup.ag/swap/SOL-${TEFT_MINT}`} target="_blank" style={{ background: "#4ade80", color: "#000", borderRadius: 12, padding: "12px 28px", fontWeight: 900, fontSize: 13, textDecoration: "none" }}>Buy TEFT</a>
+        <a href={`https://jup.ag/swap/SOL-${TEFT_MINT}`} target="_blank" style={{ background: "#4ade80", color: "#000", borderRadius: 12, padding: "12px 28px", fontWeight: 900, fontSize: 13, textDecoration: "none", display: "inline-block", marginBottom: 16 }}>Buy TEFT</a>
+        <br />
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}>
+          <WalletButton />
+        </div>
       </div>
     </div>
   );
@@ -210,14 +269,17 @@ export default function IdentityPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#000", color: "#fff", fontFamily: "'Inter', -apple-system, sans-serif" }}>
-      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} .wallet-adapter-button{background:#1a1a1a!important;color:#fff!important;border-radius:10px!important;font-weight:800!important;font-size:11px!important;height:36px!important;padding:0 16px!important;}`}</style>
 
       <div style={{ position: "relative", height: 220, overflow: "hidden" }}>
         <img src="/teft.png" alt="TEFT" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", opacity: 0.5 }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,1) 100%)" }} />
         <div style={{ position: "absolute", top: 20, left: 20, right: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <a href="/" style={{ color: "#888", fontSize: 11, fontWeight: 800, textDecoration: "none", letterSpacing: "0.1em" }}>← TEFT</a>
-          <span style={{ background: "#C084FC22", border: "1px solid #c084fc44", borderRadius: 6, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: "#C084FC", letterSpacing: "0.1em" }}>IDENTITY</span>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <span style={{ background: "#C084FC22", border: "1px solid #c084fc44", borderRadius: 6, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: "#C084FC", letterSpacing: "0.1em" }}>IDENTITY</span>
+            <WalletButton />
+          </div>
         </div>
         <div style={{ position: "absolute", bottom: 24, left: 20 }}>
           <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, letterSpacing: "-0.02em" }}>Your Identity</h1>
@@ -227,7 +289,6 @@ export default function IdentityPage() {
 
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 80px" }}>
 
-        {/* Identity Card */}
         <div style={{ background: "#0d0d0d", border: `1px solid ${rank && ts ? ts.border : "#222"}`, borderRadius: 20, padding: 20, marginBottom: 12, position: "relative", overflow: "hidden", boxShadow: rank && ts ? ts.glow : "none" }}>
           {rank && rank.tier !== "white" && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 100% 0%, ${rank.color}0d 0%, transparent 60%)`, pointerEvents: "none" }} />}
           <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 20 }}>
@@ -270,7 +331,6 @@ export default function IdentityPage() {
           </div>
         </div>
 
-        {/* X Account */}
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
           <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>X ACCOUNT</div>
           {connectedHandle ? (
@@ -287,7 +347,6 @@ export default function IdentityPage() {
           )}
         </div>
 
-        {/* Referral */}
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
           <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>LEGION REFERRAL</div>
           <div style={{ background: "#111", border: "1px solid #222", borderRadius: 12, padding: "12px 14px", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
@@ -303,7 +362,6 @@ export default function IdentityPage() {
           </div>
         </div>
 
-        {/* Rank Ladder */}
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
           <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>RANK LADDER</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -325,7 +383,6 @@ export default function IdentityPage() {
           </div>
         </div>
 
-        {/* Leaderboard */}
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
             <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>LEGION LEADERBOARD</div>
@@ -334,7 +391,7 @@ export default function IdentityPage() {
           {lbLoading ? (
             <div style={{ textAlign: "center", padding: "20px 0", color: "#333", fontSize: 11 }}>Loading...</div>
           ) : leaderboard.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "20px 0", color: "#333", fontSize: 11 }}>No members yet — be the first!</div>
+            <div style={{ textAlign: "center", padding: "20px 0", color: "#333", fontSize: 11 }}>No members yet</div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {leaderboard.slice(0, 20).map((member: any) => {
@@ -343,12 +400,8 @@ export default function IdentityPage() {
                 const mts = memberRank ? TIER_STYLES[memberRank.tier] : null;
                 return (
                   <div key={member.wallet} style={{ display: "flex", alignItems: "center", gap: 10, background: isMe ? "#0a1a0a" : "#0a0a0a", border: `1px solid ${isMe ? "#4ade8044" : "#111"}`, borderRadius: 10, padding: "10px 12px" }}>
-                    <div style={{ width: 28, display: "flex", justifyContent: "center", flexShrink: 0 }}>
-                      <PositionBadge position={member.position} />
-                    </div>
-                    <div style={{ width: 28, height: 28, background: memberRank?.bg || "#111", border: `1px solid ${mts?.border || "#222"}`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>
-                      {mts?.badge || "•"}
-                    </div>
+                    <div style={{ width: 28, display: "flex", justifyContent: "center", flexShrink: 0 }}><PositionBadge position={member.position} /></div>
+                    <div style={{ width: 28, height: 28, background: memberRank?.bg || "#111", border: `1px solid ${mts?.border || "#222"}`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{mts?.badge || "•"}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 12, fontWeight: 800, color: isMe ? "#4ade80" : "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {member.xHandle ? `@${member.xHandle}` : `${member.wallet.slice(0, 4)}...${member.wallet.slice(-4)}`}
@@ -380,7 +433,6 @@ export default function IdentityPage() {
           )}
         </div>
 
-        {/* Share */}
         <button onClick={shareOnX} style={{ width: "100%", background: "transparent", border: "1px solid #1e3a5f", borderRadius: 12, padding: "14px", color: "#60a5fa", fontSize: 11, fontWeight: 800, cursor: "pointer", letterSpacing: "0.1em" }}>
           SHARE IDENTITY ON X ↗
         </button>
