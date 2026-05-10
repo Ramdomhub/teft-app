@@ -180,7 +180,7 @@ export default function IdentityPage() {
         <img src="/teft.png" alt="TEFT" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", opacity: 0.5 }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,1) 100%)" }} />
         <div style={{ position: "absolute", top: 20, left: 20, right: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <a href="/" style={{ color: "#888", fontSize: 11, fontWeight: 800, textDecoration: "none", letterSpacing: "0.1em" }}>← TEFT</a>
+          <a href="/" style={{ color: "#888", fontSize: 11, fontWeight: 800, textDecoration: "none", letterSpacing: "0.1em" }}>← Back</a>
           <span style={{ background: "#C084FC22", border: "1px solid #c084fc44", borderRadius: 6, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: "#C084FC", letterSpacing: "0.1em" }}>IDENTITY</span>
         </div>
         <div style={{ position: "absolute", bottom: 24, left: 20 }}>
@@ -275,7 +275,7 @@ export default function IdentityPage() {
         <img src="/teft.png" alt="TEFT" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", opacity: 0.5 }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,1) 100%)" }} />
         <div style={{ position: "absolute", top: 20, left: 20, right: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <a href="/" style={{ color: "#888", fontSize: 11, fontWeight: 800, textDecoration: "none", letterSpacing: "0.1em" }}>← TEFT</a>
+          <a href="/" style={{ color: "#888", fontSize: 11, fontWeight: 800, textDecoration: "none", letterSpacing: "0.1em" }}>← Back</a>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <span style={{ background: "#C084FC22", border: "1px solid #c084fc44", borderRadius: 6, padding: "3px 10px", fontSize: 9, fontWeight: 800, color: "#C084FC", letterSpacing: "0.1em" }}>IDENTITY</span>
             <WalletButton />
