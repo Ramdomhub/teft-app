@@ -40,6 +40,15 @@ export default function Home() {
             <p className="text-[11px] text-zinc-400 leading-relaxed">Real-time signals from 24 smart wallets. See what the best traders on Solana are buying — before everyone else.</p>
           </a>
 
+          {/* TEFT Terminal */}
+          <a href="/terminal" className="block bg-black text-white rounded-2xl p-4 hover:opacity-90 transition-all active:scale-95">
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-xs font-black tracking-wide">TEFT Terminal</span>
+              <span style={{background:"#4ade8022",borderRadius:4,padding:"2px 6px",fontSize:9,fontWeight:700,color:"#4ade80"}}>LIVE</span>
+            </div>
+            <p className="text-[11px] text-zinc-400 leading-relaxed">Price, MCap, Fear & Greed, Crypto News — all signals, one screen.</p>
+          </a>
+
           {/* TEFT Identity */}
           <a href="/identity" className="block bg-black text-white rounded-2xl p-4 hover:opacity-90 transition-all active:scale-95">
             <div className="flex justify-between items-start mb-2">
