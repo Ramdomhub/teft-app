@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
   if (wallet) {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/legion_stats?wallet_address=eq.${wallet}&select=teft_balance,score,x_handle,x_verified_at,referral_count_live`,
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/legion_stats?wallet_address=eq.${wallet}&select=teft_balance,score,x_handle,x_verified_at,referral_count`,
         { headers: { apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}` } }
       );
       const data = await res.json();
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
         power = data[0].score || 0;
         xHandle = data[0].x_handle || "";
         xVerified = !!data[0].x_verified_at;
-        referrals = data[0].referral_count_live || 0;
+        referrals = data[0].referral_count || 0;
       }
     } catch (e) {}
   }
