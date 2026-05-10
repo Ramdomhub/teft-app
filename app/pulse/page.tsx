@@ -626,7 +626,7 @@ export default function PulsePage() {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   useEffect(() => {
     setShowDisclaimer(!localStorage.getItem('teft_disclaimer_accepted'));
-  }, []);
+  }, [publicKey]);
   const [showLegend, setShowLegend] = useState(false);
   const [signals, setSignals] = useState<Signal[]>([]);
   const [showWeak, setShowWeak] = useState(true);
