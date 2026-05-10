@@ -169,7 +169,7 @@ export default function IdentityPage() {
     const rank = getRank(cardData?.balance || 0);
     const refLink = `https://teftlegion.com/identity?ref=${cardData?.referralCode}`;
     const rankLine = rank ? `${TIER_STYLES[rank.tier].badge} ${rank.name} — "${rank.tagline}"` : "";
-    const text = `My wallet revealed its TEFT Identity.\n\n${rankLine} — "${rank?.tagline || ""}"\n\nYours is still hidden. Reveal it ↓\n${refLink}\n\n$TEFT`;
+    const text = `My wallet revealed its TEFT Identity.\n\n${rankLine}\n\nYours is still hidden. Reveal it ↓\n${refLink}\n\n$TEFT`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
   };
 
