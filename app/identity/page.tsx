@@ -10,28 +10,35 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
 
 const RANKS = [
-  { name: "GHOST",            min: 0,           max: 999,          color: "#444",    bg: "#111",    emoji: "👻" },
-  { name: "RECRUIT",          min: 1_000,        max: 9_999,        color: "#6b7280", bg: "#1a1a1a", emoji: "🪖" },
-  { name: "SOLDIER",          min: 10_000,       max: 99_999,       color: "#60a5fa", bg: "#1a1a3a", emoji: "⚔️" },
-  { name: "VETERAN",          min: 100_000,      max: 499_999,      color: "#34d399", bg: "#0a2a1a", emoji: "🛡️" },
-  { name: "ELITE",            min: 500_000,      max: 1_999_999,    color: "#fbbf24", bg: "#2a1a00", emoji: "🌟" },
-  { name: "COMMANDER",        min: 2_000_000,    max: 9_999_999,    color: "#f97316", bg: "#2a1000", emoji: "🔥" },
-  { name: "WARLORD",          min: 10_000_000,   max: 49_999_999,   color: "#c084fc", bg: "#1a0a2a", emoji: "⚡" },
-  { name: "LEGION COMMANDER", min: 50_000_000,   max: Infinity,     color: "#4ade80", bg: "#0a2a0a", emoji: "👑" },
+  { name: "SHADOWCORE", min: 1,          max: 4_999_999,  color: "#94a3b8", bg: "#0f1117", tier: "white",  tagline: "Not visible. Still present.",         desc: "Beobachter im Schatten." },
+  { name: "IRONVEIL",   min: 5_000_000,  max: 9_999_999,  color: "#cbd5e1", bg: "#111318", tier: "white",  tagline: "Steel without noise.",                desc: "Disziplinierte Legionäre." },
+  { name: "TITANCORE",  min: 10_000_000, max: 19_999_999, color: "#e2e8f0", bg: "#111318", tier: "white",  tagline: "Weight becomes power.",               desc: "Veteranen der Legion." },
+  { name: "VOIDWALKER", min: 20_000_000, max: 29_999_999, color: "#cd7f32", bg: "#1a1100", tier: "bronze", tagline: "They walk where signals disappear.",   desc: "Mystische Elite." },
+  { name: "ASCENDANT",  min: 30_000_000, max: 39_999_999, color: "#C0C0C0", bg: "#141414", tier: "silver", tagline: "No longer followers. No longer human.", desc: "Legionäre, die Teil der Mythologie werden." },
+  { name: "NULLCORE",   min: 40_000_000, max: Infinity,   color: "#FFD700", bg: "#1a1400", tier: "gold",   tagline: "The center of inevitability.",         desc: "Der Kern der Legion." },
 ];
+
+const TIER_STYLES: Record<string, { border: string; glow: string; badge: string }> = {
+  white:  { border: "#ffffff22", glow: "none",                        badge: "⚪" },
+  bronze: { border: "#cd7f32",   glow: "0 0 20px #cd7f3244",          badge: "🥉" },
+  silver: { border: "#C0C0C0",   glow: "0 0 20px #C0C0C044",          badge: "🥈" },
+  gold:   { border: "#FFD700",   glow: "0 0 28px #FFD70066",          badge: "🥇" },
+};
 
 function getRank(balance: number) {
   for (let i = RANKS.length - 1; i >= 0; i--) {
     if (balance >= RANKS[i].min) return { ...RANKS[i], index: i };
   }
-  return { ...RANKS[0], index: 0 };
+  return null;
 }
 
 function getProgress(balance: number, rank: typeof RANKS[0] & { index: number }) {
   if (rank.max === Infinity) return 100;
-  const range = rank.max - rank.min;
-  const progress = balance - rank.min;
-  return Math.min(100, Math.max(0, (progress / range) * 100));
+  return Math.min(100, Math.max(0, ((balance - rank.min) / (rank.max - rank.min)) * 100));
+}
+
+function calcScore(balance: number, referrals: number) {
+  return Math.round(balance * (1 + referrals * 0.25));
 }
 
 function formatBalance(n: number): string {
@@ -41,34 +48,34 @@ function formatBalance(n: number): string {
   return n.toFixed(0);
 }
 
-function RankBadge({ rank, size = "md" }: { rank: ReturnType<typeof getRank>; size?: "sm" | "md" | "lg" }) {
-  const sizes = { sm: { box: 48, emoji: 20, font: 8 }, md: { box: 72, emoji: 28, font: 9 }, lg: { box: 96, emoji: 36, font: 10 } };
-  const s = sizes[size];
-  const isTop = rank.index >= 6;
+function RankBadge({ rank, size = "md" }: { rank: NonNullable<ReturnType<typeof getRank>>; size?: "sm" | "md" | "lg" }) {
+  const s = { sm: 44, md: 80, lg: 100 }[size];
+  const ts = TIER_STYLES[rank.tier];
+  const emojiSize = { sm: 16, md: 30, lg: 38 }[size];
+  const fontSize = { sm: 6, md: 8, lg: 9 }[size];
   return (
     <div style={{
-      width: s.box, height: s.box,
-      background: rank.bg,
-      border: `2px solid ${rank.color}${isTop ? "" : "66"}`,
-      borderRadius: 16,
+      width: s, height: s, background: rank.bg,
+      border: `2px solid ${ts.border}`, borderRadius: 16, flexShrink: 0,
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-      gap: 2,
-      boxShadow: isTop ? `0 0 20px ${rank.color}44` : "none",
-      position: "relative", overflow: "hidden",
-      flexShrink: 0,
+      gap: 3, boxShadow: ts.glow, position: "relative", overflow: "hidden",
     }}>
-      {isTop && (
-        <div style={{
-          position: "absolute", inset: 0,
-          background: `radial-gradient(circle at 50% 0%, ${rank.color}22 0%, transparent 70%)`,
-        }} />
+      {rank.tier !== "white" && (
+        <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 50% 0%, ${rank.color}22 0%, transparent 70%)` }} />
       )}
-      <span style={{ fontSize: s.emoji }}>{rank.emoji}</span>
-      <span style={{ color: rank.color, fontSize: s.font, fontWeight: 900, letterSpacing: "0.05em", lineHeight: 1 }}>
+      <span style={{ fontSize: emojiSize }}>{ts.badge}</span>
+      <span style={{ color: rank.color, fontSize, fontWeight: 900, letterSpacing: "0.04em", lineHeight: 1, textAlign: "center", padding: "0 4px" }}>
         {rank.name.split(" ")[0]}
       </span>
     </div>
   );
+}
+
+function PositionBadge({ position }: { position: number }) {
+  if (position === 1) return <span style={{ fontSize: 18 }}>🥇</span>;
+  if (position === 2) return <span style={{ fontSize: 18 }}>🥈</span>;
+  if (position === 3) return <span style={{ fontSize: 18 }}>🥉</span>;
+  return <span style={{ color: "#444", fontSize: 12, fontWeight: 900, width: 24, textAlign: "center" }}>#{position}</span>;
 }
 
 export default function IdentityPage() {
@@ -77,51 +84,49 @@ export default function IdentityPage() {
   const [cardData, setCardData] = useState<any>(null);
   const [xSession, setXSession] = useState<{ handle: string; avatar?: string } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [lbLoading, setLbLoading] = useState(true);
 
   const loadIdentity = useCallback(async () => {
     if (!publicKey) return;
     setLoading(true);
     try {
       const conn = new Connection(window.location.origin + "/api/rpc");
-      const accounts = await conn.getParsedTokenAccountsByOwner(publicKey, {
-        mint: new PublicKey(TEFT_MINT),
-      });
+      const accounts = await conn.getParsedTokenAccountsByOwner(publicKey, { mint: new PublicKey(TEFT_MINT) });
       const balance = accounts.value[0]?.account.data.parsed.info.tokenAmount.uiAmount || 0;
-      const { data } = await supabase
-        .from("legion_stats").select("*")
-        .eq("wallet_address", publicKey.toBase58()).single();
+      const { data } = await supabase.from("legion_members").select("*").eq("wallet_address", publicKey.toBase58()).single();
       setCardData({
-        wallet: publicKey.toBase58(),
-        balance,
-        legionSize: data?.legion_size || 0,
+        wallet: publicKey.toBase58(), balance,
+        legionSize: data?.referral_count || 0,
         xHandle: data?.x_handle || null,
-        xVerified: !!data?.x_verified_at,
-        joinDate: data?.created_at || null,
         referralCode: data?.referral_code || publicKey.toBase58().slice(0, 8),
+        score: calcScore(balance, data?.referral_count || 0),
       });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
   }, [publicKey]);
 
-  useEffect(() => { loadIdentity(); }, [loadIdentity]);
+  const loadLeaderboard = useCallback(async () => {
+    setLbLoading(true);
+    try {
+      const res = await fetch("/api/leaderboard");
+      const data = await res.json();
+      setLeaderboard(data.leaderboard || []);
+    } catch (e) { console.error(e); }
+    finally { setLbLoading(false); }
+  }, []);
+
+  useEffect(() => { loadIdentity(); loadLeaderboard(); }, [loadIdentity, loadLeaderboard]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user?.user_metadata?.user_name) {
-        setXSession({
-          handle: session.user.user_metadata.user_name,
-          avatar: session.user.user_metadata.avatar_url,
-        });
-      }
+      if (session?.user?.user_metadata?.user_name)
+        setXSession({ handle: session.user.user_metadata.user_name, avatar: session.user.user_metadata.avatar_url });
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user?.user_metadata?.user_name) {
         const handle = session.user.user_metadata.user_name;
-        const avatar = session.user.user_metadata.avatar_url;
-        setXSession({ handle, avatar });
+        setXSession({ handle, avatar: session.user.user_metadata.avatar_url });
         if (publicKey) {
           supabase.from("legion_members").upsert({
             wallet_address: publicKey.toBase58(),
@@ -137,41 +142,35 @@ export default function IdentityPage() {
 
   const connectX = async () => {
     if (!publicKey) return;
-    await supabase.auth.signInWithOAuth({
-      provider: "x" as any,
-      options: { redirectTo: window.location.origin + "/auth/callback" },
-    });
+    await supabase.auth.signInWithOAuth({ provider: "x" as any, options: { redirectTo: window.location.origin + "/auth/callback" } });
   };
 
   const disconnectX = async () => {
     await supabase.auth.signOut();
-    if (publicKey) {
-      await supabase.from("legion_members")
-        .update({ x_handle: null, x_verified_at: null })
-        .eq("wallet_address", publicKey.toBase58());
-      await loadIdentity();
-    }
+    if (publicKey) await supabase.from("legion_members").update({ x_handle: null, x_verified_at: null }).eq("wallet_address", publicKey.toBase58());
     setXSession(null);
+    await loadIdentity();
   };
 
   const copyReferral = () => {
-    const link = `https://teftlegion.com/identity?ref=${cardData?.referralCode}`;
-    navigator.clipboard.writeText(link);
+    navigator.clipboard.writeText(`https://teftlegion.com/identity?ref=${cardData?.referralCode}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const shareOnX = () => {
     const rank = getRank(cardData?.balance || 0);
-    const text = `My TEFT Legion Identity\n\n${rank.emoji} Rank: ${rank.name}\n💎 Holdings: ${formatBalance(cardData?.balance || 0)} TEFT\n⚔️ Legion: ${cardData?.legionSize || 0} members\n\nJoin the Legion 👇\nhttps://teftlegion.com/identity?ref=${cardData?.referralCode}\n\n#TEFT #Solana #TEFTLegion`;
+    const refLink = `https://teftlegion.com/identity?ref=${cardData?.referralCode}`;
+    const rankLine = rank ? `${TIER_STYLES[rank.tier].badge} ${rank.name} — "${rank.tagline}"` : "";
+    const text = `TEFT Legion Identity\n\n${rankLine}\n${formatBalance(cardData?.balance || 0)} TEFT · ${cardData?.legionSize || 0} Legion members\n\nJoin my Legion 👇\n${refLink}\n\n#TEFT #Solana #TEFTLegion`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   if (!publicKey) return (
     <div style={{ minHeight: "100vh", background: "#000", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ textAlign: "center", maxWidth: 360 }}>
+      <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
-        <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8, letterSpacing: "-0.02em" }}>TEFT Identity</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8 }}>TEFT Identity</h1>
         <p style={{ color: "#444", fontSize: 13 }}>Connect your wallet to access your on-chain identity.</p>
       </div>
     </div>
@@ -183,33 +182,31 @@ export default function IdentityPage() {
         <div style={{ width: 32, height: 32, border: "2px solid #222", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 12px" }} />
         <p style={{ color: "#444", fontSize: 11, fontWeight: 800, letterSpacing: "0.1em" }}>LOADING IDENTITY...</p>
       </div>
-      <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 
-  if (cardData?.balance < 1) return (
+  if (!cardData || cardData.balance < 1) return (
     <div style={{ minHeight: "100vh", background: "#000", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ textAlign: "center", maxWidth: 360 }}>
+      <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>🚫</div>
         <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8 }}>No Access</h1>
         <p style={{ color: "#444", fontSize: 13, marginBottom: 24 }}>You need at least 1 TEFT to access Identity.</p>
-        <a href={`https://jup.ag/swap/SOL-${TEFT_MINT}`} target="_blank"
-          style={{ background: "#4ade80", color: "#000", borderRadius: 12, padding: "12px 28px", fontWeight: 900, fontSize: 13, textDecoration: "none", display: "inline-block" }}>
-          Buy TEFT
-        </a>
+        <a href={`https://jup.ag/swap/SOL-${TEFT_MINT}`} target="_blank" style={{ background: "#4ade80", color: "#000", borderRadius: 12, padding: "12px 28px", fontWeight: 900, fontSize: 13, textDecoration: "none" }}>Buy TEFT</a>
       </div>
     </div>
   );
 
   const rank = getRank(cardData.balance);
-  const nextRank = RANKS[rank.index + 1];
-  const progress = getProgress(cardData.balance, rank);
+  const nextRank = rank ? RANKS[rank.index + 1] : null;
+  const progress = rank ? getProgress(cardData.balance, rank) : 0;
   const connectedHandle = cardData?.xHandle || xSession?.handle;
-  const avatar = xSession?.avatar;
+  const ts = rank ? TIER_STYLES[rank.tier] : null;
+  const myPosition = leaderboard.findIndex((m: any) => m.wallet === cardData.wallet) + 1;
 
   return (
     <div style={{ minHeight: "100vh", background: "#000", color: "#fff", fontFamily: "'Inter', -apple-system, sans-serif" }}>
-      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}} @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}`}</style>
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
 
       {/* Hero */}
       <div style={{ position: "relative", height: 220, overflow: "hidden" }}>
@@ -228,16 +225,23 @@ export default function IdentityPage() {
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 80px" }}>
 
         {/* Identity Card */}
-        <div style={{ background: "#0d0d0d", border: `1px solid ${rank.color}33`, borderRadius: 20, padding: 20, marginBottom: 12, position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 100% 0%, ${rank.color}11 0%, transparent 60%)`, pointerEvents: "none" }} />
-
-          {/* Top row: Badge + Info */}
+        <div style={{
+          background: "#0d0d0d", border: `1px solid ${rank && ts ? ts.border : "#222"}`,
+          borderRadius: 20, padding: 20, marginBottom: 12,
+          position: "relative", overflow: "hidden", boxShadow: rank && ts ? ts.glow : "none",
+        }}>
+          {rank && rank.tier !== "white" && (
+            <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 100% 0%, ${rank.color}0d 0%, transparent 60%)`, pointerEvents: "none" }} />
+          )}
           <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 20 }}>
-            <RankBadge rank={rank} size="lg" />
+            {rank && <RankBadge rank={rank} size="lg" />}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                <span style={{ fontSize: 18, fontWeight: 900, color: rank.color, letterSpacing: "-0.01em" }}>{rank.name}</span>
-              </div>
+              {rank && (
+                <>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: rank.color, letterSpacing: "0.05em", marginBottom: 2 }}>{rank.name}</div>
+                  <div style={{ fontSize: 11, color: "#555", fontStyle: "italic", marginBottom: 8 }}>"{rank.tagline}"</div>
+                </>
+              )}
               <div style={{ fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em", marginBottom: 4 }}>
                 {formatBalance(cardData.balance)} <span style={{ fontSize: 13, color: "#444", fontWeight: 700 }}>TEFT</span>
               </div>
@@ -247,38 +251,35 @@ export default function IdentityPage() {
             </div>
           </div>
 
-          {/* Rank Progress */}
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>RANK PROGRESS</span>
-              <span style={{ fontSize: 9, color: rank.color, fontWeight: 800 }}>
-                {rank.max === Infinity ? "MAX RANK" : `Next: ${nextRank?.name} (${formatBalance(nextRank?.min)} TEFT)`}
-              </span>
+          {rank && ts && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                <span style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>RANK PROGRESS</span>
+                <span style={{ fontSize: 9, color: rank.color, fontWeight: 800 }}>
+                  {rank.max === Infinity ? "🥇 MAX RANK" : `Next: ${nextRank?.name} (${formatBalance(nextRank?.min)} TEFT)`}
+                </span>
+              </div>
+              <div style={{ background: "#1a1a1a", borderRadius: 99, height: 5, overflow: "hidden" }}>
+                <div style={{
+                  height: "100%", borderRadius: 99, width: `${progress}%`, transition: "width 1s ease",
+                  background: rank.tier === "gold" ? "linear-gradient(90deg, #b8860b, #FFD700)" : rank.tier === "silver" ? "linear-gradient(90deg, #999, #C0C0C0)" : rank.tier === "bronze" ? "linear-gradient(90deg, #8b4513, #cd7f32)" : `linear-gradient(90deg, ${rank.color}44, ${rank.color}88)`,
+                  boxShadow: ts.glow !== "none" ? `0 0 6px ${rank.color}66` : "none",
+                }} />
+              </div>
+              <div style={{ fontSize: 9, color: "#333", marginTop: 4, textAlign: "right" }}>{progress.toFixed(1)}%</div>
             </div>
-            <div style={{ background: "#1a1a1a", borderRadius: 99, height: 6, overflow: "hidden" }}>
-              <div style={{
-                height: "100%", borderRadius: 99,
-                background: `linear-gradient(90deg, ${rank.color}88, ${rank.color})`,
-                width: `${progress}%`,
-                transition: "width 1s ease",
-                boxShadow: `0 0 8px ${rank.color}66`,
-              }} />
-            </div>
-            <div style={{ fontSize: 9, color: "#333", marginTop: 4, textAlign: "right" }}>
-              {progress.toFixed(1)}%
-            </div>
-          </div>
+          )}
 
-          {/* Stats Row */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 1, background: "#1a1a1a", borderRadius: 12, overflow: "hidden" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 1, background: "#1a1a1a", borderRadius: 12, overflow: "hidden" }}>
             {[
-              { label: "RANK", value: `#${rank.index + 1}` },
+              { label: "TIER", value: rank ? `${rank.index + 1}/6` : "—" },
+              { label: "SCORE", value: formatBalance(cardData.score) },
               { label: "LEGION", value: `${cardData.legionSize}` },
-              { label: "TIER", value: `${rank.index + 1}/8` },
+              { label: "RANK", value: myPosition > 0 ? `#${myPosition}` : "—" },
             ].map(({ label, value }) => (
               <div key={label} style={{ background: "#0d0d0d", padding: "10px 8px", textAlign: "center" }}>
                 <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.08em" }}>{label}</div>
-                <div style={{ fontSize: 15, fontWeight: 900, color: "#fff", marginTop: 2 }}>{value}</div>
+                <div style={{ fontSize: 12, fontWeight: 900, color: "#fff", marginTop: 2 }}>{value}</div>
               </div>
             ))}
           </div>
@@ -289,27 +290,19 @@ export default function IdentityPage() {
           <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>X ACCOUNT</div>
           {connectedHandle ? (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              {avatar ? (
-                <img src={avatar} alt="avatar" style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid #333" }} />
+              {xSession?.avatar ? (
+                <img src={xSession.avatar} alt="avatar" style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid #333" }} />
               ) : (
-                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "#1a1a1a", border: "2px solid #333", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🐦</div>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "#1a1a1a", border: "2px solid #333", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>𝕏</div>
               )}
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>@{connectedHandle}</div>
+                <div style={{ fontSize: 15, fontWeight: 800 }}>@{connectedHandle}</div>
                 <div style={{ fontSize: 10, color: "#4ade80", fontWeight: 700, marginTop: 2 }}>✓ Verified</div>
               </div>
-              <button onClick={disconnectX} style={{
-                background: "transparent", border: "1px solid #2a1a1a",
-                borderRadius: 10, padding: "8px 14px", color: "#f87171",
-                fontSize: 10, fontWeight: 800, cursor: "pointer", letterSpacing: "0.05em",
-              }}>DISCONNECT</button>
+              <button onClick={disconnectX} style={{ background: "transparent", border: "1px solid #2a1a1a", borderRadius: 10, padding: "8px 14px", color: "#f87171", fontSize: 10, fontWeight: 800, cursor: "pointer" }}>DISCONNECT</button>
             </div>
           ) : (
-            <button onClick={connectX} style={{
-              width: "100%", background: "#000", border: "1px solid #333",
-              borderRadius: 12, padding: "14px", color: "#fff",
-              fontSize: 12, fontWeight: 800, cursor: "pointer", letterSpacing: "0.05em",
-            }}>
+            <button onClick={connectX} style={{ width: "100%", background: "#000", border: "1px solid #333", borderRadius: 12, padding: "14px", color: "#fff", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>
               Connect X Account →
             </button>
           )}
@@ -322,24 +315,18 @@ export default function IdentityPage() {
             <span style={{ fontSize: 11, color: "#888", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               teftlegion.com/identity?ref={cardData.referralCode}
             </span>
-            <button onClick={copyReferral} style={{
-              background: copied ? "#0a2a1a" : "#1a1a1a", border: `1px solid ${copied ? "#4ade80" : "#333"}`,
-              borderRadius: 8, padding: "6px 12px", color: copied ? "#4ade80" : "#888",
-              fontSize: 10, fontWeight: 800, cursor: "pointer", flexShrink: 0, letterSpacing: "0.05em",
-            }}>
+            <button onClick={copyReferral} style={{ background: copied ? "#0a2a1a" : "#1a1a1a", border: `1px solid ${copied ? "#4ade80" : "#333"}`, borderRadius: 8, padding: "6px 12px", color: copied ? "#4ade80" : "#888", fontSize: 10, fontWeight: 800, cursor: "pointer", flexShrink: 0 }}>
               {copied ? "COPIED ✓" : "COPY"}
             </button>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: "#1a1a1a", borderRadius: 12, overflow: "hidden" }}>
-            {[
-              { label: "REFERRED", value: cardData.legionSize },
-              { label: "LEGION SIZE", value: cardData.legionSize },
-            ].map(({ label, value }) => (
-              <div key={label} style={{ background: "#0d0d0d", padding: "10px", textAlign: "center" }}>
-                <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.08em" }}>{label}</div>
-                <div style={{ fontSize: 18, fontWeight: 900, color: "#fff", marginTop: 2 }}>{value}</div>
-              </div>
-            ))}
+          <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 12, padding: "12px 14px" }}>
+            <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.08em", marginBottom: 6 }}>SCORE FORMULA</div>
+            <div style={{ fontSize: 11, color: "#666" }}>
+              Score = TEFT × (1 + Referrals × 0.25)
+            </div>
+            <div style={{ fontSize: 10, color: "#4ade80", marginTop: 4 }}>
+              Each referral = +25% score boost
+            </div>
           </div>
         </div>
 
@@ -347,42 +334,107 @@ export default function IdentityPage() {
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
           <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>RANK LADDER</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {RANKS.slice().reverse().map((r, i) => {
-              const isCurrentRank = r.name === rank.name;
+            {RANKS.slice().reverse().map((r) => {
+              const isCurrentRank = rank?.name === r.name;
+              const rts = TIER_STYLES[r.tier];
               return (
                 <div key={r.name} style={{
                   display: "flex", alignItems: "center", gap: 12,
-                  background: isCurrentRank ? `${r.color}11` : "transparent",
-                  border: `1px solid ${isCurrentRank ? r.color + "44" : "#1a1a1a"}`,
-                  borderRadius: 12, padding: "10px 14px",
+                  background: isCurrentRank ? `${r.color}0d` : "transparent",
+                  border: `1px solid ${isCurrentRank ? rts.border : "#1a1a1a"}`,
+                  borderRadius: 12, padding: "12px 14px",
+                  boxShadow: isCurrentRank ? rts.glow : "none",
                 }}>
-                  <span style={{ fontSize: 16 }}>{r.emoji}</span>
+                  <span style={{ fontSize: 16 }}>{rts.badge}</span>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 11, fontWeight: 900, color: isCurrentRank ? r.color : "#888" }}>{r.name}</div>
-                    <div style={{ fontSize: 9, color: "#444", fontWeight: 700, marginTop: 1 }}>
-                      {r.max === Infinity ? `${formatBalance(r.min)}+` : `${formatBalance(r.min)} – ${formatBalance(r.max)}`} TEFT
+                    <div style={{ fontSize: 11, fontWeight: 900, color: isCurrentRank ? r.color : "#555", letterSpacing: "0.05em" }}>{r.name}</div>
+                    <div style={{ fontSize: 10, color: "#444", fontStyle: "italic", marginTop: 1 }}>"{r.tagline}"</div>
+                    <div style={{ fontSize: 9, color: "#333", marginTop: 2 }}>
+                      {r.max === Infinity ? `${formatBalance(r.min)}+ TEFT` : `${formatBalance(r.min)} – ${formatBalance(r.max)} TEFT`}
                     </div>
                   </div>
-                  {isCurrentRank && (
-                    <span style={{ fontSize: 9, color: r.color, fontWeight: 900, letterSpacing: "0.05em" }}>YOU ARE HERE</span>
-                  )}
+                  {isCurrentRank && <span style={{ fontSize: 9, color: r.color, fontWeight: 900, flexShrink: 0 }}>YOU ARE HERE</span>}
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* Share Button */}
-        <button onClick={shareOnX} style={{
-          width: "100%", background: "transparent",
-          border: "1px solid #1e3a5f", borderRadius: 12,
-          padding: "14px", color: "#60a5fa",
-          fontSize: 11, fontWeight: 800, cursor: "pointer",
-          letterSpacing: "0.1em", textTransform: "uppercase" as const,
-        }}>
-          Share Identity on X ↗
-        </button>
+        {/* Leaderboard */}
+        <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>LEGION LEADERBOARD</div>
+            <div style={{ fontSize: 9, color: "#333", fontWeight: 700 }}>Score = TEFT × (1 + refs × 0.25)</div>
+          </div>
 
+          {lbLoading ? (
+            <div style={{ textAlign: "center", padding: "20px 0", color: "#333", fontSize: 11 }}>Loading...</div>
+          ) : leaderboard.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "20px 0", color: "#333", fontSize: 11 }}>No members yet</div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {leaderboard.slice(0, 20).map((member: any) => {
+                const isMe = member.wallet === cardData?.wallet;
+                const memberRank = getRank(member.balance);
+                const mts = memberRank ? TIER_STYLES[memberRank.tier] : null;
+                return (
+                  <div key={member.wallet} style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    background: isMe ? "#0a1a0a" : "#0a0a0a",
+                    border: `1px solid ${isMe ? "#4ade8044" : "#111"}`,
+                    borderRadius: 10, padding: "10px 12px",
+                  }}>
+                    <div style={{ width: 28, display: "flex", justifyContent: "center", flexShrink: 0 }}>
+                      <PositionBadge position={member.position} />
+                    </div>
+                    <div style={{ width: 28, height: 28, background: memberRank?.bg || "#111", border: `1px solid ${mts?.border || "#222"}`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>
+                      {mts?.badge || "•"}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: isMe ? "#4ade80" : "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {member.xHandle ? `@${member.xHandle}` : `${member.wallet.slice(0, 4)}...${member.wallet.slice(-4)}`}
+                        {isMe && <span style={{ color: "#4ade80", fontSize: 9, marginLeft: 6 }}>YOU</span>}
+                      </div>
+                      <div style={{ fontSize: 9, color: "#444", marginTop: 1 }}>
+                        {formatBalance(member.balance)} TEFT · {member.referrals} referrals
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 900, color: memberRank?.color || "#fff" }}>{formatBalance(member.score)}</div>
+                      <div style={{ fontSize: 9, color: "#444" }}>score</div>
+                    </div>
+                  </div>
+                );
+              })}
+              {myPosition > 20 && (
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  background: "#0a1a0a", border: "1px solid #4ade8044",
+                  borderRadius: 10, padding: "10px 12px", marginTop: 4,
+                }}>
+                  <div style={{ width: 28, textAlign: "center", color: "#4ade80", fontSize: 12, fontWeight: 900 }}>#{myPosition}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: "#4ade80" }}>You</div>
+                    <div style={{ fontSize: 9, color: "#444" }}>{formatBalance(cardData.balance)} TEFT · {cardData.legionSize} referrals</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 12, fontWeight: 900, color: "#4ade80" }}>{formatBalance(cardData.score)}</div>
+                    <div style={{ fontSize: 9, color: "#444" }}>score</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Share */}
+        <button onClick={shareOnX} style={{
+          width: "100%", background: "transparent", border: "1px solid #1e3a5f",
+          borderRadius: 12, padding: "14px", color: "#60a5fa",
+          fontSize: 11, fontWeight: 800, cursor: "pointer", letterSpacing: "0.1em",
+        }}>
+          SHARE IDENTITY ON X ↗
+        </button>
       </div>
     </div>
   );
