@@ -55,8 +55,7 @@ export default function IdentityPage() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user?.user_metadata?.user_name) {
-        const handle = session.user.user_metadata.user_name;
-        setXHandle(handle);
+        setXHandle(session.user.user_metadata.user_name);
       }
     });
 
@@ -75,6 +74,9 @@ export default function IdentityPage() {
             .then(() => loadIdentity());
         }
       }
+      if (event === "SIGNED_OUT") {
+        setXHandle(null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -88,6 +90,17 @@ export default function IdentityPage() {
         redirectTo: window.location.origin + "/auth/callback",
       },
     });
+  };
+
+  const disconnectX = async () => {
+    await supabase.auth.signOut();
+    if (publicKey) {
+      await supabase
+        .from("legion_members")
+        .update({ x_handle: null, x_verified_at: null })
+        .eq("wallet_address", publicKey.toBase58());
+      await loadIdentity();
+    }
   };
 
   if (!publicKey) {
@@ -123,6 +136,8 @@ export default function IdentityPage() {
     );
   }
 
+  const connectedHandle = cardData?.xHandle || xHandle;
+
   return (
     <div style={{ minHeight: "100vh", background: "#000", color: "#fff", padding: "40px 20px" }}>
       <div style={{ maxWidth: 440, margin: "0 auto" }}>
@@ -142,10 +157,10 @@ export default function IdentityPage() {
             <div style={{ fontSize: 12, fontFamily: "monospace", color: "#fff" }}>{cardData?.wallet.slice(0, 8)}...{cardData?.wallet.slice(-8)}</div>
           </div>
 
-          {(cardData?.xHandle || xHandle) && (
+          {connectedHandle && (
             <div style={{ borderTop: "1px solid #222", paddingTop: 16, marginTop: 16 }}>
               <div style={{ fontSize: 11, color: "#666", marginBottom: 4 }}>X Handle</div>
-              <div style={{ fontSize: 14, color: "#fff" }}>@{cardData?.xHandle || xHandle} {cardData?.xVerified && "✓"}</div>
+              <div style={{ fontSize: 14, color: "#fff" }}>@{connectedHandle} {cardData?.xVerified && "✓"}</div>
             </div>
           )}
 
@@ -155,7 +170,7 @@ export default function IdentityPage() {
           </div>
         </div>
 
-        {!cardData?.xHandle && !xHandle && (
+        {!connectedHandle ? (
           <button
             onClick={connectX}
             style={{
@@ -171,6 +186,23 @@ export default function IdentityPage() {
             }}
           >
             Connect X Account
+          </button>
+        ) : (
+          <button
+            onClick={disconnectX}
+            style={{
+              width: "100%",
+              padding: "14px 24px",
+              background: "#000",
+              border: "1px solid #ff4444",
+              borderRadius: 12,
+              color: "#ff4444",
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            Disconnect X Account
           </button>
         )}
       </div>
