@@ -740,7 +740,7 @@ export default function PulsePage() {
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {/* Content */}
-      <div style={{ padding: "16px 16px 80px" }}>
+      <div style={{ maxWidth: 480, margin: "0 auto", padding: "16px 16px 80px" }}>
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           marginBottom: 12,
