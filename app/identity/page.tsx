@@ -237,7 +237,7 @@ export default function IdentityPage() {
                 return (
                   <div key={member.wallet} style={{ display: "flex", alignItems: "center", gap: 10, background: "#0a0a0a", border: "1px solid #111", borderRadius: 10, padding: "10px 12px" }}>
                     <div style={{ width: 28, display: "flex", justifyContent: "center", flexShrink: 0 }}><PositionBadge position={member.position} /></div>
-                    <div style={{ width: 28, height: 28, background: memberRank?.bg || "#111", border: `1px solid ${mts?.border || "#222"}`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{mts?.badge || "•"}</div>
+                    <div style={{ width: 28, height: 28, borderRadius: 6, overflow: "hidden", flexShrink: 0 }}>{memberRank ? <img src={RANK_IMAGES[memberRank.name]} alt={memberRank.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div style={{ width: 28, height: 28, background: "#111" }} />}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 12, fontWeight: 800, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {member.xHandle ? `@${member.xHandle}` : `${member.wallet.slice(0, 4)}...${member.wallet.slice(-4)}`}
@@ -397,7 +397,7 @@ export default function IdentityPage() {
               const rts = TIER_STYLES[r.tier];
               return (
                 <div key={r.name} style={{ display: "flex", alignItems: "center", gap: 12, background: isCurrentRank ? `${r.color}0d` : "transparent", border: `1px solid ${isCurrentRank ? rts.border : "#1a1a1a"}`, borderRadius: 12, padding: "12px 14px", boxShadow: isCurrentRank ? rts.glow : "none" }}>
-                  <span style={{ fontSize: 16 }}>{rts.badge}</span>
+                  <img src={RANK_IMAGES[r.name]} alt={r.name} style={{ width: 32, height: 32, objectFit: "cover", borderRadius: 6 }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 11, fontWeight: 900, color: isCurrentRank ? r.color : "#555", letterSpacing: "0.05em" }}>{r.name}</div>
                     <div style={{ fontSize: 10, color: "#444", fontStyle: "italic", marginTop: 1 }}>"{r.tagline}"</div>
@@ -428,7 +428,7 @@ export default function IdentityPage() {
                 return (
                   <div key={member.wallet} style={{ display: "flex", alignItems: "center", gap: 10, background: isMe ? "#0a1a0a" : "#0a0a0a", border: `1px solid ${isMe ? "#4ade8044" : "#111"}`, borderRadius: 10, padding: "10px 12px" }}>
                     <div style={{ width: 28, display: "flex", justifyContent: "center", flexShrink: 0 }}><PositionBadge position={member.position} /></div>
-                    <div style={{ width: 28, height: 28, background: memberRank?.bg || "#111", border: `1px solid ${mts?.border || "#222"}`, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>{mts?.badge || "•"}</div>
+                    <div style={{ width: 28, height: 28, borderRadius: 6, overflow: "hidden", flexShrink: 0 }}>{memberRank ? <img src={RANK_IMAGES[memberRank.name]} alt={memberRank.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div style={{ width: 28, height: 28, background: "#111" }} />}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 12, fontWeight: 800, color: isMe ? "#4ade80" : "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {member.xHandle ? `@${member.xHandle}` : `${member.wallet.slice(0, 4)}...${member.wallet.slice(-4)}`}
