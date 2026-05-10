@@ -169,7 +169,7 @@ export default function IdentityPage() {
     const rank = getRank(cardData?.balance || 0);
     const refLink = `https://teftlegion.com/identity?ref=${cardData?.referralCode}`;
     const rankLine = rank ? `${TIER_STYLES[rank.tier].badge} ${rank.name} — "${rank.tagline}"` : "";
-    const text = `TEFT Legion Identity\n\n${rankLine}\n${formatBalance(cardData?.balance || 0)} TEFT · ${cardData?.legionSize || 0} Legion members\n\nJoin my Legion 👇\n${refLink}\n\n#TEFT #Solana #TEFTLegion`;
+    const text = `My wallet revealed its TEFT Identity.\n\n${rankLine} — "${rank?.tagline || ""}"\n\nYours is still hidden. Reveal it ↓\n${refLink}\n\n#TEFT #Solana #TEFTLegion`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
   };
 
@@ -190,13 +190,17 @@ export default function IdentityPage() {
         </div>
       </div>
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 80px" }}>
-        <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 32, marginBottom: 12, textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
-          <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 8, margin: "0 0 8px" }}>Connect Wallet</h2>
-          <p style={{ color: "#444", fontSize: 13, marginBottom: 24 }}>Connect your Phantom or Solflare wallet to access your TEFT Identity.</p>
-          <div style={{ display: "flex", justifyContent: "center" }}>
+        <div style={{ background: "#0d0d0d", border: "1px solid #333", borderRadius: 20, padding: 32, marginBottom: 12, textAlign: "center", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 50% 0%, #ffffff08 0%, transparent 70%)", pointerEvents: "none" }} />
+          <div style={{ fontSize: 40, marginBottom: 16 }}>⬡</div>
+          <div style={{ fontSize: 10, color: "#555", fontWeight: 800, letterSpacing: "0.2em", marginBottom: 12 }}>SOMEONE FROM THE LEGION INVITED YOU</div>
+          <h2 style={{ fontSize: 22, fontWeight: 900, marginBottom: 8, color: "#fff", letterSpacing: "-0.02em" }}>Your wallet already has a rank.</h2>
+          <p style={{ color: "#555", fontSize: 13, marginBottom: 8, fontStyle: "italic" }}>One wallet. One signature. One rank.</p>
+          <p style={{ color: "#444", fontSize: 11, marginBottom: 24 }}>Reveal your TEFT Identity.</p>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
             <WalletButton />
           </div>
+          <p style={{ color: "#333", fontSize: 10, letterSpacing: "0.05em" }}>No transaction. No fee. Signature only.<br/>Used only to verify TEFT ownership.</p>
         </div>
 
         {/* Show leaderboard even without wallet */}
@@ -248,13 +252,16 @@ export default function IdentityPage() {
   if (!cardData || cardData.balance < 1) return (
     <div style={{ minHeight: "100vh", background: "#000", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <style>{`.wallet-adapter-button{background:#fff!important;color:#000!important;border-radius:12px!important;font-weight:900!important;}`}</style>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>🚫</div>
-        <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8 }}>No Access</h1>
-        <p style={{ color: "#444", fontSize: 13, marginBottom: 24 }}>You need at least 1 TEFT to access Identity.</p>
-        <a href={`https://jup.ag/swap/SOL-${TEFT_MINT}`} target="_blank" style={{ background: "#4ade80", color: "#000", borderRadius: 12, padding: "12px 28px", fontWeight: 900, fontSize: 13, textDecoration: "none", display: "inline-block", marginBottom: 16 }}>Buy TEFT</a>
-        <br />
-        <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}>
+      <div style={{ textAlign: "center", maxWidth: 360 }}>
+        <div style={{ fontSize: 11, color: "#555", fontWeight: 800, letterSpacing: "0.2em", marginBottom: 16 }}>GATE CLOSED</div>
+        <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8, letterSpacing: "-0.02em" }}>Your wallet holds 0 TEFT.</h1>
+        <p style={{ color: "#444", fontSize: 13, marginBottom: 8 }}>Hold at least 1 TEFT to reveal your Identity.</p>
+        <p style={{ color: "#333", fontSize: 11, marginBottom: 28, fontStyle: "italic" }}>Only TEFT holders can reveal theirs.</p>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+          <a href={`https://jup.ag/swap/SOL-${TEFT_MINT}`} target="_blank" style={{ background: "#4ade80", color: "#000", borderRadius: 12, padding: "12px 24px", fontWeight: 900, fontSize: 13, textDecoration: "none" }}>Get TEFT</a>
+          <button onClick={loadIdentity} style={{ background: "transparent", border: "1px solid #333", borderRadius: 12, padding: "12px 24px", color: "#fff", fontWeight: 800, fontSize: 13, cursor: "pointer" }}>Check again</button>
+        </div>
+        <div style={{ marginTop: 20 }}>
           <WalletButton />
         </div>
       </div>
