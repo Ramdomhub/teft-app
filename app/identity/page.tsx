@@ -46,8 +46,9 @@ function getProgress(balance: number, rank: typeof RANKS[0] & { index: number })
   return Math.min(100, Math.max(0, ((balance - rank.min) / (rank.max - rank.min)) * 100));
 }
 
-function calcScore(balance: number, referrals: number) {
-  return Math.round(balance * (1 + referrals * 0.25));
+function calcLegionPower(balance: number, referrals: number, xVerified: boolean) {
+  const base = (balance / 1000) + (referrals * 1000);
+  return Math.round(base * (xVerified ? 1.1 : 1.0));
 }
 
 function formatBalance(n: number): string {
@@ -222,7 +223,7 @@ export default function IdentityPage() {
                     </div>
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
                       <div style={{ fontSize: 12, fontWeight: 900, color: memberRank?.color || "#fff" }}>{formatBalance(member.score)}</div>
-                      <div style={{ fontSize: 9, color: "#444" }}>score</div>
+                      <div style={{ fontSize: 9, color: "#444" }}>power</div>
                     </div>
                   </div>
                 );
@@ -319,7 +320,7 @@ export default function IdentityPage() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 1, background: "#1a1a1a", borderRadius: 12, overflow: "hidden" }}>
             {[
               { label: "TIER", value: rank ? `${rank.index + 1}/6` : "—" },
-              { label: "SCORE", value: formatBalance(cardData.score) },
+              { label: "⚡ POWER", value: formatBalance(cardData.score) },
               { label: "LEGION", value: `${cardData.legionSize}` },
               { label: "RANK", value: myPosition > 0 ? `#${myPosition}` : "—" },
             ].map(({ label, value }) => (
@@ -356,9 +357,9 @@ export default function IdentityPage() {
             </button>
           </div>
           <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 12, padding: "12px 14px" }}>
-            <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.08em", marginBottom: 4 }}>SCORE FORMULA</div>
-            <div style={{ fontSize: 11, color: "#555" }}>Score = TEFT × (1 + Referrals × 0.25)</div>
-            <div style={{ fontSize: 10, color: "#4ade80", marginTop: 4 }}>Each referral = +25% score boost</div>
+            <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.08em", marginBottom: 4 }}>LEGION POWER FORMULA</div>
+            <div style={{ fontSize: 11, color: "#555" }}>(TEFT ÷ 1000) + (Referrals × 1000)</div>
+            <div style={{ fontSize: 10, color: "#4ade80", marginTop: 4 }}>+10% X boost · 1 referral = 1M TEFT equivalent</div>
           </div>
         </div>
 
@@ -386,7 +387,7 @@ export default function IdentityPage() {
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
             <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>LEGION LEADERBOARD</div>
-            <div style={{ fontSize: 9, color: "#333" }}>TEFT × (1 + refs × 0.25)</div>
+            <div style={{ fontSize: 9, color: "#333" }}>⚡ LEGION POWER</div>
           </div>
           {lbLoading ? (
             <div style={{ textAlign: "center", padding: "20px 0", color: "#333", fontSize: 11 }}>Loading...</div>
@@ -411,7 +412,7 @@ export default function IdentityPage() {
                     </div>
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
                       <div style={{ fontSize: 12, fontWeight: 900, color: memberRank?.color || "#fff" }}>{formatBalance(member.score)}</div>
-                      <div style={{ fontSize: 9, color: "#444" }}>score</div>
+                      <div style={{ fontSize: 9, color: "#444" }}>power</div>
                     </div>
                   </div>
                 );
@@ -425,7 +426,7 @@ export default function IdentityPage() {
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 12, fontWeight: 900, color: "#4ade80" }}>{formatBalance(cardData.score)}</div>
-                    <div style={{ fontSize: 9, color: "#444" }}>score</div>
+                    <div style={{ fontSize: 9, color: "#444" }}>power</div>
                   </div>
                 </div>
               )}
