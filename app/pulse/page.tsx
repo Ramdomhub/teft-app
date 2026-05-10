@@ -639,10 +639,12 @@ export default function PulsePage() {
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const [countdown, setCountdown] = useState(30);
 
+  const walletAddress = typeof window !== "undefined" && publicKey ? publicKey.toBase58() : "";
+
   const fetchSignals = useCallback(async (showRefreshing = false) => {
     if (showRefreshing) setRefreshing(true);
     try {
-      const res = await fetch("/api/signals", { cache: "no-store", headers: { "x-wallet-address": publicKey?.toBase58() || "" } });
+      const res = await fetch("/api/signals", { cache: "no-store", headers: { "x-wallet-address": walletAddress } });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setSignals(data.signals || []);
