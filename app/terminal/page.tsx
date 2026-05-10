@@ -33,8 +33,7 @@ export default function TerminalPage() {
         const teftRes = await fetch(`https://api.dexscreener.com/tokens/v1/solana/${TEFT_MINT}`);
         const teftData = await teftRes.json();
         const pairs = Array.isArray(teftData) ? teftData : teftData?.pairs ?? [];
-        const best = pairs.filter((p: any) => (p.liquidity?.usd || 0) > 100)
-          .sort((a: any, b: any) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0] || pairs[0];
+        const best = pairs.sort((a: any, b: any) => (b.marketCap || 0) - (a.marketCap || 0))[0] || pairs[0];
         setTeft(best);
 
         // SOL + BTC via CoinGecko
@@ -48,10 +47,12 @@ export default function TerminalPage() {
         const fgData = await fgRes.json();
         setFg(fgData.data?.[0]);
 
-        // Crypto News via CryptoPanic public
-        const newsRes = await fetch("https://cryptopanic.com/api/free/v1/posts/?auth_token=pub_public&currencies=SOL&kind=news&limit=8");
-        const newsData = await newsRes.json();
-        setNews(newsData.results?.slice(0, 8) || []);
+        // Crypto News via Coindesk RSS
+        try {
+          const newsRes = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.coindesk.com/arc/outboundfeeds/rss/&count=8");
+          const newsData = await newsRes.json();
+          setNews(newsData.items?.slice(0, 8) || []);
+        } catch { setNews([]); }
 
       } catch (e) { console.error(e); }
       finally {
@@ -200,10 +201,10 @@ export default function TerminalPage() {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {news.map((item: any, i) => (
-                <a key={i} href={item.url} target="_blank" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#111", borderRadius: 8, padding: "10px 14px", textDecoration: "none", gap: 12 }}>
+                <a key={i} href={item.link} target="_blank" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#111", borderRadius: 8, padding: "10px 14px", textDecoration: "none", gap: 12 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.title}</div>
-                    <div style={{ fontSize: 9, color: "#444", marginTop: 2 }}>{item.source?.title} · {new Date(item.published_at).toLocaleTimeString()}</div>
+                    <div style={{ fontSize: 9, color: "#444", marginTop: 2 }}>CoinDesk · {new Date(item.pubDate).toLocaleTimeString()}</div>
                   </div>
                   <span style={{ color: "#333", fontSize: 11, flexShrink: 0 }}>↗</span>
                 </a>
