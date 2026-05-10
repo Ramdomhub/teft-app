@@ -169,7 +169,7 @@ export default function IdentityPage() {
     const rank = getRank(cardData?.balance || 0);
     const refLink = `https://teftlegion.com/identity?ref=${cardData?.referralCode}`;
     const rankLine = rank ? `${TIER_STYLES[rank.tier].badge} ${rank.name} — "${rank.tagline}"` : "";
-    const text = `My wallet revealed its TEFT Identity.\n\n${rankLine} — "${rank?.tagline || ""}"\n\nYours is still hidden. Reveal it ↓\n${refLink}\n\n#TEFT #Solana #TEFTLegion`;
+    const text = `My wallet revealed its TEFT Identity.\n\n${rankLine} — "${rank?.tagline || ""}"\n\nYours is still hidden. Reveal it ↓\n${refLink}\n\n$TEFT`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
   };
 
@@ -199,6 +199,9 @@ export default function IdentityPage() {
           <p style={{ color: "#444", fontSize: 11, marginBottom: 24 }}>Reveal your TEFT Identity.</p>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
             <WalletButton />
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <a href="https://jup.ag/swap/SOL-8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump?referral=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&feeBps=50" target="_blank" style={{ display: "inline-block", background: "#4ade80", color: "#000", borderRadius: 12, padding: "12px 28px", fontWeight: 900, fontSize: 13, textDecoration: "none" }}>Buy TEFT to unlock →</a>
           </div>
           <p style={{ color: "#333", fontSize: 10, letterSpacing: "0.05em" }}>No transaction. No fee. Signature only.<br/>Used only to verify TEFT ownership.</p>
         </div>
