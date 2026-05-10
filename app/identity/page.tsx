@@ -58,16 +58,22 @@ function formatBalance(n: number): string {
   return n.toFixed(0);
 }
 
+const RANK_IMAGES: Record<string, string> = {
+  SHADOWCORE: "/ranks/shadowcore.png",
+  IRONVEIL:   "/ranks/ironveil.png",
+  TITANCORE:  "/ranks/titancore.png",
+  VOIDWALKER: "/ranks/voidwalker.png",
+  ASCENDANT:  "/ranks/ascendant.png",
+  NULLCORE:   "/ranks/nullcore.png",
+};
+
 function RankBadge({ rank, size = "md" }: { rank: NonNullable<ReturnType<typeof getRank>>; size?: "sm" | "md" | "lg" }) {
   const s = { sm: 44, md: 80, lg: 100 }[size];
   const ts = TIER_STYLES[rank.tier];
-  const emojiSize = { sm: 16, md: 30, lg: 38 }[size];
-  const fontSize = { sm: 6, md: 8, lg: 9 }[size];
+  const img = RANK_IMAGES[rank.name];
   return (
-    <div style={{ width: s, height: s, background: rank.bg, border: `2px solid ${ts.border}`, borderRadius: 16, flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, boxShadow: ts.glow, position: "relative", overflow: "hidden" }}>
-      {rank.tier !== "white" && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 50% 0%, ${rank.color}22 0%, transparent 70%)` }} />}
-      <span style={{ fontSize: emojiSize }}>{ts.badge}</span>
-      <span style={{ color: rank.color, fontSize, fontWeight: 900, letterSpacing: "0.04em", lineHeight: 1, textAlign: "center", padding: "0 4px" }}>{rank.name.split(" ")[0]}</span>
+    <div style={{ width: s, height: s, flexShrink: 0, borderRadius: 12, overflow: "hidden", boxShadow: ts.glow, border: `1px solid ${ts.border}` }}>
+      <img src={img} alt={rank.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
     </div>
   );
 }
