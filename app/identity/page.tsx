@@ -97,10 +97,14 @@ export default function IdentityPage() {
       const balance = accounts.value[0]?.account.data.parsed.info.tokenAmount.uiAmount || 0;
       const urlParams = new URLSearchParams(window.location.search);
       const referredBy = urlParams.get("ref");
+      const { data: { session } } = await supabase.auth.getSession();
       await fetch("/api/identity/sync", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wallet: publicKey.toBase58(), balance, ...(referredBy ? { referredBy } : {}) }),
+        headers: {
+          "Content-Type": "application/json",
+          ...(session?.access_token ? { "Authorization": `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ wallet: publicKey.toBase58(), ...(referredBy ? { referredBy } : {}) }),
       });
       const { data } = await supabase.from("legion_stats").select("*").eq("wallet_address", publicKey.toBase58()).single();
       setCardData({
