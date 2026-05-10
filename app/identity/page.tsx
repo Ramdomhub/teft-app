@@ -10,12 +10,12 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
 
 const RANKS = [
-  { name: "SHADOWCORE", min: 1,          max: 4_999_999,  color: "#94a3b8", bg: "#0f1117", tier: "white",  tagline: "Not visible. Still present.",         desc: "Beobachter im Schatten." },
-  { name: "IRONVEIL",   min: 5_000_000,  max: 9_999_999,  color: "#cbd5e1", bg: "#111318", tier: "white",  tagline: "Steel without noise.",                desc: "Disziplinierte Legionäre." },
-  { name: "TITANCORE",  min: 10_000_000, max: 19_999_999, color: "#e2e8f0", bg: "#111318", tier: "white",  tagline: "Weight becomes power.",               desc: "Veteranen der Legion." },
-  { name: "VOIDWALKER", min: 20_000_000, max: 29_999_999, color: "#cd7f32", bg: "#1a1100", tier: "bronze", tagline: "They walk where signals disappear.",   desc: "Mystische Elite." },
+  { name: "SHADOWCORE", min: 1,          max: 4_999_999,  color: "#94a3b8", bg: "#0f1117", tier: "white",  tagline: "Not visible. Still present.",          desc: "Beobachter im Schatten." },
+  { name: "IRONVEIL",   min: 5_000_000,  max: 9_999_999,  color: "#cbd5e1", bg: "#111318", tier: "white",  tagline: "Steel without noise.",                 desc: "Disziplinierte Legionäre." },
+  { name: "TITANCORE",  min: 10_000_000, max: 19_999_999, color: "#e2e8f0", bg: "#111318", tier: "white",  tagline: "Weight becomes power.",                desc: "Veteranen der Legion." },
+  { name: "VOIDWALKER", min: 20_000_000, max: 29_999_999, color: "#cd7f32", bg: "#1a1100", tier: "bronze", tagline: "They walk where signals disappear.",    desc: "Mystische Elite." },
   { name: "ASCENDANT",  min: 30_000_000, max: 39_999_999, color: "#C0C0C0", bg: "#141414", tier: "silver", tagline: "No longer followers. No longer human.", desc: "Legionäre, die Teil der Mythologie werden." },
-  { name: "NULLCORE",   min: 40_000_000, max: Infinity,   color: "#FFD700", bg: "#1a1400", tier: "gold",   tagline: "The center of inevitability.",         desc: "Der Kern der Legion." },
+  { name: "NULLCORE",   min: 40_000_000, max: Infinity,   color: "#FFD700", bg: "#1a1400", tier: "gold",   tagline: "The center of inevitability.",          desc: "Der Kern der Legion." },
 ];
 
 const TIER_STYLES: Record<string, { border: string; glow: string; badge: string }> = {
@@ -54,19 +54,10 @@ function RankBadge({ rank, size = "md" }: { rank: NonNullable<ReturnType<typeof 
   const emojiSize = { sm: 16, md: 30, lg: 38 }[size];
   const fontSize = { sm: 6, md: 8, lg: 9 }[size];
   return (
-    <div style={{
-      width: s, height: s, background: rank.bg,
-      border: `2px solid ${ts.border}`, borderRadius: 16, flexShrink: 0,
-      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-      gap: 3, boxShadow: ts.glow, position: "relative", overflow: "hidden",
-    }}>
-      {rank.tier !== "white" && (
-        <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 50% 0%, ${rank.color}22 0%, transparent 70%)` }} />
-      )}
+    <div style={{ width: s, height: s, background: rank.bg, border: `2px solid ${ts.border}`, borderRadius: 16, flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, boxShadow: ts.glow, position: "relative", overflow: "hidden" }}>
+      {rank.tier !== "white" && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 50% 0%, ${rank.color}22 0%, transparent 70%)` }} />}
       <span style={{ fontSize: emojiSize }}>{ts.badge}</span>
-      <span style={{ color: rank.color, fontSize, fontWeight: 900, letterSpacing: "0.04em", lineHeight: 1, textAlign: "center", padding: "0 4px" }}>
-        {rank.name.split(" ")[0]}
-      </span>
+      <span style={{ color: rank.color, fontSize, fontWeight: 900, letterSpacing: "0.04em", lineHeight: 1, textAlign: "center", padding: "0 4px" }}>{rank.name.split(" ")[0]}</span>
     </div>
   );
 }
@@ -94,13 +85,30 @@ export default function IdentityPage() {
       const conn = new Connection(window.location.origin + "/api/rpc");
       const accounts = await conn.getParsedTokenAccountsByOwner(publicKey, { mint: new PublicKey(TEFT_MINT) });
       const balance = accounts.value[0]?.account.data.parsed.info.tokenAmount.uiAmount || 0;
-      const { data } = await supabase.from("legion_members").select("*").eq("wallet_address", publicKey.toBase58()).single();
+
+      // Get ref from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const referredBy = urlParams.get("ref");
+
+      // Sync balance + referral to DB
+      await fetch("/api/identity/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          wallet: publicKey.toBase58(),
+          balance,
+          ...(referredBy ? { referredBy } : {}),
+        }),
+      });
+
+      const { data } = await supabase.from("legion_stats").select("*").eq("wallet_address", publicKey.toBase58()).single();
       setCardData({
-        wallet: publicKey.toBase58(), balance,
-        legionSize: data?.referral_count || 0,
+        wallet: publicKey.toBase58(),
+        balance,
+        legionSize: data?.referral_count_live || 0,
         xHandle: data?.x_handle || null,
         referralCode: data?.referral_code || publicKey.toBase58().slice(0, 8),
-        score: calcScore(balance, data?.referral_count || 0),
+        score: data?.score || calcScore(balance, 0),
       });
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
@@ -128,11 +136,7 @@ export default function IdentityPage() {
         const handle = session.user.user_metadata.user_name;
         setXSession({ handle, avatar: session.user.user_metadata.avatar_url });
         if (publicKey) {
-          supabase.from("legion_members").upsert({
-            wallet_address: publicKey.toBase58(),
-            x_handle: handle,
-            x_verified_at: new Date().toISOString(),
-          }).then(() => loadIdentity());
+          supabase.from("legion_members").upsert({ wallet_address: publicKey.toBase58(), x_handle: handle, x_verified_at: new Date().toISOString() }).then(() => loadIdentity());
         }
       }
       if (event === "SIGNED_OUT") setXSession(null);
@@ -208,7 +212,6 @@ export default function IdentityPage() {
     <div style={{ minHeight: "100vh", background: "#000", color: "#fff", fontFamily: "'Inter', -apple-system, sans-serif" }}>
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
 
-      {/* Hero */}
       <div style={{ position: "relative", height: 220, overflow: "hidden" }}>
         <img src="/teft.png" alt="TEFT" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", opacity: 0.5 }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,1) 100%)" }} />
@@ -225,50 +228,32 @@ export default function IdentityPage() {
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 80px" }}>
 
         {/* Identity Card */}
-        <div style={{
-          background: "#0d0d0d", border: `1px solid ${rank && ts ? ts.border : "#222"}`,
-          borderRadius: 20, padding: 20, marginBottom: 12,
-          position: "relative", overflow: "hidden", boxShadow: rank && ts ? ts.glow : "none",
-        }}>
-          {rank && rank.tier !== "white" && (
-            <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 100% 0%, ${rank.color}0d 0%, transparent 60%)`, pointerEvents: "none" }} />
-          )}
+        <div style={{ background: "#0d0d0d", border: `1px solid ${rank && ts ? ts.border : "#222"}`, borderRadius: 20, padding: 20, marginBottom: 12, position: "relative", overflow: "hidden", boxShadow: rank && ts ? ts.glow : "none" }}>
+          {rank && rank.tier !== "white" && <div style={{ position: "absolute", inset: 0, background: `radial-gradient(circle at 100% 0%, ${rank.color}0d 0%, transparent 60%)`, pointerEvents: "none" }} />}
           <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 20 }}>
             {rank && <RankBadge rank={rank} size="lg" />}
             <div style={{ flex: 1, minWidth: 0 }}>
-              {rank && (
-                <>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: rank.color, letterSpacing: "0.05em", marginBottom: 2 }}>{rank.name}</div>
-                  <div style={{ fontSize: 11, color: "#555", fontStyle: "italic", marginBottom: 8 }}>"{rank.tagline}"</div>
-                </>
-              )}
+              {rank && <>
+                <div style={{ fontSize: 18, fontWeight: 900, color: rank.color, letterSpacing: "0.05em", marginBottom: 2 }}>{rank.name}</div>
+                <div style={{ fontSize: 11, color: "#555", fontStyle: "italic", marginBottom: 8 }}>"{rank.tagline}"</div>
+              </>}
               <div style={{ fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em", marginBottom: 4 }}>
                 {formatBalance(cardData.balance)} <span style={{ fontSize: 13, color: "#444", fontWeight: 700 }}>TEFT</span>
               </div>
-              <div style={{ fontSize: 11, color: "#444", fontFamily: "monospace" }}>
-                {cardData.wallet.slice(0, 6)}...{cardData.wallet.slice(-6)}
-              </div>
+              <div style={{ fontSize: 11, color: "#444", fontFamily: "monospace" }}>{cardData.wallet.slice(0, 6)}...{cardData.wallet.slice(-6)}</div>
             </div>
           </div>
 
-          {rank && ts && (
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <span style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>RANK PROGRESS</span>
-                <span style={{ fontSize: 9, color: rank.color, fontWeight: 800 }}>
-                  {rank.max === Infinity ? "🥇 MAX RANK" : `Next: ${nextRank?.name} (${formatBalance(nextRank?.min)} TEFT)`}
-                </span>
-              </div>
-              <div style={{ background: "#1a1a1a", borderRadius: 99, height: 5, overflow: "hidden" }}>
-                <div style={{
-                  height: "100%", borderRadius: 99, width: `${progress}%`, transition: "width 1s ease",
-                  background: rank.tier === "gold" ? "linear-gradient(90deg, #b8860b, #FFD700)" : rank.tier === "silver" ? "linear-gradient(90deg, #999, #C0C0C0)" : rank.tier === "bronze" ? "linear-gradient(90deg, #8b4513, #cd7f32)" : `linear-gradient(90deg, ${rank.color}44, ${rank.color}88)`,
-                  boxShadow: ts.glow !== "none" ? `0 0 6px ${rank.color}66` : "none",
-                }} />
-              </div>
-              <div style={{ fontSize: 9, color: "#333", marginTop: 4, textAlign: "right" }}>{progress.toFixed(1)}%</div>
+          {rank && ts && <div style={{ marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+              <span style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>RANK PROGRESS</span>
+              <span style={{ fontSize: 9, color: rank.color, fontWeight: 800 }}>{rank.max === Infinity ? "🥇 MAX RANK" : `Next: ${nextRank?.name} (${formatBalance(nextRank?.min)} TEFT)`}</span>
             </div>
-          )}
+            <div style={{ background: "#1a1a1a", borderRadius: 99, height: 5, overflow: "hidden" }}>
+              <div style={{ height: "100%", borderRadius: 99, width: `${progress}%`, transition: "width 1s ease", background: rank.tier === "gold" ? "linear-gradient(90deg, #b8860b, #FFD700)" : rank.tier === "silver" ? "linear-gradient(90deg, #999, #C0C0C0)" : rank.tier === "bronze" ? "linear-gradient(90deg, #8b4513, #cd7f32)" : `linear-gradient(90deg, ${rank.color}44, ${rank.color}88)`, boxShadow: ts.glow !== "none" ? `0 0 6px ${rank.color}66` : "none" }} />
+            </div>
+            <div style={{ fontSize: 9, color: "#333", marginTop: 4, textAlign: "right" }}>{progress.toFixed(1)}%</div>
+          </div>}
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 1, background: "#1a1a1a", borderRadius: 12, overflow: "hidden" }}>
             {[
@@ -290,11 +275,7 @@ export default function IdentityPage() {
           <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>X ACCOUNT</div>
           {connectedHandle ? (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              {xSession?.avatar ? (
-                <img src={xSession.avatar} alt="avatar" style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid #333" }} />
-              ) : (
-                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "#1a1a1a", border: "2px solid #333", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>𝕏</div>
-              )}
+              {xSession?.avatar ? <img src={xSession.avatar} alt="avatar" style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid #333" }} /> : <div style={{ width: 44, height: 44, borderRadius: "50%", background: "#1a1a1a", border: "2px solid #333", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>𝕏</div>}
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 15, fontWeight: 800 }}>@{connectedHandle}</div>
                 <div style={{ fontSize: 10, color: "#4ade80", fontWeight: 700, marginTop: 2 }}>✓ Verified</div>
@@ -302,9 +283,7 @@ export default function IdentityPage() {
               <button onClick={disconnectX} style={{ background: "transparent", border: "1px solid #2a1a1a", borderRadius: 10, padding: "8px 14px", color: "#f87171", fontSize: 10, fontWeight: 800, cursor: "pointer" }}>DISCONNECT</button>
             </div>
           ) : (
-            <button onClick={connectX} style={{ width: "100%", background: "#000", border: "1px solid #333", borderRadius: 12, padding: "14px", color: "#fff", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>
-              Connect X Account →
-            </button>
+            <button onClick={connectX} style={{ width: "100%", background: "#000", border: "1px solid #333", borderRadius: 12, padding: "14px", color: "#fff", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>Connect X Account →</button>
           )}
         </div>
 
@@ -312,21 +291,15 @@ export default function IdentityPage() {
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
           <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>LEGION REFERRAL</div>
           <div style={{ background: "#111", border: "1px solid #222", borderRadius: 12, padding: "12px 14px", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-            <span style={{ fontSize: 11, color: "#888", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              teftlegion.com/identity?ref={cardData.referralCode}
-            </span>
+            <span style={{ fontSize: 11, color: "#888", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>teftlegion.com/identity?ref={cardData.referralCode}</span>
             <button onClick={copyReferral} style={{ background: copied ? "#0a2a1a" : "#1a1a1a", border: `1px solid ${copied ? "#4ade80" : "#333"}`, borderRadius: 8, padding: "6px 12px", color: copied ? "#4ade80" : "#888", fontSize: 10, fontWeight: 800, cursor: "pointer", flexShrink: 0 }}>
               {copied ? "COPIED ✓" : "COPY"}
             </button>
           </div>
           <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 12, padding: "12px 14px" }}>
-            <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.08em", marginBottom: 6 }}>SCORE FORMULA</div>
-            <div style={{ fontSize: 11, color: "#666" }}>
-              Score = TEFT × (1 + Referrals × 0.25)
-            </div>
-            <div style={{ fontSize: 10, color: "#4ade80", marginTop: 4 }}>
-              Each referral = +25% score boost
-            </div>
+            <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.08em", marginBottom: 4 }}>SCORE FORMULA</div>
+            <div style={{ fontSize: 11, color: "#555" }}>Score = TEFT × (1 + Referrals × 0.25)</div>
+            <div style={{ fontSize: 10, color: "#4ade80", marginTop: 4 }}>Each referral = +25% score boost</div>
           </div>
         </div>
 
@@ -338,20 +311,12 @@ export default function IdentityPage() {
               const isCurrentRank = rank?.name === r.name;
               const rts = TIER_STYLES[r.tier];
               return (
-                <div key={r.name} style={{
-                  display: "flex", alignItems: "center", gap: 12,
-                  background: isCurrentRank ? `${r.color}0d` : "transparent",
-                  border: `1px solid ${isCurrentRank ? rts.border : "#1a1a1a"}`,
-                  borderRadius: 12, padding: "12px 14px",
-                  boxShadow: isCurrentRank ? rts.glow : "none",
-                }}>
+                <div key={r.name} style={{ display: "flex", alignItems: "center", gap: 12, background: isCurrentRank ? `${r.color}0d` : "transparent", border: `1px solid ${isCurrentRank ? rts.border : "#1a1a1a"}`, borderRadius: 12, padding: "12px 14px", boxShadow: isCurrentRank ? rts.glow : "none" }}>
                   <span style={{ fontSize: 16 }}>{rts.badge}</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 11, fontWeight: 900, color: isCurrentRank ? r.color : "#555", letterSpacing: "0.05em" }}>{r.name}</div>
                     <div style={{ fontSize: 10, color: "#444", fontStyle: "italic", marginTop: 1 }}>"{r.tagline}"</div>
-                    <div style={{ fontSize: 9, color: "#333", marginTop: 2 }}>
-                      {r.max === Infinity ? `${formatBalance(r.min)}+ TEFT` : `${formatBalance(r.min)} – ${formatBalance(r.max)} TEFT`}
-                    </div>
+                    <div style={{ fontSize: 9, color: "#333", marginTop: 2 }}>{r.max === Infinity ? `${formatBalance(r.min)}+ TEFT` : `${formatBalance(r.min)} – ${formatBalance(r.max)} TEFT`}</div>
                   </div>
                   {isCurrentRank && <span style={{ fontSize: 9, color: r.color, fontWeight: 900, flexShrink: 0 }}>YOU ARE HERE</span>}
                 </div>
@@ -364,13 +329,12 @@ export default function IdentityPage() {
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
             <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>LEGION LEADERBOARD</div>
-            <div style={{ fontSize: 9, color: "#333", fontWeight: 700 }}>Score = TEFT × (1 + refs × 0.25)</div>
+            <div style={{ fontSize: 9, color: "#333" }}>TEFT × (1 + refs × 0.25)</div>
           </div>
-
           {lbLoading ? (
             <div style={{ textAlign: "center", padding: "20px 0", color: "#333", fontSize: 11 }}>Loading...</div>
           ) : leaderboard.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "20px 0", color: "#333", fontSize: 11 }}>No members yet</div>
+            <div style={{ textAlign: "center", padding: "20px 0", color: "#333", fontSize: 11 }}>No members yet — be the first!</div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {leaderboard.slice(0, 20).map((member: any) => {
@@ -378,12 +342,7 @@ export default function IdentityPage() {
                 const memberRank = getRank(member.balance);
                 const mts = memberRank ? TIER_STYLES[memberRank.tier] : null;
                 return (
-                  <div key={member.wallet} style={{
-                    display: "flex", alignItems: "center", gap: 10,
-                    background: isMe ? "#0a1a0a" : "#0a0a0a",
-                    border: `1px solid ${isMe ? "#4ade8044" : "#111"}`,
-                    borderRadius: 10, padding: "10px 12px",
-                  }}>
+                  <div key={member.wallet} style={{ display: "flex", alignItems: "center", gap: 10, background: isMe ? "#0a1a0a" : "#0a0a0a", border: `1px solid ${isMe ? "#4ade8044" : "#111"}`, borderRadius: 10, padding: "10px 12px" }}>
                     <div style={{ width: 28, display: "flex", justifyContent: "center", flexShrink: 0 }}>
                       <PositionBadge position={member.position} />
                     </div>
@@ -395,9 +354,7 @@ export default function IdentityPage() {
                         {member.xHandle ? `@${member.xHandle}` : `${member.wallet.slice(0, 4)}...${member.wallet.slice(-4)}`}
                         {isMe && <span style={{ color: "#4ade80", fontSize: 9, marginLeft: 6 }}>YOU</span>}
                       </div>
-                      <div style={{ fontSize: 9, color: "#444", marginTop: 1 }}>
-                        {formatBalance(member.balance)} TEFT · {member.referrals} referrals
-                      </div>
+                      <div style={{ fontSize: 9, color: "#444", marginTop: 1 }}>{formatBalance(member.balance)} TEFT · {member.referrals} referrals</div>
                     </div>
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
                       <div style={{ fontSize: 12, fontWeight: 900, color: memberRank?.color || "#fff" }}>{formatBalance(member.score)}</div>
@@ -407,11 +364,7 @@ export default function IdentityPage() {
                 );
               })}
               {myPosition > 20 && (
-                <div style={{
-                  display: "flex", alignItems: "center", gap: 10,
-                  background: "#0a1a0a", border: "1px solid #4ade8044",
-                  borderRadius: 10, padding: "10px 12px", marginTop: 4,
-                }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, background: "#0a1a0a", border: "1px solid #4ade8044", borderRadius: 10, padding: "10px 12px", marginTop: 4 }}>
                   <div style={{ width: 28, textAlign: "center", color: "#4ade80", fontSize: 12, fontWeight: 900 }}>#{myPosition}</div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 12, fontWeight: 800, color: "#4ade80" }}>You</div>
@@ -428,11 +381,7 @@ export default function IdentityPage() {
         </div>
 
         {/* Share */}
-        <button onClick={shareOnX} style={{
-          width: "100%", background: "transparent", border: "1px solid #1e3a5f",
-          borderRadius: 12, padding: "14px", color: "#60a5fa",
-          fontSize: 11, fontWeight: 800, cursor: "pointer", letterSpacing: "0.1em",
-        }}>
+        <button onClick={shareOnX} style={{ width: "100%", background: "transparent", border: "1px solid #1e3a5f", borderRadius: 12, padding: "14px", color: "#60a5fa", fontSize: 11, fontWeight: 800, cursor: "pointer", letterSpacing: "0.1em" }}>
           SHARE IDENTITY ON X ↗
         </button>
       </div>
