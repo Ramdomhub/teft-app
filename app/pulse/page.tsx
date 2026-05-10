@@ -197,7 +197,7 @@ function TokenGate({ children }: { children: React.ReactNode }) {
   if (checked && hasAccess && !showPulse) return (
     <div style={{ minHeight: "100vh", background: "#000", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, position: "relative" }}>
       <a href="/" style={{ position: "absolute", top: 20, left: 20, color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: 11, fontWeight: 800, letterSpacing: "0.1em" }}>← Back</a>
-      <div style={{ fontSize: 56 }}>🎉</div>
+      
       <h2 style={{ color: "#fff", fontSize: 24, fontWeight: 800, textAlign: "center" }}>Welcome to TEFT Pulse <span style={{ background: "#1a1a1a", border: "1px solid #333", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700, color: "#888", verticalAlign: "middle" }}>BETA</span></h2>
       <p style={{ color: "#4ade80", fontSize: 18, fontWeight: 700 }}>You hold {formatTeft(teftBalance)} TEFT</p>
       <p style={{ color: "#888", fontSize: 13, textAlign: "center", maxWidth: 300 }}>Access granted. You are part of the TEFT Legion.</p>
