@@ -12,7 +12,7 @@ export async function GET() {
   try {
     const { data, error } = await supabase
       .from("legion_stats")
-      .select("wallet_address, x_handle, teft_balance, referral_count_live, referral_code, score")
+      .select("wallet_address, x_handle, teft_balance, referral_count, referral_code, score")
       .gt("teft_balance", 0)
       .order("score", { ascending: false })
       .limit(100);
@@ -24,7 +24,7 @@ export async function GET() {
       wallet: m.wallet_address,
       xHandle: m.x_handle,
       balance: m.teft_balance || 0,
-      referrals: m.referral_count_live || 0,
+      referrals: m.referral_count || 0,
       referralCode: m.referral_code,
       score: m.score || 0,
     }));

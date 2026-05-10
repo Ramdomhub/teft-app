@@ -105,10 +105,10 @@ export default function IdentityPage() {
       const { data } = await supabase.from("legion_stats").select("*").eq("wallet_address", publicKey.toBase58()).single();
       setCardData({
         wallet: publicKey.toBase58(), balance,
-        legionSize: data?.referral_count_live || 0,
+        legionSize: data?.referral_count || 0,
         xHandle: data?.x_handle || null,
         referralCode: data?.referral_code || publicKey.toBase58().slice(0, 8),
-        score: data?.score || calcScore(balance, 0),
+        score: data?.score || 0,
       });
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
