@@ -154,6 +154,7 @@ export default function TerminalPage() {
             {[
               { label: "TEFT Pulse", desc: "Smart wallet signals", url: "/pulse" },
               { label: "TEFT Identity", desc: "Your on-chain rank", url: "/identity" },
+              { label: "Dust Remover", desc: "Recover SOL from empty accounts", url: "/terminal/dust" },
               { label: "NFT Marketplace", desc: "Get TEFT NFTs", url: "/nft-marketplace" },
             ].map(({ label, desc, url }) => (
               <a key={label} href={url} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#111", border: "1px solid #1a1a1a", borderRadius: 10, padding: "10px 14px", textDecoration: "none" }}>
