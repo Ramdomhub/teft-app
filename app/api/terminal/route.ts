@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
 
 export async function GET() {
   try {
     const [teftRes, cgRes, fgRes, news1Res, news2Res, news3Res] = await Promise.allSettled([
-      fetch(`https://api.dexscreener.com/tokens/v1/solana/${TEFT_MINT}`),
+      fetch(`https://api.dexscreener.com/tokens/v1/solana/${TEFT_MINT}`, { cache: "no-store" }),
       fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana,bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true"),
       fetch("https://api.alternative.me/fng/?limit=1"),
       fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fcointelegraph.com%2Frss"),
