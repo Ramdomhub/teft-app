@@ -31,6 +31,7 @@ export default function DustRemoverPage() {
   const [done, setDone] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [scanned, setScanned] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const scan = useCallback(async () => {
     if (!publicKey) return;
@@ -77,6 +78,7 @@ export default function DustRemoverPage() {
     if (!publicKey) return;
     const selected = accounts.filter(a => a.selected);
     if (selected.length === 0) return;
+    setShowConfirm(false);
     setClosing(true);
     setError(null);
     setDone(null);
@@ -221,7 +223,7 @@ export default function DustRemoverPage() {
                     <div style={{ fontSize: 16, fontWeight: 900, color: "#4ade80", marginTop: 2 }}>~{totalRecoverable.toFixed(4)} SOL</div>
                   </div>
                 </div>
-                <button onClick={closeSelected} disabled={closing || selectedCount === 0} style={{ width: "100%", background: selectedCount === 0 ? "#111" : "#4ade80", color: selectedCount === 0 ? "#444" : "#000", border: "none", borderRadius: 14, padding: 16, fontSize: 13, fontWeight: 900, cursor: selectedCount === 0 ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                <button onClick={() => setShowConfirm(true)} disabled={closing || selectedCount === 0} style={{ width: "100%", background: selectedCount === 0 ? "#111" : "#4ade80", color: selectedCount === 0 ? "#444" : "#000", border: "none", borderRadius: 14, padding: 16, fontSize: 13, fontWeight: 900, cursor: selectedCount === 0 ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
                   {closing ? (
                     <><div style={{ width: 16, height: 16, border: "2px solid #000", borderTop: "2px solid #4ade80", borderRadius: "50%", animation: "spin 1s linear infinite" }} /> Closing accounts...</>
                   ) : `Close ${selectedCount} accounts & recover SOL`}
@@ -245,11 +247,30 @@ export default function DustRemoverPage() {
           </>
         )}
 
+        {/* Confirm Modal */}
+        {showConfirm && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+            <div style={{ background: "#111", border: "1px solid #f8717144", borderRadius: 20, padding: 28, maxWidth: 380, width: "100%" }}>
+              <div style={{ fontSize: 24, marginBottom: 12, textAlign: "center" }}>⚠️</div>
+              <div style={{ fontSize: 15, fontWeight: 900, marginBottom: 8, textAlign: "center" }}>Are you sure?</div>
+              <div style={{ fontSize: 12, color: "#888", marginBottom: 20, textAlign: "center", lineHeight: 1.6 }}>
+                You are about to close <strong style={{ color: "#fff" }}>{selectedCount} token accounts</strong> and recover <strong style={{ color: "#4ade80" }}>~{totalRecoverable.toFixed(4)} SOL</strong>.<br /><br />
+                This action is <strong style={{ color: "#f87171" }}>irreversible</strong>. Make sure these accounts are no longer needed.
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button onClick={() => setShowConfirm(false)} style={{ flex: 1, background: "transparent", border: "1px solid #333", borderRadius: 12, padding: 14, color: "#888", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                <button onClick={closeSelected} style={{ flex: 1, background: "#4ade80", border: "none", borderRadius: 12, padding: 14, color: "#000", fontSize: 12, fontWeight: 900, cursor: "pointer" }}>Confirm & Close</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Warning */}
-        <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 16, padding: 16, textAlign: "center" }}>
-          <div style={{ fontSize: 10, color: "#444", lineHeight: 1.6 }}>
-            Only empty token accounts (0 balance) are shown.<br />
-            Closing an account is irreversible. You recover the SOL rent deposit.
+        <div style={{ background: "#1a0f00", border: "1px solid #f59e0b44", borderRadius: 16, padding: 16 }}>
+          <div style={{ fontSize: 11, color: "#f59e0b", fontWeight: 800, marginBottom: 6 }}>⚠️ Important</div>
+          <div style={{ fontSize: 10, color: "#888", lineHeight: 1.7 }}>
+            Only empty token accounts (0 balance) are shown. Closing an account is <strong style={{ color: "#fff" }}>irreversible</strong> — you will lose access to that token account permanently. You recover the SOL rent deposit (~0.002 SOL per account).<br /><br />
+            TEFT Legion is not responsible for any loss. By using this tool you agree to our <a href="/terms" style={{ color: "#f59e0b", textDecoration: "underline" }}>Terms of Service</a>.
           </div>
         </div>
 
