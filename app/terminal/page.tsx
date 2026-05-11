@@ -73,17 +73,15 @@ export default function TerminalPage() {
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 80px" }}>
 
         {/* TEFT Card */}
-        <div style={{ background: "#0d0d0d", border: "1px solid #FFD70033", borderRadius: 20, padding: 20, marginBottom: 12, boxShadow: "0 0 28px #FFD70022" }}>
+        <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
           <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>$TEFT · SOLANA</div>
           {loading ? <div style={{ color: "#333", fontSize: 12 }}>Loading...</div> : teft ? <>
-            <div style={{ fontSize: 24, fontWeight: 900, color: "#FFD700", marginBottom: 4 }}>${Number(teft.priceUsd || 0).toFixed(8)}</div>
+            <div style={{ fontSize: 24, fontWeight: 900, color: "#fff", marginBottom: 4 }}>${Number(teft.priceUsd || 0).toFixed(8)}</div>
             <div style={{ fontSize: 11, color: "#555", marginBottom: 16 }}>{pct(Number(teft.priceChange?.h24 || 0))} <span style={{ color: "#333" }}>24h change</span></div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 1, background: "#1a1a1a", borderRadius: 12, overflow: "hidden" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 1, background: "#1a1a1a", borderRadius: 12, overflow: "hidden" }}>
               {[
                 { label: "MCAP", value: fmt(teft.marketCap || teft.fdv || 0) },
-                { label: "LIQUIDITY", value: fmt(teft.liquidity?.usd || 0) },
                 { label: "VOL 24H", value: fmt(teft.volume?.h24 || 0) },
-                { label: "VOL 1H", value: fmt(teft.volume?.h1 || 0) },
                 { label: "HOLDERS", value: holders ? holders.toString() : "—" },
               ].map(({ label, value }) => (
                 <div key={label} style={{ background: "#0d0d0d", padding: "10px 8px", textAlign: "center" }}>
