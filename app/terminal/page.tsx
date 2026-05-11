@@ -24,7 +24,6 @@ export default function TerminalPage() {
   const [news, setNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [holders, setHolders] = useState<number | null>(null);
-  const [holders, setHolders] = useState<number | null>(null);
   const [lastUpdate, setLastUpdate] = useState("");
 
   useEffect(() => {

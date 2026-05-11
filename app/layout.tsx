@@ -51,17 +51,6 @@ export default function RootLayout({
             alignItems: "center",
             gap: 6,
             boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLAnchorElement).style.background = "#222";
-            (e.currentTarget as HTMLAnchorElement).style.color = "#fff";
-            (e.currentTarget as HTMLAnchorElement).style.borderColor = "#444";
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLAnchorElement).style.background = "#1a1a1a";
-            (e.currentTarget as HTMLAnchorElement).style.color = "#888";
-            (e.currentTarget as HTMLAnchorElement).style.borderColor = "#333";
           }}
         >
           <span style={{ fontSize: 13 }}>💬</span> Feedback
