@@ -4,10 +4,12 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
+const TREASURY_WALLET = "DW8PwzfYZizzxafFhbXwdHEeXRBtMHSTyiHehM6T2myz";
+const DAILY_DISTRIBUTION = 500; // TEFT per NFT per day
 
 export async function GET() {
   try {
-    const [teftRes, cgRes, fgRes, news1Res, news2Res, news3Res, holdersRes] = await Promise.allSettled([
+    const [teftRes, cgRes, fgRes, news1Res, news2Res, news3Res, holdersRes, treasuryRes] = await Promise.allSettled([
       fetch(`https://api.dexscreener.com/tokens/v1/solana/${TEFT_MINT}`, { cache: "no-store" }),
       fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana,bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true"),
       fetch("https://api.alternative.me/fng/?limit=1"),
@@ -21,6 +23,15 @@ export async function GET() {
           jsonrpc: "2.0", id: 1,
           method: "getTokenAccounts",
           params: { mint: TEFT_MINT, limit: 1000, displayOptions: { showZeroBalance: false } }
+        })
+      }),
+      fetch(`https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0", id: 2,
+          method: "getTokenAccountsByOwner",
+          params: [TREASURY_WALLET, { mint: TEFT_MINT }, { encoding: "jsonParsed" }]
         })
       }),
     ]);
@@ -81,7 +92,17 @@ export async function GET() {
       } catch {}
     }
 
-    return NextResponse.json({ teft, cg, fg, news, holders });
+    // Treasury
+    let treasury = null;
+    if (treasuryRes.status === "fulfilled" && treasuryRes.value.ok) {
+      try {
+        const tData = await treasuryRes.value.json();
+        const balance = tData.result?.value?.[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0;
+        treasury = { balance, dailyDistribution: DAILY_DISTRIBUTION };
+      } catch {}
+    }
+
+    return NextResponse.json({ teft, cg, fg, news, holders, treasury });
   } catch (e) {
     return NextResponse.json({ teft: null, cg: null, fg: null, news: [] });
   }

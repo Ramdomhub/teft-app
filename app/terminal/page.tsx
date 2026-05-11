@@ -24,6 +24,7 @@ export default function TerminalPage() {
   const [news, setNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [holders, setHolders] = useState<number | null>(null);
+  const [treasury, setTreasury] = useState<any>(null);
   const [lastUpdate, setLastUpdate] = useState("");
 
   useEffect(() => {
@@ -37,7 +38,9 @@ export default function TerminalPage() {
         setFg(data.fg);
         setNews(data.news || []);
         setHolders(data.holders || null);
+        setTreasury(data.treasury || null);
         setHolders(data.holders || null);
+        setTreasury(data.treasury || null);
       } catch (e) { console.error(e); }
       finally {
         setLoading(false);
@@ -127,6 +130,32 @@ export default function TerminalPage() {
             <div style={{ background: "#1a1a1a", borderRadius: 99, height: 5, overflow: "hidden" }}>
               <div style={{ height: "100%", width: `${fg.value}%`, background: "linear-gradient(90deg, #f87171, #fb923c, #a3e635, #4ade80)", borderRadius: 99 }} />
             </div>
+          </> : <div style={{ color: "#333", fontSize: 12 }}>Loading...</div>}
+        </div>
+
+        {/* Treasury Card */}
+        <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
+          <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>TEFT TREASURY · NFT STAKING REWARDS</div>
+          {treasury ? <>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 1, background: "#1a1a1a", borderRadius: 12, overflow: "hidden", marginBottom: 12 }}>
+              {[
+                { label: "TREASURY BALANCE", value: (treasury.balance / 1_000_000).toFixed(1) + "M TEFT" },
+                { label: "DAILY PER NFT", value: treasury.dailyDistribution + " TEFT" },
+                { label: "DAYS REMAINING", value: treasury.balance > 0 ? Math.floor(treasury.balance / (treasury.dailyDistribution * 100)).toString() + "+ days" : "—" },
+              ].map(({ label, value }) => (
+                <div key={label} style={{ background: "#0d0d0d", padding: "10px 8px", textAlign: "center" }}>
+                  <div style={{ fontSize: 8, color: "#444", fontWeight: 800, letterSpacing: "0.08em" }}>{label}</div>
+                  <div style={{ fontSize: 11, fontWeight: 900, color: "#fff", marginTop: 2 }}>{value}</div>
+                </div>
+              ))}
+            </div>
+            <a href="https://www.solsuite.io/teftsupreme" target="_blank" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#111", border: "1px solid #1a1a1a", borderRadius: 10, padding: "10px 14px", textDecoration: "none" }}>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#fff" }}>Stake TEFT NFTs on Solsuite</div>
+                <div style={{ fontSize: 9, color: "#444", marginTop: 1 }}>Earn 500 TEFT per NFT per day</div>
+              </div>
+              <span style={{ fontSize: 11, color: "#444" }}>↗</span>
+            </a>
           </> : <div style={{ color: "#333", fontSize: 12 }}>Loading...</div>}
         </div>
 
