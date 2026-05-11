@@ -34,7 +34,8 @@ export default function RootLayout({
         <meta name="twitter:title" content="TEFT Legion" />
         <meta name="twitter:description" content="Token-gated tools for TEFT holders. Smart wallet signals, on-chain identity, and legion building on Solana." />
         <meta name="twitter:image" content="https://teftlegion.com/og.png" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
         <Script src="https://terminal.jup.ag/main-v3.js" strategy="afterInteractive" />
       </head>
       <body>
