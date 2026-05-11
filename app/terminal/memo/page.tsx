@@ -188,10 +188,11 @@ export default function MemoSenderPage() {
           </>
         )}
 
-        <div style={{ background: "#111", border: "1px solid #1a1a1a", borderRadius: 16, padding: 16, textAlign: "center" }}>
-          <div style={{ fontSize: 10, color: "#444", lineHeight: 1.6 }}>
-            Messages are stored permanently on Solana blockchain.<br />
-            Small network fee (~0.000005 SOL) applies.
+        <div style={{ background: "#1a0f00", border: "1px solid #f59e0b44", borderRadius: 16, padding: 16 }}>
+          <div style={{ fontSize: 11, color: "#f59e0b", fontWeight: 800, marginBottom: 6 }}>⚠️ Important</div>
+          <div style={{ fontSize: 10, color: "#888", lineHeight: 1.7 }}>
+            Messages are stored <strong style={{ color: "#fff" }}>permanently</strong> on the Solana blockchain and <strong style={{ color: "#fff" }}>cannot be deleted</strong>. Do not send sensitive, private, or illegal content. A small network fee (~0.000005 SOL) applies.<br /><br />
+            TEFT Legion is not responsible for the content of messages sent. By using this tool you agree to our <a href="/terms" style={{ color: "#f59e0b", textDecoration: "underline" }}>Terms of Service</a>.
           </div>
         </div>
 

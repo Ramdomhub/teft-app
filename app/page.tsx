@@ -78,6 +78,9 @@ export default function Home() {
             <a href="https://www.teftlegion.io" target="_blank" className="text-zinc-400 hover:text-black transition-colors">teftlegion.io</a>
             <a href="https://t.me/teftlegionofficial" target="_blank" className="text-zinc-400 hover:text-black transition-colors">Telegram</a>
           </div>
+          <p className="text-[9px] text-zinc-600 mt-3 px-4 leading-relaxed">
+            Cryptocurrency is highly speculative and volatile. Nothing on this platform constitutes financial advice. Always do your own research (DYOR). By using TEFT Legion you agree to our <a href="/terms" className="underline hover:text-zinc-400">Terms of Service</a>.
+          </p>
         </div>
 
       </div>
