@@ -7,13 +7,22 @@ const TEFT_MINT = "8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump";
 
 export async function GET() {
   try {
-    const [teftRes, cgRes, fgRes, news1Res, news2Res, news3Res] = await Promise.allSettled([
+    const [teftRes, cgRes, fgRes, news1Res, news2Res, news3Res, holdersRes] = await Promise.allSettled([
       fetch(`https://api.dexscreener.com/tokens/v1/solana/${TEFT_MINT}`, { cache: "no-store" }),
       fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana,bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true"),
       fetch("https://api.alternative.me/fng/?limit=1"),
       fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fcointelegraph.com%2Frss"),
       fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fnews.bitcoin.com%2Ffeed%2F"),
       fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.coindesk.com%2Farc%2Foutboundfeeds%2Frss%2F"),
+      fetch(`https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0", id: 1,
+          method: "getTokenAccounts",
+          params: { mint: TEFT_MINT, limit: 1000, displayOptions: { showZeroBalance: false } }
+        })
+      }),
     ]);
 
     // TEFT
@@ -63,7 +72,16 @@ export async function GET() {
       .filter((item, i, arr) => arr.findIndex(x => x.title === item.title) === i)
       .slice(0, 15);
 
-    return NextResponse.json({ teft, cg, fg, news });
+    // Holders
+    let holders = null;
+    if (holdersRes.status === "fulfilled" && holdersRes.value.ok) {
+      try {
+        const hData = await holdersRes.value.json();
+        holders = hData.result?.token_accounts?.length || null;
+      } catch {}
+    }
+
+    return NextResponse.json({ teft, cg, fg, news, holders });
   } catch (e) {
     return NextResponse.json({ teft: null, cg: null, fg: null, news: [] });
   }

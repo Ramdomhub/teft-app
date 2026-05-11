@@ -23,6 +23,7 @@ export default function TerminalPage() {
   const [fg, setFg] = useState<any>(null);
   const [news, setNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [holders, setHolders] = useState<number | null>(null);
   const [lastUpdate, setLastUpdate] = useState("");
 
   useEffect(() => {
@@ -35,6 +36,7 @@ export default function TerminalPage() {
         setBtc(data.cg?.bitcoin || null);
         setFg(data.fg);
         setNews(data.news || []);
+        setHolders(data.holders || null);
       } catch (e) { console.error(e); }
       finally {
         setLoading(false);
