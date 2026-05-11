@@ -30,6 +30,42 @@ export default function RootLayout({
         <AppWalletProvider>
           {children}
         </AppWalletProvider>
+        {/* Global Feedback Button */}
+        
+          href="mailto:support@teftlegion.io?subject=Feedback%20TEFT%20Legion"
+          style={{
+            position: "fixed",
+            bottom: 24,
+            right: 24,
+            zIndex: 9999,
+            background: "#1a1a1a",
+            border: "1px solid #333",
+            borderRadius: 12,
+            padding: "8px 14px",
+            color: "#888",
+            fontSize: 11,
+            fontWeight: 800,
+            textDecoration: "none",
+            letterSpacing: "0.05em",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLAnchorElement).style.background = "#222";
+            (e.currentTarget as HTMLAnchorElement).style.color = "#fff";
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = "#444";
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLAnchorElement).style.background = "#1a1a1a";
+            (e.currentTarget as HTMLAnchorElement).style.color = "#888";
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = "#333";
+          }}
+        >
+          <span style={{ fontSize: 13 }}>💬</span> Feedback
+        </a>
       </body>
     </html>
   );
