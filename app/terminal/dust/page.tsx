@@ -270,7 +270,8 @@ export default function DustRemoverPage() {
           <div style={{ fontSize: 11, color: "#f59e0b", fontWeight: 800, marginBottom: 6 }}>⚠️ Important</div>
           <div style={{ fontSize: 10, color: "#888", lineHeight: 1.7 }}>
             Only empty token accounts (0 balance) are shown. Closing an account is <strong style={{ color: "#fff" }}>irreversible</strong> — you will lose access to that token account permanently. You recover the SOL rent deposit (~0.002 SOL per account).<br /><br />
-            TEFT Legion is not responsible for any loss. By using this tool you agree to our <a href="/terms" style={{ color: "#f59e0b", textDecoration: "underline" }}>Terms of Service</a>.
+            TEFT Legion is not responsible for any loss. By using this tool you agree to our <a href="/terms" style={{ color: "#f59e0b", textDecoration: "underline" }}>Terms of Service</a>.<br /><br />
+            <strong style={{ color: "#f59e0b" }}>Note:</strong> Closing accounts may disqualify you from future airdrops that target existing token account holders.
           </div>
         </div>
 
