@@ -162,6 +162,7 @@ export async function POST(req: NextRequest) {
             pair_address: tokenInfo?.pairAddress || null,
             liquidity_usd: tokenInfo?.liquidityUsd || null,
             market_cap: tokenInfo?.marketCap || null,
+            entry_market_cap: tokenInfo?.marketCap || null,
             dexscreener_url: tokenInfo?.dexscreenerUrl || null,
           });
           if (!error) {
