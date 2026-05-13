@@ -310,22 +310,47 @@ function MultiplierBadge({ multiplier }: { multiplier: number | null }) {
   );
 }
 
-function openJupiter(tokenAddress: string, amount: string) {
-  if (typeof window === 'undefined') return;
-  const jup = (window as any).Jupiter;
-  if (!jup) { console.warn('Jupiter Plugin not loaded yet'); return; }
-  jup.init({
-    displayMode: "modal",
-    endpoint: "https://mainnet.helius-rpc.com/?api-key=bf59014c-870b-4f10-aee5-ebfcec0dd99d",
-    enableWalletPassthrough: true,
-    passthroughWalletContextState: (window as any).__teftWalletCtx,
-    formProps: {
-      initialInputMint: "So11111111111111111111111111111111111111112",
-      initialOutputMint: tokenAddress,
-      referralAccount: "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere",
-      referralFee: 50,
-    },
-  });
+async function openJupiter(tokenAddress: string, amount: string) {
+  const walletCtx = (window as any).__teftWalletCtx;
+  if (!walletCtx?.publicKey) {
+    alert("Please connect your wallet first");
+    return;
+  }
+  try {
+    const orderRes = await fetch("/api/swap", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        inputMint: "So11111111111111111111111111111111111111112",
+        outputMint: tokenAddress,
+        amount: amount || "0.1",
+        taker: walletCtx.publicKey.toString(),
+      }),
+    });
+    const order = await orderRes.json();
+    if (!order.transaction) throw new Error(order.error || "No transaction");
+
+    const { VersionedTransaction } = await import("@solana/web3.js");
+    const txBytes = Buffer.from(order.transaction, "base64");
+    const tx = VersionedTransaction.deserialize(txBytes);
+    const signedTx = await walletCtx.signTransaction(tx);
+    const signedB64 = Buffer.from(signedTx.serialize()).toString("base64");
+
+    const execRes = await fetch("/api/swap/execute", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ signedTransaction: signedB64, requestId: order.requestId }),
+    });
+    const result = await execRes.json();
+    if (result.status === "Success") {
+      alert("Swap successful! 🎉");
+      window.open(`https://solscan.io/tx/${result.signature}`, "_blank");
+    } else {
+      alert("Swap failed: " + (result.error || "Unknown error"));
+    }
+  } catch (e: any) {
+    alert("Error: " + e.message);
+  }
 }
 
 function ShareLink({ href, children, style }: { href: string; children: React.ReactNode; style?: React.CSSProperties }) {
@@ -642,15 +667,6 @@ export default function PulsePage() {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   useEffect(() => {
     setShowDisclaimer(!localStorage.getItem('teft_disclaimer_accepted'));
-  }, []);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !document.querySelector('script[src*="plugin.jup.ag"]')) {
-      const script = document.createElement('script');
-      script.src = 'https://plugin.jup.ag/plugin-ultra-beta.js';
-      script.async = true;
-      document.head.appendChild(script);
-    }
   }, []);
 
   const [showLegend, setShowLegend] = useState(false);
