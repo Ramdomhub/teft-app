@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       taker,
       referralAccount: REFERRAL_ACCOUNT,
       referralFee: REFERRAL_FEE,
-      slippageBps: "300",
+      slippageBps: "1000",
     });
 
     const orderRes = await fetch(`${BASE_URL}/order?${params}`, {
