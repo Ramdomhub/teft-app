@@ -186,7 +186,7 @@ function TokenGate({ children }: { children: React.ReactNode }) {
       <p style={{ color: "#888", fontSize: 14, textAlign: "center", maxWidth: 300 }}>
         You need at least <strong style={{color:"#fff"}}>1 TEFT</strong> to access Pulse.
       </p>
-      <a href={`https://jup.ag/swap/SOL-${TEFT_MINT}?referral=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&feeBps=50`} target="_blank"
+      <a href={`https://jup.ag/swap/SOL-${TEFT_MINT}?referrer=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&feeBps=50`} target="_blank"
         style={{ background: "#4ade80", color: "#000", borderRadius: 10, padding: "12px 28px", fontWeight: 800, fontSize: 14, textDecoration: "none" }}>
         Buy TEFT
       </a>
@@ -310,7 +310,7 @@ function MultiplierBadge({ multiplier }: { multiplier: number | null }) {
 
 function openJupiter(tokenAddress: string, amount: number) {
   const referrer = "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere";
-  window.open(`https://jup.ag/swap?sell=So11111111111111111111111111111111111111112&buy=${tokenAddress}&amount=${amount}&referral=${referrer}&feeBps=50`, "_blank");
+  window.open(`https://jup.ag/swap?sell=So11111111111111111111111111111111111111112&buy=${tokenAddress}&amount=${amount}&referrer=${referrer}&feeBps=50`, "_blank");
 }
 
 function ShareLink({ href, children, style }: { href: string; children: React.ReactNode; style?: React.CSSProperties }) {
