@@ -316,6 +316,7 @@ function openJupiter(tokenAddress: string, amount: string) {
   if (!jup) { console.warn('Jupiter Plugin not loaded yet'); return; }
   jup.init({
     displayMode: "modal",
+    endpoint: "https://mainnet.helius-rpc.com/?api-key=bf59014c-870b-4f10-aee5-ebfcec0dd99d",
     enableWalletPassthrough: true,
     passthroughWalletContextState: (window as any).__teftWalletCtx,
     formProps: {
