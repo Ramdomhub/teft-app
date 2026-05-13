@@ -322,7 +322,6 @@ function openJupiter(tokenAddress: string, amount: string) {
     formProps: {
       initialInputMint: "So11111111111111111111111111111111111111112",
       initialOutputMint: tokenAddress,
-      initialAmount: String(Math.round(parseFloat(String(amount)) * 1e9)),
       referralAccount: "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere",
       referralFee: 50,
     },
