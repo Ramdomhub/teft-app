@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const REFERRAL_ACCOUNT = "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere";
+const REFERRAL_ACCOUNT = "7zWJaZ9bGrUNrMPN2CeaH3P7YTYen3FNjEtLToqVD29U";
 const REFERRAL_FEE = "50";
 const BASE_URL = "https://api.jup.ag/swap/v2";
 
