@@ -112,8 +112,8 @@ function formatTeft(n: number): string {
 }
 
 function TokenGate({ children }: { children: React.ReactNode }) {
-  const { publicKey, connected, signMessage } = useWallet();
   const walletContextState = useWallet();
+  const { publicKey, connected, signMessage } = walletContextState;
   const [hasAccess, setHasAccess] = useState(false);
   const [checking, setChecking] = useState(false);
   const [checked, setChecked] = useState(false);
