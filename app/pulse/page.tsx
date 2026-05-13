@@ -113,6 +113,7 @@ function formatTeft(n: number): string {
 
 function TokenGate({ children }: { children: React.ReactNode }) {
   const { publicKey, connected, signMessage } = useWallet();
+  const walletContextState = useWallet();
   const [hasAccess, setHasAccess] = useState(false);
   const [checking, setChecking] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -308,19 +309,21 @@ function MultiplierBadge({ multiplier }: { multiplier: number | null }) {
   );
 }
 
-function openJupiter(tokenAddress: string, amount: string) {
-  if (typeof window === 'undefined' || !(window as any).Jupiter) return;
-  (window as any).Jupiter.init({
+function openJupiter(tokenAddress: string, amount: string, walletCtx: any) {
+  if (typeof window === 'undefined') return;
+  const jup = (window as any).Jupiter;
+  if (!jup) { console.warn('Jupiter Plugin not loaded yet'); return; }
+  jup.init({
     displayMode: "modal",
+    enableWalletPassthrough: true,
+    passthroughWalletContextState: walletCtx,
     formProps: {
       initialInputMint: "So11111111111111111111111111111111111111112",
       initialOutputMint: tokenAddress,
-      initialAmount: String(Math.round(parseFloat(amount) * 1e9)),
+      initialAmount: String(Math.round(parseFloat(String(amount)) * 1e9)),
       referralAccount: "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere",
       referralFee: 50,
     },
-    enableWalletPassthrough: true,
-    passthroughWalletContextState: (window as any).__walletContext,
   });
 }
 
@@ -618,7 +621,7 @@ function SignalCard({ signal }: { signal: Signal }) {
       {/* Buy Button */}
       <div style={{ padding: "0 16px 16px" }}>
         <button
-          onClick={() => openJupiter(signal.token_address, 0)}
+          onClick={() => openJupiter(signal.token_address, "0.1", walletContextState)}
           style={{
             width: "100%", background: "#fff", color: "#000",
             border: "none", borderRadius: 12, padding: "13px 0",
