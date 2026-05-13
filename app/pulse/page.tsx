@@ -308,9 +308,19 @@ function MultiplierBadge({ multiplier }: { multiplier: number | null }) {
   );
 }
 
-function openJupiter(tokenAddress: string, amount: number) {
-  const referrer = "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere";
-  window.open(`https://jup.ag/swap?sell=So11111111111111111111111111111111111111112&buy=${tokenAddress}&amount=${amount}&referrer=${referrer}&feeBps=50`, "_blank");
+function openJupiter(tokenAddress: string, amount: string) {
+  if (typeof window === 'undefined' || !(window as any).Jupiter) return;
+  (window as any).Jupiter.init({
+    displayMode: "modal",
+    formProps: {
+      initialInputMint: "So11111111111111111111111111111111111111112",
+      initialOutputMint: tokenAddress,
+      initialAmount: String(Math.round(parseFloat(amount) * 1e9)),
+      referralAccount: "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere",
+      referralFee: 50,
+    },
+    enableWalletPassthrough: false,
+  });
 }
 
 function ShareLink({ href, children, style }: { href: string; children: React.ReactNode; style?: React.CSSProperties }) {
@@ -628,6 +638,16 @@ export default function PulsePage() {
   useEffect(() => {
     setShowDisclaimer(!localStorage.getItem('teft_disclaimer_accepted'));
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !document.querySelector('script[src*="plugin.jup.ag"]')) {
+      const script = document.createElement('script');
+      script.src = 'https://plugin.jup.ag/plugin-ultra-beta.js';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+  }, []);
+
   const [showLegend, setShowLegend] = useState(false);
   const [signals, setSignals] = useState<Signal[]>([]);
   const [showWeak, setShowWeak] = useState(true);
