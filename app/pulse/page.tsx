@@ -319,7 +319,8 @@ function openJupiter(tokenAddress: string, amount: string) {
       referralAccount: "7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere",
       referralFee: 50,
     },
-    enableWalletPassthrough: false,
+    enableWalletPassthrough: true,
+    passthroughWalletContextState: (window as any).__walletContext,
   });
 }
 
