@@ -645,11 +645,28 @@ function SignalCard({ signal }: { signal: Signal }) {
       </div>
 
       {/* Buy Button */}
-      <div style={{ padding: "0 16px 16px" }}>
-        <button
-          onClick={() => openJupiter(signal.token_address, "0.1")}
+      <div style={{ padding: "0 16px 16px", display: "flex", gap: 8 }}>
+        <input
+          id={`amount-${signal.token_address}`}
+          type="number"
+          defaultValue="0.1"
+          min="0.01"
+          step="0.1"
           style={{
-            width: "100%", background: "#fff", color: "#000",
+            width: "90px", background: "#111", color: "#fff",
+            border: "1px solid #333", borderRadius: 12, padding: "13px 10px",
+            fontWeight: 700, fontSize: 12, textAlign: "center",
+          }}
+          placeholder="SOL"
+        />
+        <button
+          onClick={() => {
+            const input = document.getElementById(`amount-${signal.token_address}`) as HTMLInputElement;
+            const amt = input?.value || "0.1";
+            openJupiter(signal.token_address, amt);
+          }}
+          style={{
+            flex: 1, background: "#fff", color: "#000",
             border: "none", borderRadius: 12, padding: "13px 0",
             fontWeight: 900, fontSize: 12, letterSpacing: "0.05em",
             cursor: "pointer", textTransform: "uppercase",
