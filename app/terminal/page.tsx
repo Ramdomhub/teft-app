@@ -77,7 +77,10 @@ export default function TerminalPage() {
 
         {/* TEFT Card */}
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
-          <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>$TEFT · SOLANA</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14 }}>
+            <img src="https://pump.fun/_next/image?url=https%3A%2F%2Fdd.dexscreener.com%2Fds-data%2Ftokens%2Fsolana%2F8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump.png&w=48&q=75" alt="TEFT" style={{ width: 16, height: 16, borderRadius: "50%" }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>$TEFT · SOLANA</div>
+          </div>
           {loading ? <div style={{ color: "#333", fontSize: 12 }}>Loading...</div> : teft ? <>
             <div style={{ fontSize: 24, fontWeight: 900, color: "#fff", marginBottom: 4 }}>${Number(teft.priceUsd || 0).toFixed(8)}</div>
             <div style={{ fontSize: 11, color: "#555", marginBottom: 16 }}>{pct(Number(teft.priceChange?.h24 || 0))} <span style={{ color: "#333" }}>24h change</span></div>
@@ -99,11 +102,14 @@ export default function TerminalPage() {
         {/* SOL + BTC */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
           {[
-            { label: "SOLANA", data: sol, color: "#fff" },
-            { label: "BITCOIN", data: btc, color: "#fff" },
-          ].map(({ label, data, color }) => (
+            { label: "SOLANA", data: sol, color: "#fff", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png" },
+            { label: "BITCOIN", data: btc, color: "#fff", logo: "https://assets.coingecko.com/coins/images/1/small/bitcoin.png" },
+          ].map(({ label, data, color, logo }: any) => (
             <div key={label} style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20 }}>
-              <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>{label}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14 }}>
+                {logo && <img src={logo} alt={label} style={{ width: 16, height: 16, borderRadius: "50%" }} />}
+                <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>{label}</div>
+              </div>
               {data ? <>
                 <div style={{ fontSize: 20, fontWeight: 900, color, marginBottom: 4 }}>${data.usd.toLocaleString()}</div>
                 <div style={{ fontSize: 11, marginBottom: 12 }}>{pct(data.usd_24h_change)}</div>
