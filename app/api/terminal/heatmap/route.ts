@@ -77,6 +77,7 @@ export async function GET() {
 
     const tokenAddresses = candidates.map((t: any) => t.token_address).join(",");
     let volumeMap = new Map<string, number>();
+    let mcapLiveMap = new Map<string, number>();
     try {
       const dexRes = await fetch(`https://api.dexscreener.com/tokens/v1/solana/${tokenAddresses}`, { cache: "no-store" });
       if (dexRes.ok) {
@@ -85,8 +86,10 @@ export async function GET() {
         for (const pair of pairs) {
           const addr = pair.baseToken?.address;
           const vol = pair.volume?.h24 || 0;
+          const mcap = pair.marketCap || pair.fdv || 0;
           if (addr && (!volumeMap.has(addr) || vol > (volumeMap.get(addr) || 0))) {
             volumeMap.set(addr, vol);
+            mcapLiveMap.set(addr, mcap);
           }
         }
       }
@@ -97,7 +100,7 @@ export async function GET() {
         token_address: t.token_address,
         token_name: t.token_name,
         token_symbol: t.token_symbol,
-        market_cap: t.market_cap,
+        market_cap: mcapLiveMap.get(t.token_address) || t.market_cap,
         entry_market_cap: t.entry_market_cap,
         wallet_count: t.wallets.size,
         still_holding: t.still_holding,
