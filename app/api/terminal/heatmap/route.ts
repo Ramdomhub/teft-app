@@ -19,7 +19,18 @@ export async function GET() {
       .gte("created_at", since)
       .order("created_at", { ascending: false });
 
-    if (!signals || signals.length === 0) return NextResponse.json({ heatmap: [], debug: "no signals", since });
+    // Debug: count all signals
+    const { count } = await supabase
+      .from("pulse_signals")
+      .select("*", { count: "exact", head: true });
+    
+    const { data: sample } = await supabase
+      .from("pulse_signals")
+      .select("token_address, created_at")
+      .limit(3)
+      .order("created_at", { ascending: false });
+
+    if (!signals || signals.length === 0) return NextResponse.json({ heatmap: [], debug: "no signals", since, total_count: count, sample });
 
     const { data: wallets } = await supabase
       .from("smart_wallets")
