@@ -49,6 +49,39 @@ function Tooltip({ text }: { text: string }) {
   );
 }
 
+
+function Tooltip({ text }: { text: string }) {
+  const [show, setShow] = React.useState(false);
+  return (
+    <span style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+      <span
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        onClick={() => setShow(!show)}
+        style={{
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          width: 14, height: 14, borderRadius: "50%",
+          border: "1px solid #444", color: "#444", fontSize: 9,
+          fontWeight: 900, cursor: "pointer", marginLeft: 4, flexShrink: 0,
+        }}
+      >!
+      </span>
+      {show && (
+        <span style={{
+          position: "absolute", bottom: "calc(100% + 6px)", left: "50%",
+          transform: "translateX(-50%)", background: "#1a1a1a",
+          border: "1px solid #333", borderRadius: 8, padding: "8px 10px",
+          fontSize: 10, color: "#ccc", whiteSpace: "nowrap", zIndex: 100,
+          maxWidth: 220, whiteSpace: "normal", lineHeight: 1.4,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+        }}>
+          {text}
+        </span>
+      )}
+    </span>
+  );
+}
+
 export default function TerminalPage() {
   const [teft, setTeft] = useState<any>(null);
   const [sol, setSol] = useState<any>(null);
@@ -183,14 +216,20 @@ export default function TerminalPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
               <div style={{ background: "#111", borderRadius: 8, padding: "8px 10px" }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
                   <div style={{ fontSize: 8, color: "#444", fontWeight: 800, letterSpacing: "0.08em" }}>BTC DOMINANCE</div>
+                  <Tooltip text="Wie viel % des gesamten Crypto-Marktes Bitcoin ausmacht. Über 60% = Altcoins laufen schlecht. Unter 50% = Altcoin Season." />
+                </div>
                   <Tooltip text="Wie viel % des gesamten Crypto-Marktes Bitcoin ausmacht. Über 60% = Altcoins laufen schlecht. Unter 50% = Altcoin Season." />
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 900, color: "#f7931a", marginTop: 2 }}>{globalMcap.btcDominance?.toFixed(1)}%</div>
               </div>
               <div style={{ background: "#111", borderRadius: 8, padding: "8px 10px" }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
                   <div style={{ fontSize: 8, color: "#444", fontWeight: 800, letterSpacing: "0.08em" }}>SOL TPS</div>
+                  <Tooltip text="Transactions per Second auf Solana. Normal: 1000-3000 TPS. Über 4000 = Netzwerk unter Last. Niedrig = ruhiger Markt." />
+                </div>
                   <Tooltip text="Transactions per Second auf Solana. Normal: 1000-3000 TPS. Über 4000 = Netzwerk unter Last. Niedrig = ruhiger Markt." />
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 900, color: "#9945ff", marginTop: 2 }}>{solTps ?? "—"}</div>
@@ -270,9 +309,27 @@ export default function TerminalPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
               <span style={{ fontSize: 16 }}>🧠</span>
               <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ display: "flex", alignItems: "center" }}>
                 <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>SMART MONEY HEATMAP · LAST 24H</div>
                 <Tooltip text="Zeigt welche Tokens unsere 25 verifizierten Smart Money Wallets in den letzten 24h gekauft haben. Je mehr Wallets (W), desto stärker das Signal." />
               </div>
+                <Tooltip text="Zeigt welche Tokens unsere 25 verifizierten Smart Money Wallets in den letzten 24h gekauft haben. Je mehr Wallets (W), desto stärker das Signal." />
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <div style={{ background: "#f97316", borderRadius: 4, padding: "2px 6px", fontSize: 9, fontWeight: 900, color: "#000" }}>5W+</div>
+                <span style={{ fontSize: 9, color: "#555" }}>HOT</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <div style={{ background: "#eab308", borderRadius: 4, padding: "2px 6px", fontSize: 9, fontWeight: 900, color: "#000" }}>3W+</div>
+                <span style={{ fontSize: 9, color: "#555" }}>WARM</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <div style={{ background: "#4ade80", borderRadius: 4, padding: "2px 6px", fontSize: 9, fontWeight: 900, color: "#000" }}>1W+</div>
+                <span style={{ fontSize: 9, color: "#555" }}>SIGNAL</span>
+              </div>
+              <span style={{ fontSize: 9, color: "#333", marginLeft: "auto" }}>🔒 Full details on Pulse →</span>
             </div>
             <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -332,6 +389,7 @@ export default function TerminalPage() {
                   </a>
                 );
               })}
+            </div>
             </div>
             </div>
           </div>
