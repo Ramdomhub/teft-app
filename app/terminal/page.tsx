@@ -234,7 +234,7 @@ export default function TerminalPage() {
                 const heat = token.wallet_count >= 5 ? "#f97316" : token.wallet_count >= 3 ? "#eab308" : "#4ade80";
                 const mcapChange = token.mcap_change;
                 return (
-                  
+                  <a
                     key={token.token_address}
                     href={`https://dexscreener.com/solana/${token.token_address}`}
                     target="_blank"
