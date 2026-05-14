@@ -24,11 +24,10 @@ export async function GET() {
       .from("pulse_signals")
       .select("*", { count: "exact", head: true });
     
-    const { data: sample } = await supabase
+    const { data: sample, error: sampleError } = await supabase
       .from("pulse_signals")
       .select("token_address, created_at")
-      .limit(3)
-      .order("created_at", { ascending: false });
+      .limit(3);
 
     if (!signals || signals.length === 0) return NextResponse.json({ heatmap: [], debug: "no signals", since, total_count: count, sample });
 
