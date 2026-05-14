@@ -186,7 +186,7 @@ export default function TerminalPage() {
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <div style={{ display: "flex", alignItems: "center" }}>
                   <div style={{ fontSize: 8, color: "#444", fontWeight: 800, letterSpacing: "0.08em" }}>BTC DOMINANCE</div>
-                  <Tooltip text="Wie viel % des gesamten Crypto-Marktes Bitcoin ausmacht. Über 60% = Altcoins laufen schlecht. Unter 50% = Altcoin Season." />
+                  <Tooltip text="Bitcoin's share of the total crypto market. Above 60% = Altcoins underperforming. Below 50% = Altcoin Season." />
                 </div>
                   
                 </div>
@@ -196,7 +196,7 @@ export default function TerminalPage() {
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <div style={{ display: "flex", alignItems: "center" }}>
                   <div style={{ fontSize: 8, color: "#444", fontWeight: 800, letterSpacing: "0.08em" }}>SOL TPS</div>
-                  <Tooltip text="Transactions per Second auf Solana. Normal: 1000-3000 TPS. Über 4000 = Netzwerk unter Last. Niedrig = ruhiger Markt." />
+                  <Tooltip text="Transactions per Second on Solana. Normal: 1000-3000 TPS. Above 4000 = network under load. Low = quiet market." />
                 </div>
                   
                 </div>
@@ -210,7 +210,7 @@ export default function TerminalPage() {
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
           <div style={{ display: "flex", alignItems: "center", marginBottom: 14 }}>
             <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>FEAR & GREED INDEX</div>
-            <Tooltip text="Misst die Marktstimmung von 0 (Extreme Fear) bis 100 (Extreme Greed). Unter 25 = guter Kaufzeitpunkt. Über 75 = Vorsicht geboten." />
+            <Tooltip text="Measures market sentiment from 0 (Extreme Fear) to 100 (Extreme Greed). Below 25 = potential buy zone. Above 75 = caution advised." />
           </div>
           {fg ? <>
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 14 }}>
@@ -279,7 +279,7 @@ export default function TerminalPage() {
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
                 <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>SMART MONEY HEATMAP · LAST 24H</div>
-                <Tooltip text="Zeigt welche Tokens unsere 25 verifizierten Smart Money Wallets in den letzten 24h gekauft haben. Je mehr Wallets (W), desto stärker das Signal." />
+                <Tooltip text="Shows which tokens our 25 verified Smart Money wallets bought in the last 24h. More wallets (W) = stronger signal." />
               </div>
                 
               </div>
