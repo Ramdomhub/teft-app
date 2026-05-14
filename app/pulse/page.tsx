@@ -127,7 +127,39 @@ function TokenGate({ children }: { children: React.ReactNode }) {
     if (!connected || !publicKey) { 
       setHasAccess(false); setChecked(false); setShowPulse(false); setSigned(false); return; 
     }
-    // Auto-sign on connect
+
+    // Check localStorage cache (24h valid)
+    const cacheKey = `teft_session_${publicKey.toString()}`;
+    const cached = localStorage.getItem(cacheKey);
+    const SESSION_TTL = 24 * 60 * 60 * 1000; // 24h
+
+    const checkBalance = () => {
+      setChecking(true);
+      const conn = new Connection(RPC);
+      conn.getParsedTokenAccountsByOwner(publicKey, { mint: new PublicKey(TEFT_MINT) })
+        .then(res => {
+          const amount = res.value?.[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount ?? 0;
+          setTeftBalance(amount);
+          setHasAccess(amount >= 1);
+          setChecked(true);
+        })
+        .catch(() => { setHasAccess(false); setChecked(false); })
+        .finally(() => setChecking(false));
+    };
+
+    if (cached) {
+      try {
+        const { timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp < SESSION_TTL) {
+          // Session still valid — skip signing
+          setSigned(true);
+          checkBalance();
+          return;
+        }
+      } catch {}
+    }
+
+    // No valid session — sign once
     if (!signed && signMessage) {
       setSigning(true);
       const msg = new TextEncoder().encode("Welcome to TEFT Pulse. Sign to verify wallet ownership.");
@@ -135,20 +167,11 @@ function TokenGate({ children }: { children: React.ReactNode }) {
         .then(() => {
           setSigned(true);
           setSigning(false);
-          // Now check TEFT balance
-          setChecking(true);
-          const conn = new Connection(RPC);
-          return conn.getParsedTokenAccountsByOwner(publicKey, { mint: new PublicKey(TEFT_MINT) });
+          // Save session
+          localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now() }));
+          checkBalance();
         })
-        .then(res => {
-          if (!res) return;
-          const amount = res.value?.[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount ?? 0;
-          setTeftBalance(amount);
-          setHasAccess(amount >= 1);
-          setChecked(true);
-        })
-        .catch(() => { setSigning(false); setHasAccess(false); setChecked(false); })
-        .finally(() => setChecking(false));
+        .catch(() => { setSigning(false); setHasAccess(false); setChecked(false); });
     }
   }, [connected, publicKey, signed, signMessage]);
 
