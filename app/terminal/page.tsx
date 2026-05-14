@@ -333,12 +333,6 @@ export default function TerminalPage() {
             )}
           </div>
         )}
-                        {token.volume_24h > 0 && (
-                          <div style={{ fontSize: 9, color: "#444", marginTop: 2 }}>
-                            {token.volume_h6 > 0 && <span style={{ color: "#555" }}>6h ${(token.volume_h6/1000).toFixed(0)}K · </span>}
-                            24h ${(token.volume_24h/1000).toFixed(0)}K
-                          </div>
-                        )}
                       </div>
                     </div>
                   </a>
