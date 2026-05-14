@@ -275,7 +275,7 @@ export default function TerminalPage() {
         {/* Smart Money Heatmap */}
         {heatmap.length > 0 && (
           <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
+            <div onClick={() => setHeatmapOpen(!heatmapOpen)} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: heatmapOpen ? 16 : 0, cursor: "pointer" }}>
               <span style={{ fontSize: 16 }}>🧠</span>
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
