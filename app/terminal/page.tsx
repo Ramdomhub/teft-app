@@ -390,8 +390,6 @@ export default function TerminalPage() {
                 );
               })}
             </div>
-            </div>
-            </div>
           </div>
         )}
 
