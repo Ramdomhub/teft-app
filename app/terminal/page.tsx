@@ -333,9 +333,10 @@ export default function TerminalPage() {
                             {token.market_cap >= 1_000_000 ? `${(token.market_cap/1_000_000).toFixed(1)}M` : `${(token.market_cap/1_000).toFixed(0)}K`}
                           </div>
                         )}
-                        {mcapChange !== null && (
-                          <div style={{ fontSize: 10, fontWeight: 700, color: mcapChange >= 0 ? "#4ade80" : "#f87171" }}>
-                            {mcapChange >= 0 ? "+" : ""}{mcapChange.toFixed(0)}%
+                        {token.volume_24h > 0 && (
+                          <div style={{ fontSize: 9, color: "#444", marginTop: 2 }}>
+                            {token.volume_h6 > 0 && <span style={{ color: "#555" }}>6h ${(token.volume_h6/1000).toFixed(0)}K · </span>}
+                            24h ${(token.volume_24h/1000).toFixed(0)}K
                           </div>
                         )}
                       </div>

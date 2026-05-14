@@ -78,6 +78,8 @@ export async function GET() {
     const tokenAddresses = candidates.map((t: any) => t.token_address).join(",");
     let volumeMap = new Map<string, number>();
     let mcapLiveMap = new Map<string, number>();
+    let volH6Map = new Map<string, number>();
+    let volM5Map = new Map<string, number>();
     try {
       const dexRes = await fetch(`https://api.dexscreener.com/tokens/v1/solana/${tokenAddresses}`, { cache: "no-store" });
       if (dexRes.ok) {
@@ -90,6 +92,8 @@ export async function GET() {
           if (addr && (!volumeMap.has(addr) || vol > (volumeMap.get(addr) || 0))) {
             volumeMap.set(addr, vol);
             mcapLiveMap.set(addr, mcap);
+            volH6Map.set(addr, pair.volume?.h6 || 0);
+            volM5Map.set(addr, pair.volume?.m5 || 0);
           }
         }
       }
@@ -107,6 +111,8 @@ export async function GET() {
         avg_win_rate: t.win_rates.length > 0 ? Math.round(t.win_rates.reduce((a: number, b: number) => a + b, 0) / t.win_rates.length) : null,
         mcap_change: t.entry_market_cap > 0 ? ((t.market_cap - t.entry_market_cap) / t.entry_market_cap * 100) : null,
         volume_24h: volumeMap.get(t.token_address) || 0,
+        volume_h6: volH6Map.get(t.token_address) || 0,
+        volume_m5: volM5Map.get(t.token_address) || 0,
       }))
       .sort((a: any, b: any) => (b.wallet_count * 10 + (b.avg_win_rate || 0) / 10) - (a.wallet_count * 10 + (a.avg_win_rate || 0) / 10))
       .slice(0, 15);
