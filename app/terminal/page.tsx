@@ -323,7 +323,7 @@ export default function TerminalPage() {
                           </div>
                           <div style={{ fontSize: 9, color: "#444", marginTop: 1 }}>
                             {token.avg_win_rate ? `⚡ ${token.avg_win_rate}% win-rate` : ""}
-                            {token.still_holding > 0 ? ` · ${token.still_holding} still holding` : ""}
+                            
                           </div>
                         </div>
                       </div>
