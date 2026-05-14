@@ -1,0 +1,81 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
+export async function GET() {
+  try {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+    const { data: signals } = await supabase
+      .from("pulse_signals")
+      .select("token_address, token_name, token_symbol, wallet_address, entry_market_cap, market_cap")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false });
+
+    if (!signals || signals.length === 0) return NextResponse.json({ heatmap: [] });
+
+    const { data: wallets } = await supabase
+      .from("smart_wallets")
+      .select("wallet_address, win_rate")
+      .eq("active", true);
+
+    const walletMap = new Map(wallets?.map((w: any) => [w.wallet_address, w]) || []);
+
+    const { data: sells } = await supabase
+      .from("smart_wallet_sells")
+      .select("token_address, wallet_address")
+      .gte("created_at", since);
+
+    const sellSet = new Set(sells?.map((s: any) => `${s.wallet_address}-${s.token_address}`) || []);
+
+    const tokenMap = new Map<string, any>();
+    for (const signal of signals) {
+      const key = signal.token_address;
+      if (!tokenMap.has(key)) {
+        tokenMap.set(key, {
+          token_address: signal.token_address,
+          token_name: signal.token_name,
+          token_symbol: signal.token_symbol,
+          market_cap: signal.market_cap,
+          entry_market_cap: signal.entry_market_cap,
+          wallets: new Set(),
+          win_rates: [],
+          still_holding: 0,
+        });
+      }
+      const entry = tokenMap.get(key);
+      const wallet = walletMap.get(signal.wallet_address);
+      if (!entry.wallets.has(signal.wallet_address)) {
+        entry.wallets.add(signal.wallet_address);
+        if (wallet?.win_rate) entry.win_rates.push(wallet.win_rate);
+        if (!sellSet.has(`${signal.wallet_address}-${signal.token_address}`)) entry.still_holding++;
+      }
+    }
+
+    const heatmap = Array.from(tokenMap.values())
+      .map((t: any) => ({
+        token_address: t.token_address,
+        token_name: t.token_name,
+        token_symbol: t.token_symbol,
+        market_cap: t.market_cap,
+        entry_market_cap: t.entry_market_cap,
+        wallet_count: t.wallets.size,
+        still_holding: t.still_holding,
+        avg_win_rate: t.win_rates.length > 0 ? Math.round(t.win_rates.reduce((a: number, b: number) => a + b, 0) / t.win_rates.length) : null,
+        mcap_change: t.entry_market_cap > 0 ? ((t.market_cap - t.entry_market_cap) / t.entry_market_cap * 100) : null,
+      }))
+      .sort((a: any, b: any) => (b.wallet_count * 10 + (b.avg_win_rate || 0) / 10) - (a.wallet_count * 10 + (a.avg_win_rate || 0) / 10))
+      .slice(0, 15);
+
+    return NextResponse.json({ heatmap });
+  } catch (e: any) {
+    return NextResponse.json({ heatmap: [], error: e.message });
+  }
+}
