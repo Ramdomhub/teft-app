@@ -299,21 +299,7 @@ export default function TerminalPage() {
               </div>
               <span style={{ fontSize: 9, color: "#333", marginLeft: "auto" }}>🔒 Full details on Pulse →</span>
             </div>
-            <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <div style={{ background: "#f97316", borderRadius: 4, padding: "2px 6px", fontSize: 9, fontWeight: 900, color: "#000" }}>5W+</div>
-                <span style={{ fontSize: 9, color: "#555" }}>HOT</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <div style={{ background: "#eab308", borderRadius: 4, padding: "2px 6px", fontSize: 9, fontWeight: 900, color: "#000" }}>3W+</div>
-                <span style={{ fontSize: 9, color: "#555" }}>WARM</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <div style={{ background: "#4ade80", borderRadius: 4, padding: "2px 6px", fontSize: 9, fontWeight: 900, color: "#000" }}>1W+</div>
-                <span style={{ fontSize: 9, color: "#555" }}>SIGNAL</span>
-              </div>
-              <span style={{ fontSize: 9, color: "#333", marginLeft: "auto" }}>🔒 Full details on Pulse →</span>
-            </div>
+            
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 6 }}>
               {heatmap.map((token: any) => {
                 const heat = token.wallet_count >= 5 ? "#f97316" : token.wallet_count >= 3 ? "#eab308" : "#4ade80";
