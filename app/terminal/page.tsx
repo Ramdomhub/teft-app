@@ -63,6 +63,7 @@ export default function TerminalPage() {
   const [globalMcap, setGlobalMcap] = useState<any>(null);
   const [solTps, setSolTps] = useState<number | null>(null);
   const [heatmap, setHeatmap] = useState<any[]>([]);
+  const [heatmapOpen, setHeatmapOpen] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -284,7 +285,7 @@ export default function TerminalPage() {
                 
               </div>
             </div>
-            <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
+            {heatmapOpen && <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                 <div style={{ background: "#f97316", borderRadius: 4, padding: "2px 6px", fontSize: 9, fontWeight: 900, color: "#000" }}>5W+</div>
                 <span style={{ fontSize: 9, color: "#555" }}>HOT</span>
@@ -298,9 +299,9 @@ export default function TerminalPage() {
                 <span style={{ fontSize: 9, color: "#555" }}>SIGNAL</span>
               </div>
               <span style={{ fontSize: 9, color: "#333", marginLeft: "auto" }}>🔒 Full details on Pulse →</span>
-            </div>
+            </div>}
             
-            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 6 }}>
+            {heatmapOpen && <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 6 }}>
               {heatmap.map((token: any) => {
                 const heat = token.wallet_count >= 5 ? "#f97316" : token.wallet_count >= 3 ? "#eab308" : "#4ade80";
                 const mcapChange = token.mcap_change;

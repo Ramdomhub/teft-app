@@ -75,29 +75,41 @@ export async function GET() {
       .filter((t: any) => (t.market_cap || 0) >= 7000)
       .slice(0, 30);
 
-    const tokenAddresses = candidates.map((t: any) => t.token_address).join(",");
     let volumeMap = new Map<string, number>();
     let mcapLiveMap = new Map<string, number>();
     let volH6Map = new Map<string, number>();
+    let volH1Map = new Map<string, number>();
     let volM5Map = new Map<string, number>();
-    try {
-      const dexRes = await fetch(`https://api.dexscreener.com/tokens/v1/solana/${tokenAddresses}`, { cache: "no-store" });
-      if (dexRes.ok) {
-        const dexData = await dexRes.json();
-        const pairs = Array.isArray(dexData) ? dexData : dexData?.pairs ?? [];
-        for (const pair of pairs) {
-          const addr = pair.baseToken?.address;
-          const vol = pair.volume?.h24 || 0;
-          const mcap = pair.marketCap || pair.fdv || 0;
-          if (addr && (!volumeMap.has(addr) || vol > (volumeMap.get(addr) || 0))) {
-            volumeMap.set(addr, vol);
-            mcapLiveMap.set(addr, mcap);
-            volH6Map.set(addr, pair.volume?.h6 || 0);
-            volM5Map.set(addr, pair.volume?.m5 || 0);
+    let holdingMap = new Map<string, number>();
+
+    // DexScreener in Batches von 10
+    const tokenAddresses = candidates.map((t: any) => t.token_address);
+    const batches = [];
+    for (let i = 0; i < tokenAddresses.length; i += 10) {
+      batches.push(tokenAddresses.slice(i, i + 10));
+    }
+    for (const batch of batches) {
+      try {
+        const dexRes = await fetch(`https://api.dexscreener.com/tokens/v1/solana/${batch.join(",")}`, { cache: "no-store" });
+        if (dexRes.ok) {
+          const dexData = await dexRes.json();
+          const pairs = Array.isArray(dexData) ? dexData : [];
+          for (const pair of pairs) {
+            const addr = pair.baseToken?.address;
+            if (!addr) continue;
+            const vol24 = pair.volume?.h24 || 0;
+            const existing = volumeMap.get(addr) || 0;
+            if (vol24 > existing) {
+              volumeMap.set(addr, vol24);
+              mcapLiveMap.set(addr, pair.marketCap || pair.fdv || 0);
+              volH6Map.set(addr, pair.volume?.h6 || 0);
+              volH1Map.set(addr, pair.volume?.h1 || 0);
+              volM5Map.set(addr, pair.volume?.m5 || 0);
+            }
           }
         }
-      }
-    } catch {}
+      } catch {}
+    }
 
     const heatmap = candidates
       .map((t: any) => ({
@@ -112,10 +124,11 @@ export async function GET() {
         mcap_change: t.entry_market_cap > 0 ? ((t.market_cap - t.entry_market_cap) / t.entry_market_cap * 100) : null,
         volume_24h: volumeMap.get(t.token_address) || 0,
         volume_h6: volH6Map.get(t.token_address) || 0,
+        volume_h1: volH1Map.get(t.token_address) || 0,
         volume_m5: volM5Map.get(t.token_address) || 0,
       }))
       .sort((a: any, b: any) => (b.wallet_count * 10 + (b.avg_win_rate || 0) / 10) - (a.wallet_count * 10 + (a.avg_win_rate || 0) / 10))
-      .slice(0, 15);
+      .slice(0, 10);
 
     return NextResponse.json({ heatmap });
   } catch (e: any) {
