@@ -16,8 +16,8 @@ export async function GET() {
     const { data: signals } = await supabase
       .from("pulse_signals")
       .select("token_address, token_name, token_symbol, wallet_address, entry_market_cap, market_cap")
-      .gte("created_at", since)
-      .order("created_at", { ascending: false });
+      .gte("detected_at", since)
+      .order("detected_at", { ascending: false });
 
     // Debug: count all signals
     const { count } = await supabase
@@ -26,7 +26,7 @@ export async function GET() {
     
     const { data: sample, error: sampleError } = await supabase
       .from("pulse_signals")
-      .select("token_address, created_at")
+      .select("token_address, detected_at")
       .limit(3);
 
     if (!signals || signals.length === 0) return NextResponse.json({ heatmap: [], debug: "no signals", since, total_count: count, sample, url: process.env.NEXT_PUBLIC_SUPABASE_URL?.slice(0,30) });
@@ -41,7 +41,7 @@ export async function GET() {
     const { data: sells } = await supabase
       .from("smart_wallet_sells")
       .select("token_address, wallet_address")
-      .gte("created_at", since);
+      .gte("detected_at", since);
 
     const sellSet = new Set(sells?.map((s: any) => `${s.wallet_address}-${s.token_address}`) || []);
 
