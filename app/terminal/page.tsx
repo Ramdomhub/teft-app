@@ -323,6 +323,7 @@ export default function TerminalPage() {
                             {token.volume_m5 > 0 && <span style={{ color: "#555" }}>5m {fmtVol(token.volume_m5)}</span>}
                             {token.volume_h1 > 0 && <span style={{ color: h1Color }}>1h {fmtVol(token.volume_h1)}</span>}
                             {token.volume_24h > 0 && <span style={{ color: "#555" }}>24h {fmtVol(token.volume_24h)}</span>}
+                          </div>
                         </div>
                       </div>
                     </a>
