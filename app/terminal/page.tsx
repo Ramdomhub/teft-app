@@ -188,7 +188,7 @@ export default function TerminalPage() {
                   <div style={{ fontSize: 8, color: "#444", fontWeight: 800, letterSpacing: "0.08em" }}>BTC DOMINANCE</div>
                   <Tooltip text="Wie viel % des gesamten Crypto-Marktes Bitcoin ausmacht. Über 60% = Altcoins laufen schlecht. Unter 50% = Altcoin Season." />
                 </div>
-                  <Tooltip text="Wie viel % des gesamten Crypto-Marktes Bitcoin ausmacht. Über 60% = Altcoins laufen schlecht. Unter 50% = Altcoin Season." />
+                  
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 900, color: "#f7931a", marginTop: 2 }}>{globalMcap.btcDominance?.toFixed(1)}%</div>
               </div>
@@ -198,7 +198,7 @@ export default function TerminalPage() {
                   <div style={{ fontSize: 8, color: "#444", fontWeight: 800, letterSpacing: "0.08em" }}>SOL TPS</div>
                   <Tooltip text="Transactions per Second auf Solana. Normal: 1000-3000 TPS. Über 4000 = Netzwerk unter Last. Niedrig = ruhiger Markt." />
                 </div>
-                  <Tooltip text="Transactions per Second auf Solana. Normal: 1000-3000 TPS. Über 4000 = Netzwerk unter Last. Niedrig = ruhiger Markt." />
+                  
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 900, color: "#9945ff", marginTop: 2 }}>{solTps ?? "—"}</div>
               </div>
@@ -281,7 +281,7 @@ export default function TerminalPage() {
                 <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>SMART MONEY HEATMAP · LAST 24H</div>
                 <Tooltip text="Zeigt welche Tokens unsere 25 verifizierten Smart Money Wallets in den letzten 24h gekauft haben. Je mehr Wallets (W), desto stärker das Signal." />
               </div>
-                <Tooltip text="Zeigt welche Tokens unsere 25 verifizierten Smart Money Wallets in den letzten 24h gekauft haben. Je mehr Wallets (W), desto stärker das Signal." />
+                
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
