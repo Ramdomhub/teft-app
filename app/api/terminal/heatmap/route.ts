@@ -33,10 +33,10 @@ export async function GET() {
 
     const { data: wallets } = await supabase
       .from("smart_wallets")
-      .select("wallet_address, win_rate")
+      .select("address, win_rate")
       .eq("active", true);
 
-    const walletMap = new Map(wallets?.map((w: any) => [w.wallet_address, w]) || []);
+    const walletMap = new Map(wallets?.map((w: any) => [w.address, w]) || []);
 
     const { data: sells } = await supabase
       .from("smart_wallet_sells")
