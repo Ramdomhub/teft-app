@@ -79,7 +79,7 @@ export default function TerminalPage() {
         setTreasury(data.treasury || null);
         setHolders(data.holders || null);
         setGlobalMcap(data.globalMcap || null);
-        setSolTps(data.solTps || null);
+
       } catch (e) { console.error(e); }
       finally {
         setLoading(false);
@@ -100,7 +100,18 @@ export default function TerminalPage() {
     loadHeatmap();
     const heatmapInterval = setInterval(loadHeatmap, 120_000);
 
-    return () => { clearInterval(interval); clearInterval(heatmapInterval); };
+    // TPS separat laden - alle 5 Minuten
+    async function loadTps() {
+      try {
+        const res = await fetch("/api/terminal/tps");
+        const data = await res.json();
+        if (data.tps) setSolTps(data.tps);
+      } catch {}
+    }
+    loadTps();
+    const tpsInterval = setInterval(loadTps, 5 * 60 * 1000);
+
+    return () => { clearInterval(interval); clearInterval(heatmapInterval); clearInterval(tpsInterval); };
   }, []);
 
   const fgValue = parseInt(fg?.value || "0");

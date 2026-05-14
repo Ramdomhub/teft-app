@@ -9,15 +9,10 @@ const DAILY_DISTRIBUTION = 500; // TEFT per NFT per day
 
 export async function GET() {
   try {
-    const [teftRes, cgRes, globalRes, tpsRes, fgRes, news1Res, news2Res, news3Res, holdersRes, treasuryRes] = await Promise.allSettled([
+    const [teftRes, cgRes, globalRes, fgRes, news1Res, news2Res, news3Res, holdersRes, treasuryRes] = await Promise.allSettled([
       fetch(`https://api.dexscreener.com/tokens/v1/solana/${TEFT_MINT}`, { cache: "no-store" }),
       fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana,bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true"),
       fetch("https://api.coingecko.com/api/v3/global"),
-      fetch(`https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jsonrpc: "2.0", id: 3, method: "getRecentPerformanceSamples", params: [1] })
-      }),
       fetch("https://api.alternative.me/fng/?limit=1"),
       fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fcointelegraph.com%2Frss"),
       fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fnews.bitcoin.com%2Ffeed%2F"),
@@ -108,18 +103,6 @@ export async function GET() {
       } catch {}
     }
 
-    // SOL TPS
-    let solTps = null;
-    if (tpsRes.status === "fulfilled" && tpsRes.value.ok) {
-      try {
-        const tpsData = await tpsRes.value.json();
-        const sample = tpsData.result?.[0];
-        if (sample) {
-          solTps = Math.round(sample.numTransactions / sample.samplePeriodSecs);
-        }
-      } catch {}
-    }
-
     // Global Market Cap
     let globalMcap = null;
     if (globalRes.status === "fulfilled" && globalRes.value.ok) {
@@ -133,7 +116,7 @@ export async function GET() {
       } catch {}
     }
 
-    return NextResponse.json({ teft, cg, fg, news, holders, treasury, globalMcap, solTps });
+    return NextResponse.json({ teft, cg, fg, news, holders, treasury, globalMcap});
   } catch (e) {
     return NextResponse.json({ teft: null, cg: null, fg: null, news: [] });
   }
