@@ -50,38 +50,6 @@ function Tooltip({ text }: { text: string }) {
 }
 
 
-function Tooltip({ text }: { text: string }) {
-  const [show, setShow] = React.useState(false);
-  return (
-    <span style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
-      <span
-        onMouseEnter={() => setShow(true)}
-        onMouseLeave={() => setShow(false)}
-        onClick={() => setShow(!show)}
-        style={{
-          display: "inline-flex", alignItems: "center", justifyContent: "center",
-          width: 14, height: 14, borderRadius: "50%",
-          border: "1px solid #444", color: "#444", fontSize: 9,
-          fontWeight: 900, cursor: "pointer", marginLeft: 4, flexShrink: 0,
-        }}
-      >!
-      </span>
-      {show && (
-        <span style={{
-          position: "absolute", bottom: "calc(100% + 6px)", left: "50%",
-          transform: "translateX(-50%)", background: "#1a1a1a",
-          border: "1px solid #333", borderRadius: 8, padding: "8px 10px",
-          fontSize: 10, color: "#ccc", whiteSpace: "nowrap", zIndex: 100,
-          maxWidth: 220, whiteSpace: "normal", lineHeight: 1.4,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
-        }}>
-          {text}
-        </span>
-      )}
-    </span>
-  );
-}
-
 export default function TerminalPage() {
   const [teft, setTeft] = useState<any>(null);
   const [sol, setSol] = useState<any>(null);
