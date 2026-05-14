@@ -69,7 +69,30 @@ export async function GET() {
       }
     }
 
-    const heatmap = Array.from(tokenMap.values())
+
+    // DexScreener Volume Check
+    const candidates = Array.from(tokenMap.values())
+      .filter((t: any) => (t.market_cap || 0) >= 7000)
+      .slice(0, 30);
+
+    const tokenAddresses = candidates.map((t: any) => t.token_address).join(",");
+    let volumeMap = new Map<string, number>();
+    try {
+      const dexRes = await fetch(`https://api.dexscreener.com/tokens/v1/solana/${tokenAddresses}`, { cache: "no-store" });
+      if (dexRes.ok) {
+        const dexData = await dexRes.json();
+        const pairs = Array.isArray(dexData) ? dexData : dexData?.pairs ?? [];
+        for (const pair of pairs) {
+          const addr = pair.baseToken?.address;
+          const vol = pair.volume?.h24 || 0;
+          if (addr && (!volumeMap.has(addr) || vol > (volumeMap.get(addr) || 0))) {
+            volumeMap.set(addr, vol);
+          }
+        }
+      }
+    } catch {}
+
+    const heatmap = candidates
       .map((t: any) => ({
         token_address: t.token_address,
         token_name: t.token_name,
@@ -80,6 +103,7 @@ export async function GET() {
         still_holding: t.still_holding,
         avg_win_rate: t.win_rates.length > 0 ? Math.round(t.win_rates.reduce((a: number, b: number) => a + b, 0) / t.win_rates.length) : null,
         mcap_change: t.entry_market_cap > 0 ? ((t.market_cap - t.entry_market_cap) / t.entry_market_cap * 100) : null,
+        volume_24h: volumeMap.get(t.token_address) || 0,
       }))
       .sort((a: any, b: any) => (b.wallet_count * 10 + (b.avg_win_rate || 0) / 10) - (a.wallet_count * 10 + (a.avg_win_rate || 0) / 10))
       .slice(0, 15);
