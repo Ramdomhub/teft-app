@@ -668,19 +668,44 @@ function SignalCard({ signal }: { signal: Signal }) {
       </div>
 
       {/* Buy Button */}
-      <div style={{ padding: "0 16px 16px", display: "flex", gap: 8 }}>
+      <div style={{ padding: "0 16px 16px" }}>
+        <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+          {["0.01", "0.1", "0.5", "1.0"].map((amt) => (
+            <button
+              key={amt}
+              id={`preset-${signal.token_address}-${amt}`}
+              onClick={() => {
+                document.querySelectorAll(`[id^="preset-${signal.token_address}-"]`).forEach((el) => {
+                  (el as HTMLButtonElement).style.background = "#1a1a1a";
+                  (el as HTMLButtonElement).style.color = "#888";
+                  (el as HTMLButtonElement).style.border = "1px solid #333";
+                });
+                const el = document.getElementById(`preset-${signal.token_address}-${amt}`) as HTMLButtonElement;
+                el.style.background = "#fff";
+                el.style.color = "#000";
+                el.style.border = "1px solid #fff";
+                (document.getElementById(`amount-${signal.token_address}`) as HTMLInputElement).value = amt;
+              }}
+              style={{
+                flex: 1, background: amt === "0.1" ? "#fff" : "#1a1a1a",
+                color: amt === "0.1" ? "#000" : "#888",
+                border: amt === "0.1" ? "1px solid #fff" : "1px solid #333",
+                borderRadius: 10, padding: "8px 0",
+                fontWeight: 800, fontSize: 11, cursor: "pointer",
+              }}
+            >
+              {amt}
+            </button>
+          ))}
+          <span style={{ color: "#555", fontSize: 11, fontWeight: 700, alignSelf: "center", paddingLeft: 4 }}>SOL</span>
+        </div>
         <input
           id={`amount-${signal.token_address}`}
           type="number"
           defaultValue="0.1"
           min="0.01"
-          step="0.1"
-          style={{
-            width: "90px", background: "#111", color: "#fff",
-            border: "1px solid #333", borderRadius: 12, padding: "13px 10px",
-            fontWeight: 700, fontSize: 12, textAlign: "center",
-          }}
-          placeholder="SOL"
+          step="0.01"
+          style={{ display: "none" }}
         />
         <button
           onClick={() => {
@@ -689,7 +714,7 @@ function SignalCard({ signal }: { signal: Signal }) {
             openJupiter(signal.token_address, amt);
           }}
           style={{
-            flex: 1, background: "#fff", color: "#000",
+            width: "100%", background: "#fff", color: "#000",
             border: "none", borderRadius: 12, padding: "13px 0",
             fontWeight: 900, fontSize: 12, letterSpacing: "0.05em",
             cursor: "pointer", textTransform: "uppercase",
