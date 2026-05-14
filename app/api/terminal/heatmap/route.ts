@@ -6,7 +6,7 @@ export const revalidate = 0;
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 export async function GET() {
@@ -29,7 +29,7 @@ export async function GET() {
       .select("token_address, created_at")
       .limit(3);
 
-    if (!signals || signals.length === 0) return NextResponse.json({ heatmap: [], debug: "no signals", since, total_count: count, sample });
+    if (!signals || signals.length === 0) return NextResponse.json({ heatmap: [], debug: "no signals", since, total_count: count, sample, url: process.env.NEXT_PUBLIC_SUPABASE_URL?.slice(0,30) });
 
     const { data: wallets } = await supabase
       .from("smart_wallets")
