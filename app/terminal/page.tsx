@@ -27,6 +27,7 @@ export default function TerminalPage() {
   const [treasury, setTreasury] = useState<any>(null);
   const [lastUpdate, setLastUpdate] = useState("");
   const [globalMcap, setGlobalMcap] = useState<any>(null);
+  const [solTps, setSolTps] = useState<number | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -42,6 +43,7 @@ export default function TerminalPage() {
         setTreasury(data.treasury || null);
         setHolders(data.holders || null);
         setGlobalMcap(data.globalMcap || null);
+        setSolTps(data.solTps || null);
       } catch (e) { console.error(e); }
       finally {
         setLoading(false);
@@ -131,7 +133,17 @@ export default function TerminalPage() {
               <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>GLOBAL CRYPTO MARKET CAP</div>
             </div>
             <div style={{ fontSize: 28, fontWeight: 900, color: "#fff", marginBottom: 4 }}>{fmt(globalMcap.usd)}</div>
-            <div style={{ fontSize: 11 }}>{pct(globalMcap.change)}</div>
+            <div style={{ fontSize: 11, marginBottom: 16 }}>{pct(globalMcap.change)}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <div style={{ background: "#111", borderRadius: 8, padding: "8px 10px" }}>
+                <div style={{ fontSize: 8, color: "#444", fontWeight: 800, letterSpacing: "0.08em" }}>BTC DOMINANCE</div>
+                <div style={{ fontSize: 16, fontWeight: 900, color: "#f7931a", marginTop: 2 }}>{globalMcap.btcDominance?.toFixed(1)}%</div>
+              </div>
+              <div style={{ background: "#111", borderRadius: 8, padding: "8px 10px" }}>
+                <div style={{ fontSize: 8, color: "#444", fontWeight: 800, letterSpacing: "0.08em" }}>SOL TPS</div>
+                <div style={{ fontSize: 16, fontWeight: 900, color: "#9945ff", marginTop: 2 }}>{solTps ?? "—"}</div>
+              </div>
+            </div>
           </div>
         )}
 
