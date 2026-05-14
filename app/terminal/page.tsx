@@ -301,39 +301,38 @@ export default function TerminalPage() {
               <span style={{ fontSize: 9, color: "#333", marginLeft: "auto" }}>🔒 Full details on Pulse →</span>
             </div>}
             
-            {heatmapOpen && <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 6 }}>
-              {heatmap.map((token: any) => {
-                const heat = token.wallet_count >= 5 ? "#f97316" : token.wallet_count >= 3 ? "#eab308" : "#4ade80";
-                const mcapChange = token.mcap_change;
-                return (
-                  <a
-                    key={token.token_address}
-                    href={`https://dexscreener.com/solana/${token.token_address}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ textDecoration: "none" }}
-                  >
-                    <div style={{ background: "#111", borderRadius: 12, padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ background: heat, borderRadius: 6, padding: "3px 8px", fontSize: 10, fontWeight: 900, color: "#000" }}>
-                          {token.wallet_count}W
-                        </div>
-                        <div>
-                          <div style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>
-                            {token.token_symbol || token.token_name?.slice(0, 12) || "Unknown"}
+            {heatmapOpen && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 6 }}>
+                {heatmap.map((token: any) => {
+                  const heat = token.wallet_count >= 5 ? "#f97316" : token.wallet_count >= 3 ? "#eab308" : "#4ade80";
+                  const fmtVol = (v: number) => v >= 1000000 ? `$${(v/1000000).toFixed(1)}M` : `$${(v/1000).toFixed(0)}K`;
+                  const h1Color = token.volume_h1 > 0 && token.volume_h6 > 0 ? (token.volume_h1 > token.volume_h6/6 ? "#4ade80" : "#f87171") : "#555";
+                  return (
+                    <a key={token.token_address} href={`https://dexscreener.com/solana/${token.token_address}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+                      <div style={{ background: "#111", borderRadius: 12, padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <div style={{ background: heat, borderRadius: 6, padding: "3px 8px", fontSize: 10, fontWeight: 900, color: "#000" }}>{token.wallet_count}W</div>
+                          <div>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>{token.token_symbol || token.token_name?.slice(0, 12) || "Unknown"}</div>
+                            <div style={{ fontSize: 9, color: "#555", marginTop: 1 }}>{token.avg_win_rate ? `⚡ ${token.avg_win_rate}% win-rate` : ""}</div>
                           </div>
-                          <div style={{ fontSize: 9, color: "#444", marginTop: 1 }}>
-                            {token.avg_win_rate ? `⚡ ${token.avg_win_rate}% win-rate` : ""}
-                            
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: 11, fontWeight: 800, color: "#fff" }}>{token.market_cap >= 1000000 ? `$${(token.market_cap/1000000).toFixed(1)}M` : `$${(token.market_cap/1000).toFixed(0)}K`}</div>
+                          <div style={{ fontSize: 9, marginTop: 2, display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                            {token.volume_m5 > 0 && <span style={{ color: "#555" }}>5m {fmtVol(token.volume_m5)}</span>}
+                            {token.volume_h1 > 0 && <span style={{ color: h1Color }}>1h {fmtVol(token.volume_h1)}</span>}
+                            {token.volume_24h > 0 && <span style={{ color: "#555" }}>24h {fmtVol(token.volume_24h)}</span>}
                           </div>
                         </div>
                       </div>
-                      <div style={{ textAlign: "right" }}>
-                        {token.market_cap > 0 && (
-                          <div style={{ fontSize: 11, fontWeight: 800, color: "#fff" }}>
-                            {token.market_cap >= 1_000_000 ? `${(token.market_cap/1_000_000).toFixed(1)}M` : `${(token.market_cap/1_000).toFixed(0)}K`}
-                          </div>
-                        )}
+                    </a>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
                         {token.volume_24h > 0 && (
                           <div style={{ fontSize: 9, color: "#444", marginTop: 2 }}>
                             {token.volume_h6 > 0 && <span style={{ color: "#555" }}>6h ${(token.volume_h6/1000).toFixed(0)}K · </span>}
