@@ -28,6 +28,7 @@ export default function TerminalPage() {
   const [lastUpdate, setLastUpdate] = useState("");
   const [globalMcap, setGlobalMcap] = useState<any>(null);
   const [solTps, setSolTps] = useState<number | null>(null);
+  const [heatmap, setHeatmap] = useState<any[]>([]);
 
   useEffect(() => {
     async function load() {
@@ -52,7 +53,19 @@ export default function TerminalPage() {
     }
     load();
     const interval = setInterval(load, 60_000);
-    return () => clearInterval(interval);
+
+    // Heatmap separat laden
+    async function loadHeatmap() {
+      try {
+        const res = await fetch("/api/terminal/heatmap");
+        const data = await res.json();
+        setHeatmap(data.heatmap || []);
+      } catch {}
+    }
+    loadHeatmap();
+    const heatmapInterval = setInterval(loadHeatmap, 120_000);
+
+    return () => { clearInterval(interval); clearInterval(heatmapInterval); };
   }, []);
 
   const fgValue = parseInt(fg?.value || "0");
@@ -208,6 +221,60 @@ export default function TerminalPage() {
             ))}
           </div>
         </div>
+
+        {/* Smart Money Heatmap */}
+        {heatmap.length > 0 && (
+          <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
+              <span style={{ fontSize: 16 }}>🧠</span>
+              <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>SMART MONEY HEATMAP · LAST 24H</div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 6 }}>
+              {heatmap.map((token: any) => {
+                const heat = token.wallet_count >= 5 ? "#f97316" : token.wallet_count >= 3 ? "#eab308" : "#4ade80";
+                const mcapChange = token.mcap_change;
+                return (
+                  
+                    key={token.token_address}
+                    href={`https://dexscreener.com/solana/${token.token_address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <div style={{ background: "#111", borderRadius: 12, padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ background: heat, borderRadius: 6, padding: "3px 8px", fontSize: 10, fontWeight: 900, color: "#000" }}>
+                          {token.wallet_count}W
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>
+                            {token.token_symbol || token.token_name?.slice(0, 12) || "Unknown"}
+                          </div>
+                          <div style={{ fontSize: 9, color: "#444", marginTop: 1 }}>
+                            {token.avg_win_rate ? `⚡ ${token.avg_win_rate}% win-rate` : ""}
+                            {token.still_holding > 0 ? ` · ${token.still_holding} still holding` : ""}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        {token.market_cap > 0 && (
+                          <div style={{ fontSize: 11, fontWeight: 800, color: "#fff" }}>
+                            {token.market_cap >= 1_000_000 ? `${(token.market_cap/1_000_000).toFixed(1)}M` : `${(token.market_cap/1_000).toFixed(0)}K`}
+                          </div>
+                        )}
+                        {mcapChange !== null && (
+                          <div style={{ fontSize: 10, fontWeight: 700, color: mcapChange >= 0 ? "#4ade80" : "#f87171" }}>
+                            {mcapChange >= 0 ? "+" : ""}{mcapChange.toFixed(0)}%
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* TEFT Tools */}
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
