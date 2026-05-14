@@ -11,7 +11,7 @@ const supabase = createClient(
 
 export async function GET() {
   try {
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
     const { data: signals } = await supabase
       .from("pulse_signals")
