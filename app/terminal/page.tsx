@@ -78,7 +78,7 @@ export default function TerminalPage() {
         {/* TEFT Card */}
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14 }}>
-            <img src="https://pump.fun/_next/image?url=https%3A%2F%2Fdd.dexscreener.com%2Fds-data%2Ftokens%2Fsolana%2F8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump.png&w=48&q=75" alt="TEFT" style={{ width: 16, height: 16, borderRadius: "50%" }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            <img src="https://dd.dexscreener.com/ds-data/tokens/solana/8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump.png" alt="TEFT" style={{ width: 16, height: 16, borderRadius: "50%" }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
             <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>$TEFT · SOLANA</div>
           </div>
           {loading ? <div style={{ color: "#333", fontSize: 12 }}>Loading...</div> : teft ? <>
