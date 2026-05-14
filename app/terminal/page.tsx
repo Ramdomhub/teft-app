@@ -269,22 +269,25 @@ export default function TerminalPage() {
           <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>QUICK LINKS</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {[
-              { label: "Buy TEFT on Jupiter", url: `https://jup.ag/swap/SOL-8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump?referral=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&feeBps=50` },
-              { label: "DexScreener Chart", url: `https://dexscreener.com/solana/8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump` },
-              { label: "X / Twitter", url: "https://x.com/TEFTofficial" },
-              { label: "Telegram", url: "https://t.me/teftlegionofficial" },
-              { label: "NFT Staking", url: "https://www.solsuite.io/teftsupreme" },
-            ].map(({ label, url }) => (
+              { label: "Buy TEFT on Jupiter", url: `https://jup.ag/swap/SOL-8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump?referral=7A9fc8QBgvEKLvqoXfAhyfKuo2vHzUrjre6jbbGorere&feeBps=50`, icon: "https://jup.ag/favicon.ico" },
+              { label: "DexScreener Chart", url: `https://dexscreener.com/solana/8Zut3ywVRpWf73rsLHHckh3BRmXz4iKemcmx3nmPpump`, icon: "https://dexscreener.com/favicon.ico" },
+              { label: "X / Twitter", url: "https://x.com/TEFTofficial", icon: "https://abs.twimg.com/favicons/twitter.3.ico" },
+              { label: "Telegram", url: "https://t.me/teftlegionofficial", icon: "https://telegram.org/favicon.ico" },
+              { label: "NFT Staking", url: "https://www.solsuite.io/teftsupreme", icon: "https://www.solsuite.io/favicon.ico" },
+            ].map(({ label, url, icon }: any) => (
               <a key={label} href={url} target="_blank" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#111", border: "1px solid #1a1a1a", borderRadius: 10, padding: "10px 14px", textDecoration: "none" }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#888" }}>{label}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <img src={icon} alt={label} style={{ width: 16, height: 16, borderRadius: 4 }} onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#888" }}>{label}</span>
+                </div>
                 <span style={{ fontSize: 11, color: "#444" }}>↗</span>
               </a>
             ))}
           </div>
         </div>
 
-        {/* Smart Money Heatmap */}
-        {heatmap.length > 0 && (
+        {/* Smart Money Heatmap - Coming Soon */}
+        {false && (
           <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
             <div onClick={() => setHeatmapOpen(!heatmapOpen)} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: heatmapOpen ? 16 : 0, cursor: "pointer" }}>
               <span style={{ fontSize: 16 }}>🧠</span>
@@ -350,10 +353,10 @@ export default function TerminalPage() {
           <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em", marginBottom: 14 }}>TEFT TOOLS</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {[
-              { label: "TEFT Pulse", desc: "Smart wallet signals", url: "/pulse" },
-              { label: "TEFT Identity", desc: "Your on-chain rank", url: "/identity" },
-              { label: "Dust Remover", desc: "Recover SOL from empty accounts", url: "/terminal/dust" },
-              { label: "Memo Sender", desc: "Send on-chain messages with SOL", url: "/terminal/memo" },
+              { label: "TEFT Pulse", desc: "Smart wallet signals", url: "/pulse", icon: "⚡" },
+              { label: "TEFT Identity", desc: "Your on-chain rank", url: "/identity", icon: "🎖️" },
+              { label: "Dust Remover", desc: "Recover SOL from empty accounts", url: "/terminal/dust", icon: "🧹" },
+              { label: "Memo Sender", desc: "Send on-chain messages with SOL", url: "/terminal/memo", icon: "📨" },
               { label: "NFT Marketplace", desc: "Get TEFT NFTs", url: "/nft-marketplace" },
             ].map(({ label, desc, url }) => (
               <a key={label} href={url} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#111", border: "1px solid #1a1a1a", borderRadius: 10, padding: "10px 14px", textDecoration: "none" }}>
