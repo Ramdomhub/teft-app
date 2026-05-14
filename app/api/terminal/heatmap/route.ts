@@ -19,7 +19,7 @@ export async function GET() {
       .gte("created_at", since)
       .order("created_at", { ascending: false });
 
-    if (!signals || signals.length === 0) return NextResponse.json({ heatmap: [] });
+    if (!signals || signals.length === 0) return NextResponse.json({ heatmap: [], debug: "no signals", since });
 
     const { data: wallets } = await supabase
       .from("smart_wallets")
@@ -76,6 +76,6 @@ export async function GET() {
 
     return NextResponse.json({ heatmap });
   } catch (e: any) {
-    return NextResponse.json({ heatmap: [], error: e.message });
+    return NextResponse.json({ heatmap: [], error: e.message, stack: e.stack });
   }
 }
