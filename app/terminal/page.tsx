@@ -26,6 +26,7 @@ export default function TerminalPage() {
   const [holders, setHolders] = useState<number | null>(null);
   const [treasury, setTreasury] = useState<any>(null);
   const [lastUpdate, setLastUpdate] = useState("");
+  const [globalMcap, setGlobalMcap] = useState<any>(null);
 
   useEffect(() => {
     async function load() {
@@ -40,7 +41,7 @@ export default function TerminalPage() {
         setHolders(data.holders || null);
         setTreasury(data.treasury || null);
         setHolders(data.holders || null);
-        setTreasury(data.treasury || null);
+        setGlobalMcap(data.globalMcap || null);
       } catch (e) { console.error(e); }
       finally {
         setLoading(false);
@@ -121,6 +122,18 @@ export default function TerminalPage() {
             </div>
           ))}
         </div>
+
+        {/* Global Market Cap */}
+        {globalMcap && (
+          <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 14 }}>
+              <span style={{ fontSize: 16 }}>🌐</span>
+              <div style={{ fontSize: 9, color: "#444", fontWeight: 800, letterSpacing: "0.1em" }}>GLOBAL CRYPTO MARKET CAP</div>
+            </div>
+            <div style={{ fontSize: 28, fontWeight: 900, color: "#fff", marginBottom: 4 }}>{fmt(globalMcap.usd)}</div>
+            <div style={{ fontSize: 11 }}>{pct(globalMcap.change)}</div>
+          </div>
+        )}
 
         {/* Fear & Greed */}
         <div style={{ background: "#0d0d0d", border: "1px solid #1e1e1e", borderRadius: 20, padding: 20, marginBottom: 12 }}>

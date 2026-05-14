@@ -9,9 +9,10 @@ const DAILY_DISTRIBUTION = 500; // TEFT per NFT per day
 
 export async function GET() {
   try {
-    const [teftRes, cgRes, fgRes, news1Res, news2Res, news3Res, holdersRes, treasuryRes] = await Promise.allSettled([
+    const [teftRes, cgRes, globalRes, fgRes, news1Res, news2Res, news3Res, holdersRes, treasuryRes] = await Promise.allSettled([
       fetch(`https://api.dexscreener.com/tokens/v1/solana/${TEFT_MINT}`, { cache: "no-store" }),
       fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana,bitcoin&vs_currencies=usd&include_24hr_change=true&include_market_cap=true"),
+      fetch("https://api.coingecko.com/api/v3/global"),
       fetch("https://api.alternative.me/fng/?limit=1"),
       fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fcointelegraph.com%2Frss"),
       fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fnews.bitcoin.com%2Ffeed%2F"),
@@ -102,7 +103,19 @@ export async function GET() {
       } catch {}
     }
 
-    return NextResponse.json({ teft, cg, fg, news, holders, treasury });
+    // Global Market Cap
+    let globalMcap = null;
+    if (globalRes.status === "fulfilled" && globalRes.value.ok) {
+      try {
+        const gData = await globalRes.value.json();
+        globalMcap = {
+          usd: gData.data?.total_market_cap?.usd || null,
+          change: gData.data?.market_cap_change_percentage_24h_usd || null,
+        };
+      } catch {}
+    }
+
+    return NextResponse.json({ teft, cg, fg, news, holders, treasury, globalMcap });
   } catch (e) {
     return NextResponse.json({ teft: null, cg: null, fg: null, news: [] });
   }
