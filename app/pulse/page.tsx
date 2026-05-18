@@ -272,7 +272,7 @@ function LegendModal({ onClose }: { onClose: () => void }) {
         ))}
 
         <p style={{ color: "#555", fontSize: 11, marginTop: 8 }}>
-          ⚠️ Not financial advice. DYOR. For informational purposes only.
+          ⚠️ Not financial advice. DYOR. For informational purposes only. · <a href="/terms" style={{ color: "#555", textDecoration: "underline" }}>Terms</a>
         </p>
       </div>
     </div>
@@ -896,7 +896,7 @@ export default function PulsePage() {
           borderRadius: 12, padding: "10px 14px", marginBottom: 16,
           color: "#333", fontSize: 10, lineHeight: 1.6,
         }}>
-          High risk. Many tokens will fail. Not financial advice. DYOR.
+          High risk. Many tokens will fail. Not financial advice. DYOR. · <a href="/terms" style={{ color: "#555", textDecoration: "underline" }}>Terms of Service</a>
         </div>
 
         {loading ? (
