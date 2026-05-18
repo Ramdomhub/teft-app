@@ -203,6 +203,7 @@ export default function TerminalPage() {
                   
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 900, color: "#f7931a", marginTop: 2 }}>{globalMcap.btcDominance?.toFixed(1)}%</div>
+                  <div style={{ fontSize: 8, color: "#333", marginTop: 2 }}>via CoinGecko</div>
               </div>
               <div style={{ background: "#111", borderRadius: 8, padding: "8px 10px" }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
